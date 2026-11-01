@@ -24,10 +24,10 @@
             <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#2C2C2C"/>
             <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#2F2F2F"/>
             <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#4B8BFF"/>
-            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#3A7AE8"/>
-            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#8BB4FF"/>
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#4B8BFF"/>
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#D6E4E7"/>
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#9CC9D2"/>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#9CC9D2"/>
             <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#202020"/>
             <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#1B1B1B"/>
             <SolidColorBrush x:Key="HcwFogBrush" Color="#1B1B1B"/>
@@ -36,9 +36,10 @@
             <SolidColorBrush x:Key="HcwInkBrush" Color="#F3F3F3"/>
             <SolidColorBrush x:Key="HcwMutedBrush" Color="#C8C8C8"/>
             <SolidColorBrush x:Key="HcwEdgeBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="HcwAccentBrush" Color="#4B8BFF"/>
-            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#8BB4FF"/>
-            <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="HcwAccentBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#9CC9D2"/>
+            <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#16232B"/>
             <SolidColorBrush x:Key="HcwDangerBrush" Color="#FF99A4"/>
             <SolidColorBrush x:Key="HcwNeuDarkBrush" Color="#00000000"/>
             <SolidColorBrush x:Key="HcwNeuLightBrush" Color="#00000000"/>
@@ -62,10 +63,10 @@
             <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#F1F5FA"/>
             <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="#D8DEE8"/>
-            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#1F5FD1"/>
-            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#1A52B8"/>
-            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#1F5FD1"/>
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#1F5FD1"/>
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#D6E4E7"/>
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#3B6670"/>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#3B6670"/>
             <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#EEF2F8"/>
             <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#E4EAF2"/>
             <SolidColorBrush x:Key="HcwFogBrush" Color="#E4EAF2"/>
@@ -74,9 +75,10 @@
             <SolidColorBrush x:Key="HcwInkBrush" Color="#1A2332"/>
             <SolidColorBrush x:Key="HcwMutedBrush" Color="#64748B"/>
             <SolidColorBrush x:Key="HcwEdgeBrush" Color="#D8DEE8"/>
-            <SolidColorBrush x:Key="HcwAccentBrush" Color="#1F5FD1"/>
-            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#1A52B8"/>
-            <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="HcwAccentBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#B3C6CB"/>
+            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#3B6670"/>
+            <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#16232B"/>
             <SolidColorBrush x:Key="HcwDangerBrush" Color="#B83A26"/>
             <SolidColorBrush x:Key="HcwNeuDarkBrush" Color="#00000000"/>
             <SolidColorBrush x:Key="HcwNeuLightBrush" Color="#00000000"/>
@@ -100,10 +102,10 @@
             <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#2C2C2C"/>
             <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#2F2F2F"/>
             <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#4B8BFF"/>
-            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#3A7AE8"/>
-            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#8BB4FF"/>
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#4B8BFF"/>
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#D6E4E7"/>
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#9CC9D2"/>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#9CC9D2"/>
             <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#202020"/>
             <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#1B1B1B"/>
             <SolidColorBrush x:Key="HcwFogBrush" Color="#1B1B1B"/>
@@ -112,9 +114,10 @@
             <SolidColorBrush x:Key="HcwInkBrush" Color="#F3F3F3"/>
             <SolidColorBrush x:Key="HcwMutedBrush" Color="#C8C8C8"/>
             <SolidColorBrush x:Key="HcwEdgeBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="HcwAccentBrush" Color="#4B8BFF"/>
-            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#8BB4FF"/>
-            <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="HcwAccentBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#E4EEF0"/>
+            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#9CC9D2"/>
+            <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#16232B"/>
             <SolidColorBrush x:Key="HcwDangerBrush" Color="#FF99A4"/>
             <SolidColorBrush x:Key="HcwNeuDarkBrush" Color="#00000000"/>
             <SolidColorBrush x:Key="HcwNeuLightBrush" Color="#00000000"/>

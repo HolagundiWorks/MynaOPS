@@ -7,7 +7,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteColors.xaml"/>
-                <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteAccent.Blue.xaml"/>
+                <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteAccent.Sand.xaml"/>
                 <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteStyles.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Themes/OUiTheme.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Themes/OUiFluentBridge.xaml"/>
@@ -16,17 +16,17 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <ResourceDictionary.MergedDictionaries>
-                        <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteLight.Blue.xaml"/>
+                        <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteLight.Sand.xaml"/>
                     </ResourceDictionary.MergedDictionaries>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Default">
                     <ResourceDictionary.MergedDictionaries>
-                        <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteDark.Blue.xaml"/>
+                        <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteDark.Sand.xaml"/>
                     </ResourceDictionary.MergedDictionaries>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <ResourceDictionary.MergedDictionaries>
-                        <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteDark.Blue.xaml"/>
+                        <ResourceDictionary Source="ms-appx:///O.Ui/Themes/SuiteDark.Sand.xaml"/>
                     </ResourceDictionary.MergedDictionaries>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">

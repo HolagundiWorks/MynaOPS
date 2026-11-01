@@ -127,12 +127,12 @@
         </Setter>
     </Style>
 
-    <!-- Primary / commit — Radiant Orange scarce; 44 dock / override to 35 on ribbon -->
+    <!-- Primary / commit: Wild Sand (the O-CoreOp colour) with Mirage text; a thin edge keeps it visible on light surfaces; 44 dock / override to 35 on ribbon -->
     <Style x:Key="HcwPrimaryButton" TargetType="Button">
         <Setter Property="Background" Value="{ThemeResource HcwAccentBrush}"/>
         <Setter Property="Foreground" Value="{ThemeResource HcwOnAccentBrush}"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="{ThemeResource HcwAccentEdgeBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="{StaticResource HcwCornerButton}"/>
         <Setter Property="Height" Value="26"/>
         <Setter Property="MinHeight" Value="26"/>
