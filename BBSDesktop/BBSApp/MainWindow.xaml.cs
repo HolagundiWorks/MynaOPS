@@ -96,7 +96,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
 
     private void WireBottomShell()
     {
-        _askBar = new O.Ui.Controls.SuiteAskBar("Ask about this project…");
+        _askBar = new O.Ui.Controls.SuiteAskBar("Ask about this project…") { OwnerWindow = WinRT.Interop.WindowNative.GetWindowHandle(this) };
         _askBar.Send.Click += AiSend_Click;
         _askBar.Input.KeyDown += AiInput_KeyDown;
         AskHost.Children.Add(_askBar);
