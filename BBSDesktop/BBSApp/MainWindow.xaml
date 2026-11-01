@@ -62,29 +62,9 @@
                  AutomationProperties.Name="Menu bar">
             <!-- Company first · work · Exit (same File shape as O-Studio). -->
             <MenuBarItem Title="File" AccessKey="F">
-                <MenuFlyoutItem Text="New project" Click="New_Click" AccessKey="N">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE710;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Open project…" Click="Open_Click" AccessKey="O">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE8E5;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem x:Name="OpenActiveItem" Text="Open O-Draft's project" Click="OpenActive_Click" IsEnabled="False">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE8A7;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
                 <MenuFlyoutItem Text="Save" Click="Save_Click" AccessKey="S">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE74E;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Save as…" Click="SaveAs_Click">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE792;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>

@@ -1021,14 +1021,6 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         await dlg.ShowAsync();
     }
 
-    private void New_Click(object sender, RoutedEventArgs e)
-    {
-        ProjectStore.Current.Reset();
-        RefreshWindowTitle();
-        UpdatePersonaBadge();
-        SelectNavTag("dashboard");
-    }
-
     private async void ImportCad_Click(object sender, RoutedEventArgs e)
     {
         var picker = new FileOpenPicker();
@@ -1118,54 +1110,16 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         AppNotify.Success("Import from CAD", "Last CAD import undone.");
     }
 
-    private async void Open_Click(object sender, RoutedEventArgs e)
-    {
-        var picker = new FileOpenPicker();
-        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-        picker.FileTypeFilter.Add(ProjectFiles.Extension);
-        picker.FileTypeFilter.Add(".bbsproj");     // a project from before: opens, and Save as puts it in a project file
-        picker.FileTypeFilter.Add(".json");
-        var file = await picker.PickSingleFileAsync();
-        if (file is null) return;
-        OpenProjectFile(file.Path);
-    }
-
-    private DateTime _activeStamp = DateTime.MaxValue;
-    private string? _activePath;
-
     /// <summary>
-    /// Follow the drawing O-Draft has open: O-Draft keeps a pointer to the project file (<see cref="ActiveProject"/>). When the pointer
-    /// changes, the project here is switched to that file if it has no unsaved changes, else the user is told and can switch from the File menu.
+    /// The project is chosen and locked in the launcher, so there is no pointer to follow any more; what stays is the poll of the project file's
+    /// revision, which tells when O-Draft recorded a take-off.
     /// </summary>
     private void StartActiveProjectWatch()
     {
         var t = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-        t.Tick += (_, _) => CheckActiveProject();
+        t.Tick += (_, _) => _ = ServedProject.PollAsync(ProjectStore.Current.FilePath);
         t.Start();
-        CheckActiveProject();
-    }
-
-    private void CheckActiveProject()
-    {
         _ = ServedProject.PollAsync(ProjectStore.Current.FilePath);
-        DateTime stamp;
-        try { stamp = File.Exists(ActiveProject.PointerPath) ? File.GetLastWriteTimeUtc(ActiveProject.PointerPath) : DateTime.MinValue; }
-        catch { return; }
-        if (stamp == _activeStamp) return;
-        _activeStamp = stamp;
-
-        var active = ActiveProject.Read();
-        _activePath = active?.Project;
-        bool differs = _activePath is not null && !ActiveProject.SamePath(_activePath, ProjectStore.Current.FilePath);
-        OpenActiveItem.IsEnabled = differs;
-        if (!differs || active is null) return;
-        if (!ProjectStore.Current.IsDirty) OpenProjectFile(_activePath!);
-        else AppNotify.Warning("O-Draft", $"O-Draft has {Path.GetFileName(active.Drawing)} open. Save this project, then File > Open O-Draft's project to work on the same .osp file.");
-    }
-
-    private void OpenActive_Click(object sender, RoutedEventArgs e)
-    {
-        if (_activePath is not null) OpenProjectFile(_activePath);
     }
 
     /// <summary>Make the project in a project file the open one.</summary>
@@ -1185,15 +1139,10 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrEmpty(ProjectStore.Current.FilePath))
+        // The project file is the locked project's; there is nowhere else to save to. Without one, start from the launcher.
+        if (string.IsNullOrEmpty(ProjectStore.Current.FilePath) || !ProjectFiles.IsOdp(ProjectStore.Current.FilePath))
         {
-            SaveAs_Click(sender, e);
-            return;
-        }
-        // A project from before (.bbsproj) is saved into a project file, never back into the old format.
-        if (!ProjectFiles.IsOdp(ProjectStore.Current.FilePath))
-        {
-            SaveAs_Click(sender, e);
+            AppNotify.Warning("Save", "There is no project file to save to. Choose and lock a project in the launcher, then open O-CoreOp from it.");
             return;
         }
         if (!ProjectFiles.Save(ProjectStore.Current.FilePath, ProjectStore.Current.ToJson(), out var err))
@@ -1209,33 +1158,4 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         }
     }
 
-    private async void SaveAs_Click(object sender, RoutedEventArgs e)
-    {
-        var picker = new FileSavePicker();
-        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-        picker.SuggestedFileName = ProjectStore.Current.Name.Replace(' ', '_');
-        picker.FileTypeChoices.Add(Branding.ProjectFileFilter, new List<string> { Branding.ProjectExtension });
-        var file = await picker.PickSaveFileAsync();
-        if (file is null) return;
-        var from = ProjectStore.Current.FilePath;
-        // A new project file takes a copy of the one this project came from, so the drawing and take-off stay with the project.
-        if (ProjectFiles.IsOdp(from) && !File.Exists(file.Path) && !string.Equals(from, file.Path, StringComparison.OrdinalIgnoreCase))
-        {
-            try { File.Copy(from!, file.Path); }
-            catch (Exception ex) { AppNotify.Error("Save failed", ex.Message); return; }
-        }
-        if (!ProjectFiles.Save(file.Path, ProjectStore.Current.ToJson(), out var err))
-        {
-            AppNotify.Error("Save failed", err ?? "Could not save.");
-            return;
-        }
-        ProjectStore.Current.FilePath = file.Path;
-        ProjectStore.Current.Info.OspPath = file.Path;
-        ProjectStore.Current.IsDirty = false;
-        RefreshWindowTitle();
-        AppNotify.Success("Saved", file.Name);
-        var companyErr = BBSApp.Services.Company.CompanyService.TryPushProjectSummary(ProjectStore.Current);
-        if (companyErr is not null)
-            AppNotify.Warning("Company file", companyErr);
-    }
 }

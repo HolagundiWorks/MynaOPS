@@ -43,6 +43,19 @@ public sealed partial class MainWindow
         }
     }
 
+    /// <summary>Open the project the launcher locked. It must lie in a project folder that exists; the file itself is made on the first save.</summary>
+    internal void OpenLockedProject(Office.Shared.LockedProject locked)
+    {
+        var folder = Path.GetDirectoryName(locked.OspPath);
+        if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))
+        {
+            AppNotify.Error("Project", $"The folder of the locked project was not found: {folder}. Choose the project again in the launcher.");
+            return;
+        }
+
+        OpenProjectFile(locked.OspPath);
+    }
+
     void StartCompanyPolling()
     {
         CompanyService.Changed += () => DispatcherQueue.TryEnqueue(RefreshCompanyBadge);
