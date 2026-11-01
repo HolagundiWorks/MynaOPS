@@ -101,9 +101,15 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         _askBar.Input.KeyDown += AiInput_KeyDown;
         AskHost.Children.Add(_askBar);
 
+        // An element can have one parent: adding one that still has its XAML parent throws a COMException ("No installed components were
+        // detected"), which ended the app at start. Take each control out of BottomShellParts before it goes into the status strip.
+        BottomShellParts.Children.Remove(NavCalcBtn);
         StatusStrip.Left.Children.Add(NavCalcBtn);
-        foreach (var child in BottomShellRight.Children)
+        foreach (var child in BottomShellRight.Children.ToList())
+        {
+            BottomShellRight.Children.Remove(child);
             StatusStrip.Right.Children.Add(child);
+        }
         BottomShellParts.Children.Clear();
     }
 
