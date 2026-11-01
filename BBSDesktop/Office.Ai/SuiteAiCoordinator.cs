@@ -6,7 +6,7 @@ using Office.Shared;
 namespace Office.Ai;
 
 /// <summary>
-/// One Olmo host per machine on loopback :8742. O-Studio starts it when a company workspace is open; sibling apps use <see cref="RemoteLlm"/>.
+/// One Olmo host per machine on loopback :8742. The suite launcher hosts it for as long as it runs; the apps use <see cref="RemoteLlm"/>.
 /// O-CoreOp alone may still host when the port is free (solo use).
 /// </summary>
 public static class SuiteAiCoordinator
@@ -48,7 +48,7 @@ public static class SuiteAiCoordinator
             if (remote is not null)
                 return (null, remote, null);
             if (PreferClient)
-                return (null, null, "Open O-Studio and sign in — the assistant model (Olmo 3 7B) runs there.");
+                return (null, null, "Start the suite launcher — it hosts the assistant model (Olmo 3 7B).");
         }
 
         if (!LocalLlmHost.Installed)
