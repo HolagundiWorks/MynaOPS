@@ -59,7 +59,7 @@ Source: "..\artifacts\publish\*"; DestDir: "{app}"; Flags: ignoreversion recurse
 Root: HKCU; Subkey: "Software\Classes\.osp"; ValueType: string; ValueName: ""; ValueData: "OSAS.Project"; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project"; ValueType: string; ValueName: ""; ValueData: "O-Suite project"; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop"; ValueType: string; ValueName: ""; ValueData: "Open in O-CoreOp"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-Studio\launcher\O-Studio.Launcher.exe"" --open ""%1"" --app O-CoreOp"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
