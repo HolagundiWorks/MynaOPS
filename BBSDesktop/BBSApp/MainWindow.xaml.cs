@@ -632,6 +632,8 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         }
     }
 
+    private void AiChip_Click(object sender, RoutedEventArgs e) => _askBar?.Input.Focus(FocusState.Programmatic);
+
     private void CalcFab_Click(object sender, RoutedEventArgs e)
     {
         var open = FloatingCalcPanel.Visibility != Visibility.Visible;

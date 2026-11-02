@@ -41,33 +41,42 @@ public sealed class ResultTable : UserControl
 
     public ResultTable()
     {
-        if (Application.Current.Resources.TryGetValue("SubtleFillColorTertiaryBrush", out var alt)
-            && alt is Brush ab)
-            _grid.AlternatingRowBackground = ab;
-        if (Application.Current.Resources.TryGetValue("CardStrokeColorDefaultBrush", out var stroke)
-            && stroke is Brush sb)
-        {
-            _grid.HorizontalGridLinesBrush = sb;
-            _grid.VerticalGridLinesBrush = sb;
-        }
-
-        // The grid's header takes the Windows chrome colours (near black in the dark theme); use the suite's.
-        if (Application.Current.Resources.TryGetValue("ControlFillColorSecondaryBrush", out var head) && head is Brush hb)
-        {
-            // The grid declares both a colour and a brush for each state; set both so whichever the header reads is ours.
-            foreach (var key in new[] { "DataGridColumnHeaderBackgroundBrush", "DataGridColumnHeaderPointerOverBrush", "DataGridColumnHeaderPressedBrush", "DataGridColumnHeaderDraggedBackgroundBrush" })
-                _grid.Resources[key] = hb;
-            if (hb is SolidColorBrush solid)
-                foreach (var key in new[] { "DataGridColumnHeaderBackgroundColor", "DataGridColumnHeaderHoveredBackgroundColor", "DataGridColumnHeaderPressedBackgroundColor" })
-                    _grid.Resources[key] = solid.Color;
-        }
-        if (Application.Current.Resources.TryGetValue("TextFillColorPrimaryBrush", out var ink) && ink is Brush ib)
-            _grid.Resources["DataGridColumnHeaderForegroundBrush"] = ib;
+        ApplyChrome();
+        // The colours are read from the suite theme; read them again when the person switches light and dark.
+        Loaded += (_, _) => O.Ui.SuiteAppearance.Changed += OnAppearanceChanged;
+        Unloaded += (_, _) => O.Ui.SuiteAppearance.Changed -= OnAppearanceChanged;
 
         Content = _grid;
         _grid.ItemsSource = _rows;
         AutomationProperties.SetName(this, "Results table");
         AutomationProperties.SetName(_grid, "Results table");
+    }
+
+    void OnAppearanceChanged(ElementTheme _) => DispatcherQueue.TryEnqueue(ApplyChrome);
+
+    void ApplyChrome()
+    {
+        if (O.Ui.SuiteAppearance.TryBrush("SubtleFillColorTertiaryBrush") is { } alt)
+            _grid.AlternatingRowBackground = alt;
+        if (O.Ui.SuiteAppearance.TryBrush("CardStrokeColorDefaultBrush") is { } stroke)
+        {
+            _grid.HorizontalGridLinesBrush = stroke;
+            _grid.VerticalGridLinesBrush = stroke;
+        }
+
+        // The grid's header takes the Windows chrome colours (near black in the dark theme); use the suite's. The grid declares
+        // both a colour and a brush for each state; set both so whichever the header reads is ours.
+        if (O.Ui.SuiteAppearance.TryBrush("ControlFillColorSecondaryBrush") is { } head)
+        {
+            foreach (var key in new[] { "DataGridColumnHeaderBackgroundBrush", "DataGridColumnHeaderPointerOverBrush", "DataGridColumnHeaderPressedBrush", "DataGridColumnHeaderDraggedBackgroundBrush" })
+                _grid.Resources[key] = head;
+            if (head is SolidColorBrush solid)
+                foreach (var key in new[] { "DataGridColumnHeaderBackgroundColor", "DataGridColumnHeaderHoveredBackgroundColor", "DataGridColumnHeaderPressedBackgroundColor" })
+                    _grid.Resources[key] = solid.Color;
+        }
+
+        if (O.Ui.SuiteAppearance.TryBrush("TextFillColorPrimaryBrush") is { } ink)
+            _grid.Resources["DataGridColumnHeaderForegroundBrush"] = ink;
     }
 
     public void SetAutomationName(string name)
