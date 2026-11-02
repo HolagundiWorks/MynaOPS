@@ -51,6 +51,19 @@ public sealed class ResultTable : UserControl
             _grid.VerticalGridLinesBrush = sb;
         }
 
+        // The grid's header takes the Windows chrome colours (near black in the dark theme); use the suite's.
+        if (Application.Current.Resources.TryGetValue("ControlFillColorSecondaryBrush", out var head) && head is Brush hb)
+        {
+            // The grid declares both a colour and a brush for each state; set both so whichever the header reads is ours.
+            foreach (var key in new[] { "DataGridColumnHeaderBackgroundBrush", "DataGridColumnHeaderPointerOverBrush", "DataGridColumnHeaderPressedBrush", "DataGridColumnHeaderDraggedBackgroundBrush" })
+                _grid.Resources[key] = hb;
+            if (hb is SolidColorBrush solid)
+                foreach (var key in new[] { "DataGridColumnHeaderBackgroundColor", "DataGridColumnHeaderHoveredBackgroundColor", "DataGridColumnHeaderPressedBackgroundColor" })
+                    _grid.Resources[key] = solid.Color;
+        }
+        if (Application.Current.Resources.TryGetValue("TextFillColorPrimaryBrush", out var ink) && ink is Brush ib)
+            _grid.Resources["DataGridColumnHeaderForegroundBrush"] = ib;
+
         Content = _grid;
         _grid.ItemsSource = _rows;
         AutomationProperties.SetName(this, "Results table");
