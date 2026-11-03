@@ -149,7 +149,7 @@ public sealed partial class ElementPage : Page
             SketchPanel.Visibility = Visibility.Visible;
             Grid.SetColumnSpan(SheetBorder, 1);
             Diagram.SetKind(spec.Kind);
-            Diagram.Update(BuildDiagramSnapshot(), DiagramPart.None);
+                Diagram.Update(BuildDiagramSnapshot(), DiagramPart.None);
         }
         else
         {

@@ -12,4 +12,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- O-Draft's reinforced concrete smart blocks (assets/smartblocks/rcc.json there); the same definitions draw the details in O-CoreOp. -->
+    <EmbeddedResource Include="SmartBlocks/rcc.json" />
+  </ItemGroup>
 </Project>

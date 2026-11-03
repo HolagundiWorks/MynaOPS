@@ -13,6 +13,13 @@ public sealed record OdpTakeoffHeader(uint Slot, string State, string Json);
 public sealed record OdpTakeoffRow(uint Slot, int Kind, uint N, string Json);
 
 /// <summary>
+/// A structural detail O-Draft recorded: one RCC block placed in a drawing and the parameters it was drawn with (<see cref="ParamsJson"/> is an object of
+/// numbers). O-CoreOp only reads these and draws them; the drawing is changed in O-Draft. <see cref="Kind"/> is the element page: beams, columns, slabs,
+/// footings or lintels.
+/// </summary>
+public sealed record OdpDetail(string Id, string Drawing, string Handle, string Kind, string Block, string ParamsJson, string Layer, string Label);
+
+/// <summary>
 /// A project file, <c>.osp</c> (format <c>osp</c>, version 1): one SQLite file with the drawing, the take-off O-Draft recorded, the O-CoreOp project,
 /// attachments and markups. This is the .NET side of <c>aad-odp</c> (O-Draft's Rust crate); both read and write the same file. Every committed change raises
 /// <c>meta.revision</c> by one and leaves <c>change</c> rows (what sync sends). The file is in WAL mode: another program may have it open, one writes while
@@ -43,6 +50,10 @@ CREATE TABLE IF NOT EXISTS asset (
 CREATE TABLE IF NOT EXISTS markup (
     id TEXT PRIMARY KEY, drawing TEXT NOT NULL, author TEXT NOT NULL, created TEXT NOT NULL, kind TEXT NOT NULL,
     json TEXT NOT NULL, text TEXT NOT NULL DEFAULT '', resolved INTEGER NOT NULL DEFAULT 0
+) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS detail (
+    id TEXT PRIMARY KEY, drawing TEXT NOT NULL, handle TEXT NOT NULL, kind TEXT NOT NULL, block TEXT NOT NULL, params TEXT NOT NULL,
+    layer TEXT NOT NULL, label TEXT NOT NULL
 ) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, created TEXT NOT NULL, label TEXT NOT NULL, bytes BLOB NOT NULL);
 CREATE TABLE IF NOT EXISTS change (revision INTEGER NOT NULL, tbl TEXT NOT NULL, key TEXT NOT NULL, op TEXT NOT NULL);
@@ -141,6 +152,19 @@ CREATE INDEX IF NOT EXISTS change_revision ON change (revision);";
         using var cmd = Command("SELECT kind, n, json FROM takeoff_row WHERE slot = $s ORDER BY kind, n", ("$s", (long)slot));
         using var r = cmd.ExecuteReader();
         while (r.Read()) list.Add(new OdpTakeoffRow(slot, (int)r.GetInt64(0), (uint)r.GetInt64(1), r.GetString(2)));
+        return list;
+    }
+
+    /// <summary>The structural details O-Draft recorded (all of them, or those of one element page), in id order.</summary>
+    public IReadOnlyList<OdpDetail> Details(string? kind = null)
+    {
+        var list = new List<OdpDetail>();
+        using var cmd = kind is null
+            ? Command("SELECT id, drawing, handle, kind, block, params, layer, label FROM detail ORDER BY id")
+            : Command("SELECT id, drawing, handle, kind, block, params, layer, label FROM detail WHERE kind = $k ORDER BY id", ("$k", kind));
+        using var r = cmd.ExecuteReader();
+        while (r.Read())
+            list.Add(new OdpDetail(r.GetString(0), r.GetString(1), r.GetString(2), r.GetString(3), r.GetString(4), r.GetString(5), r.GetString(6), r.GetString(7)));
         return list;
     }
 

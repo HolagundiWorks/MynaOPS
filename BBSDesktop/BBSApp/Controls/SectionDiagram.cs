@@ -4,9 +4,13 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using BBSApp.Services;
+using BBSApp.Services.Odp;
+using Office.Shared;
+using Office.Shared.SmartBlocks;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
 using Windows.UI;
@@ -136,6 +140,12 @@ public sealed class SectionDiagram : UserControl
     private DiagramPart _part = DiagramPart.None;
     private DiagramSnapshot _snap = new();
 
+    // Beams, columns, slabs, footings and lintels show the detail O-Draft drew (an RCC block recorded in the project file), read only: O-CoreOp
+    // never changes a drawing, so there is nothing to edit or redraw here, only a choice of which recorded detail to look at.
+    private IReadOnlyList<OdpDetail> _details = [];
+    private readonly ComboBox _detailBox = new() { HorizontalAlignment = HorizontalAlignment.Stretch, FontSize = 11, Margin = new Thickness(0, 0, 0, 2), Visibility = Visibility.Collapsed };
+    private bool _fillingDetails;
+
     // Distinct colours per bar diameter (mm) — readable on light/dark mica
     private static readonly Dictionary<int, Color> DiaPalette = new()
     {
@@ -156,27 +166,107 @@ public sealed class SectionDiagram : UserControl
     {
         var root = new StackPanel { Spacing = 2 };
         root.Children.Add(_caption);
+        _detailBox.SelectionChanged += (_, _) =>
+        {
+            if (!_fillingDetails)
+                Redraw();
+        };
+        root.Children.Add(_detailBox);
         var frame = new Border
         {
             Background = (Brush)Application.Current.Resources["SubtleFillColorSecondaryBrush"],
             CornerRadius = new CornerRadius(6),
             Padding = new Thickness(6),
-            Child = _canvas,
-            HorizontalAlignment = HorizontalAlignment.Center
+            // The drawing keeps its size when there is room and shrinks to fit a narrow panel.
+            Child = new Viewbox { Stretch = Stretch.Uniform, StretchDirection = StretchDirection.DownOnly, Child = _canvas },
+            HorizontalAlignment = HorizontalAlignment.Stretch
         };
         root.Children.Add(frame);
         root.Children.Add(_legend);
         root.Children.Add(_hint);
         Content = root;
         ActualThemeChanged += (_, _) => Redraw();
-        Loaded += (_, _) => Redraw();
+        Loaded += (_, _) =>
+        {
+            ServedProject.Changed += OnProjectChanged;
+            LoadDetails();
+            Redraw();
+        };
+        Unloaded += (_, _) => ServedProject.Changed -= OnProjectChanged;
     }
 
     public void SetKind(string kind)
     {
         _kind = kind;
+        LoadDetails();
         Redraw();
     }
+
+    private void OnProjectChanged() => DispatcherQueue.TryEnqueue(() =>
+    {
+        LoadDetails();
+        Redraw();
+    });
+
+    /// <summary>Read the details O-Draft recorded for this kind of element from the open project file and list them.</summary>
+    private void LoadDetails()
+    {
+        _details = StructuralDetail.Supports(_kind) ? StructuralDetail.Load(ProjectStore.Current.FilePath, _kind) : [];
+        _fillingDetails = true;
+        var keep = (_detailBox.SelectedItem as ComboBoxItem)?.Tag as string;
+        _detailBox.Items.Clear();
+        foreach (var d in _details)
+            _detailBox.Items.Add(new ComboBoxItem { Content = $"{d.Label} · {d.Layer} · {d.Handle}", Tag = d.Id });
+        _detailBox.SelectedIndex = Math.Max(0, _details.Select(d => d.Id).ToList().IndexOf(keep ?? ""));
+        _detailBox.Visibility = _details.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        _fillingDetails = false;
+    }
+
+    /// <summary>Draw the selected detail from O-Draft, or say there is none yet.</summary>
+    private void DrawDrawnInDraft()
+    {
+        var kindName = _kind switch { "beams" => "beam", "columns" => "column", "slabs" => "slab", "footings" => "footing", _ => "lintel" };
+        var chosen = _detailBox.SelectedIndex is >= 0 and var i && i < _details.Count ? _details[i] : null;
+        var geometry = chosen is null ? null : StructuralDetail.Geometry(chosen);
+        if (chosen is null || geometry is null)
+        {
+            var note = new TextBlock
+            {
+                Text = chosen is null
+                    ? $"No {kindName} has been detailed in O-Draft yet."
+                    : $"The {kindName} detail from O-Draft could not be drawn.",
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Center,
+                Width = 240,
+                FontSize = 12,
+                Foreground = Brush("TextFillColorSecondaryBrush", Colors.DimGray),
+            };
+            Canvas.SetLeft(note, 30);
+            Canvas.SetTop(note, 150);
+            _canvas.Children.Add(note);
+            _caption.Text = $"{char.ToUpperInvariant(kindName[0])}{kindName[1..]} detail";
+            _hint.Text = $"Place an RCC {kindName} in O-Draft and save the project; its detail appears here. Details are drawn in O-Draft and are read only in O-CoreOp.";
+            return;
+        }
+        var ink = new SmartBlockPainter.Ink(
+            Brush("TextFillColorPrimaryBrush", Colors.Black),
+            Brush("TextFillColorSecondaryBrush", Colors.DimGray),
+            Brush("TextFillColorTertiaryBrush", Colors.Gray),
+            dia => new SolidColorBrush(BarColor(dia)));
+        var scale = SmartBlockPainter.Paint(_canvas, geometry, ink);
+        _caption.Text = chosen.Label;
+        _hint.Text = $"Drawn in O-Draft (layer {chosen.Layer}, object {chosen.Handle}); read only. Change it in O-Draft and save: it updates here. Scale {scale:0.00} px per mm.{(_kind == "slabs" ? " A 1.2 m strip of the span is shown." : "")}";
+        foreach (var d in geometry.Prims.OfType<DotPrim>().Select(d => (int)Math.Round(d.R * 2)).Distinct().OrderBy(d => d))
+        {
+            var chip = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 3 };
+            chip.Children.Add(new Ellipse { Width = 9, Height = 9, Fill = new SolidColorBrush(BarColor(d)) });
+            chip.Children.Add(new TextBlock { Text = $"{d} dia", FontSize = 10 });
+            _legend.Children.Add(chip);
+        }
+    }
+
+    private static Color BarColor(double dia) =>
+        DiaPalette.OrderBy(k => Math.Abs(k.Key - dia)).First().Value;
 
     public void Update(DiagramSnapshot snap, DiagramPart part, string? caption = null)
     {
@@ -347,6 +437,12 @@ public sealed class SectionDiagram : UserControl
         var muted = Brush("TextFillColorTertiaryBrush", Colors.Gray);
         var line = Brush("TextFillColorSecondaryBrush", Colors.DimGray);
         var accent = Brush("AccentFillColorDefaultBrush", Color.FromArgb(255, 0, 120, 212));
+
+        if (StructuralDetail.Supports(_kind))
+        {
+            DrawDrawnInDraft();
+            return;
+        }
 
         switch (_kind)
         {
