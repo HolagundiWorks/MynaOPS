@@ -43,6 +43,40 @@ public sealed partial class MainWindow
         }
     }
 
+    O.Ui.Controls.SuiteWelcomeCard? _welcome;
+
+    /// <summary>The first screen when O-CoreOp runs without a locked project (development and tests): the suite's welcome card, over the work area until a project opens.</summary>
+    internal void ShowWelcome()
+    {
+        var lockup = Path.Combine(AppContext.BaseDirectory, "Assets", "lockup.png");
+        if (_welcome is not null || !File.Exists(lockup))
+            return;
+        _welcome = new O.Ui.Controls.SuiteWelcomeCard("O-CoreOp", lockup,
+            "Projects are chosen and locked in the O-Studio launcher. Pick one there and O-CoreOp opens on it, with the company's details read from O-Studio.");
+        var open = new Button { Content = "Open the launcher" };
+        if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var style) && style is Style accent)
+            open.Style = accent;
+        open.Click += (_, _) =>
+        {
+            if (!SuiteProjectLock.RequestLauncher("O-CoreOp"))
+                AppNotify.Warning("Launcher", "The O-Studio launcher was not found. Install O-Studio, then try again.");
+        };
+        _welcome.Actions.Children.Add(open);
+        Microsoft.UI.Xaml.Controls.Grid.SetRow(_welcome, 0);
+        Microsoft.UI.Xaml.Controls.Grid.SetRowSpan(_welcome, 3);
+        _welcome.Backdrop = WorkArea.Background;
+        Microsoft.UI.Xaml.Controls.Canvas.SetZIndex(_welcome, 100);
+        WorkArea.Children.Add(_welcome);
+    }
+
+    void HideWelcome()
+    {
+        if (_welcome is null)
+            return;
+        WorkArea.Children.Remove(_welcome);
+        _welcome = null;
+    }
+
     /// <summary>Open the project the launcher locked. It must lie in a project folder that exists; the file itself is made on the first save.</summary>
     internal void OpenLockedProject(Office.Shared.LockedProject locked)
     {

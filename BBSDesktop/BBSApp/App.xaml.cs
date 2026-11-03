@@ -43,5 +43,7 @@ public partial class App : Application
         var file = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(a => Services.ProjectFiles.IsOdp(a) && System.IO.File.Exists(a));
         if (file is not null)
             MainWindow.DispatcherQueue.TryEnqueue(() => MainWindow.OpenProjectFile(System.IO.Path.GetFullPath(file)));
+        else
+            MainWindow.DispatcherQueue.TryEnqueue(MainWindow.ShowWelcome);
     }
 }

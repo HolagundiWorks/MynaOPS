@@ -1133,6 +1133,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
     /// <summary>Make the project in a project file the open one.</summary>
     internal void OpenProjectFile(string path)
     {
+        HideWelcome();
         if (!ProjectFiles.OpenInto(ProjectStore.Current, path, out var err))
         {
             AppNotify.Error("Open failed", err ?? "Could not open project.");
