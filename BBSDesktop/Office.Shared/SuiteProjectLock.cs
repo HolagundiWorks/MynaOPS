@@ -7,7 +7,7 @@ using System.Globalization;
 namespace Office.Shared;
 
 /// <summary>The project the launcher locked: its id in the company file and its project file.</summary>
-public sealed record LockedProject(long ProjectId, string OspPath);
+public sealed record LockedProject(long ProjectId, string OspPath, string? DisplayName = null);
 
 /// <summary>
 /// The project is chosen in the launcher (or O-Studio), never in this app. The launcher starts the app with
@@ -23,9 +23,10 @@ public static class SuiteProjectLock
     {
         var osp = Environment.GetEnvironmentVariable(SuiteWire.EnvProjectOsp);
         var id = Environment.GetEnvironmentVariable(SuiteWire.EnvProjectId);
+        var name = Environment.GetEnvironmentVariable(SuiteWire.EnvProjectName);
         if (string.IsNullOrWhiteSpace(osp) || !long.TryParse(id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var projectId))
             return null;
-        return new LockedProject(projectId, osp);
+        return new LockedProject(projectId, osp, string.IsNullOrWhiteSpace(name) ? null : name.Trim());
     }
 
     /// <summary>Development and automated tests set <c>OSTUDIO_STANDALONE=1</c> to run without the launcher.</summary>

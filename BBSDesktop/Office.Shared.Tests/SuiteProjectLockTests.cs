@@ -14,6 +14,7 @@ public class SuiteProjectLockTests : IDisposable
     {
         Environment.SetEnvironmentVariable(SuiteWire.EnvProjectId, null);
         Environment.SetEnvironmentVariable(SuiteWire.EnvProjectOsp, null);
+        Environment.SetEnvironmentVariable(SuiteWire.EnvProjectName, null);
         Environment.SetEnvironmentVariable(SuiteProjectLock.EnvStandalone, null);
     }
 
@@ -29,6 +30,15 @@ public class SuiteProjectLockTests : IDisposable
         Environment.SetEnvironmentVariable(SuiteWire.EnvProjectId, "17");
         Environment.SetEnvironmentVariable(SuiteWire.EnvProjectOsp, @"C:\Practice\p17\project.osp");
         Assert.Equal(new LockedProject(17, @"C:\Practice\p17\project.osp"), SuiteProjectLock.FromEnvironment());
+    }
+
+    [Fact]
+    public void The_launcher_can_pass_the_studio_project_name()
+    {
+        Environment.SetEnvironmentVariable(SuiteWire.EnvProjectId, "17");
+        Environment.SetEnvironmentVariable(SuiteWire.EnvProjectOsp, @"C:\Practice\p17\project.osp");
+        Environment.SetEnvironmentVariable(SuiteWire.EnvProjectName, "Rao Residence");
+        Assert.Equal(new LockedProject(17, @"C:\Practice\p17\project.osp", "Rao Residence"), SuiteProjectLock.FromEnvironment());
     }
 
     [Theory]

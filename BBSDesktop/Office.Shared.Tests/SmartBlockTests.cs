@@ -48,7 +48,11 @@ public sealed class SmartBlockTests
     {
         var ids = SmartBlockLibrary.All.Select(b => b.Id).ToList();
         Assert.Equal(
-            ["rcc.column.rect", "rcc.column.circular", "rcc.beam.section", "rcc.footing.plan", "rcc.footing.section", "rcc.lintel.section", "rcc.slab.section"],
+            [
+                "rcc.column.rect", "rcc.column.circular", "rcc.beam.section", "rcc.footing.plan",
+                "rcc.footing.section", "rcc.footing.combined", "rcc.raft.lift", "rcc.beam.elevation",
+                "rcc.lintel.section", "rcc.slab.section"
+            ],
             ids);
         var column = SmartBlockLibrary.Find("rcc.column.rect")!;
         foreach (var name in new[] { "width", "depth", "cover", "nx", "ny", "bar", "tie", "tiesp", "fck", "fy", "exposure" })

@@ -87,7 +87,7 @@ public sealed partial class MainWindow
             return;
         }
 
-        OpenProjectFile(locked.OspPath);
+        OpenProjectFile(locked.OspPath, locked.DisplayName);
     }
 
     void StartCompanyPolling()

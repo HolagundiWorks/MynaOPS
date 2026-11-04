@@ -1131,13 +1131,23 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
     }
 
     /// <summary>Make the project in a project file the open one.</summary>
-    internal void OpenProjectFile(string path)
+    internal void OpenProjectFile(string path, string? launcherDisplayName = null)
     {
         HideWelcome();
         if (!ProjectFiles.OpenInto(ProjectStore.Current, path, out var err))
         {
             AppNotify.Error("Open failed", err ?? "Could not open project.");
             return;
+        }
+        if (!string.IsNullOrWhiteSpace(launcherDisplayName))
+        {
+            var stem = Path.GetFileNameWithoutExtension(path);
+            if (string.IsNullOrWhiteSpace(ProjectStore.Current.Info.Name)
+                || ProjectStore.Current.Name.Equals(stem, StringComparison.OrdinalIgnoreCase)
+                || ProjectStore.Current.Name == "Untitled Project")
+            {
+                ProjectStore.Current.Name = launcherDisplayName.Trim();
+            }
         }
         RefreshWindowTitle();
         UpdatePersonaBadge();

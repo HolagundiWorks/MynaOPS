@@ -438,7 +438,7 @@ public sealed class SectionDiagram : UserControl
         var line = Brush("TextFillColorSecondaryBrush", Colors.DimGray);
         var accent = Brush("AccentFillColorDefaultBrush", Color.FromArgb(255, 0, 120, 212));
 
-        if (StructuralDetail.Supports(_kind))
+        if (StructuralDetail.Supports(_kind) && _details.Count > 0)
         {
             DrawDrawnInDraft();
             return;

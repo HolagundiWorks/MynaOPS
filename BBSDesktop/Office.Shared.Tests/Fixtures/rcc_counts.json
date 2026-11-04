@@ -39,7 +39,7 @@
     "counts": {
       "dot": 5,
       "hatch": 1,
-      "poly": 2,
+      "poly": 3,
       "text": 2
     },
     "id": "rcc.beam.section",
@@ -48,7 +48,7 @@
   {
     "counts": {
       "dot": 8,
-      "poly": 4,
+      "poly": 5,
       "text": 2
     },
     "id": "rcc.beam.section",
@@ -76,9 +76,9 @@
   {
     "counts": {
       "dot": 10,
-      "hatch": 1,
+      "hatch": 2,
       "line": 2,
-      "poly": 6,
+      "poly": 7,
       "text": 1
     },
     "id": "rcc.footing.section",
@@ -87,9 +87,9 @@
   {
     "counts": {
       "dot": 23,
-      "hatch": 1,
+      "hatch": 2,
       "line": 2,
-      "poly": 6,
+      "poly": 7,
       "text": 1
     },
     "id": "rcc.footing.section",
@@ -115,7 +115,7 @@
   },
   {
     "counts": {
-      "dot": 15,
+      "dot": 20,
       "hatch": 1,
       "line": 1,
       "poly": 1,
@@ -133,5 +133,34 @@
     },
     "id": "rcc.slab.section",
     "params": "span=1200, spacing=100, hatch=0"
+  },
+  {
+    "counts": {
+      "line": 82,
+      "poly": 4,
+      "text": 1
+    },
+    "id": "rcc.footing.combined",
+    "params": ""
+  },
+  {
+    "counts": {
+      "hatch": 1,
+      "line": 34,
+      "poly": 3,
+      "text": 1
+    },
+    "id": "rcc.raft.lift",
+    "params": ""
+  },
+  {
+    "counts": {
+      "dot": 6,
+      "line": 25,
+      "poly": 1,
+      "text": 1
+    },
+    "id": "rcc.beam.elevation",
+    "params": ""
   }
 ]
