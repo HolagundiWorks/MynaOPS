@@ -44,18 +44,17 @@ public sealed class SmartBlockTests
     }
 
     [Fact]
-    public void The_library_has_the_seven_rcc_blocks_with_their_parameters()
+    public void The_library_has_the_eleven_rcc_blocks_with_their_parameters()
     {
         var ids = SmartBlockLibrary.All.Select(b => b.Id).ToList();
         Assert.Equal(
             [
-                "rcc.column.rect", "rcc.column.circular", "rcc.beam.section", "rcc.footing.plan",
-                "rcc.footing.section", "rcc.footing.combined", "rcc.raft.lift", "rcc.beam.elevation",
-                "rcc.lintel.section", "rcc.slab.section"
+                "rcc.column.rect", "rcc.column.circular", "rcc.beam.section", "rcc.beam.elevation", "rcc.stirrup.detail",
+                "rcc.footing.plan", "rcc.footing.section", "rcc.footing.combined", "rcc.raft.lift", "rcc.lintel.section", "rcc.slab.section",
             ],
             ids);
         var column = SmartBlockLibrary.Find("rcc.column.rect")!;
-        foreach (var name in new[] { "width", "depth", "cover", "nx", "ny", "bar", "tie", "tiesp", "fck", "fy", "exposure" })
+        foreach (var name in new[] { "width", "depth", "cover", "nx", "ny", "bar", "bar2", "tie", "tiesp", "fck", "fy", "exposure", "dims", "ftin" })
             Assert.NotNull(column.Param(name));
     }
 
@@ -77,12 +76,63 @@ public sealed class SmartBlockTests
     {
         var g = SmartBlockLibrary.Find("rcc.column.rect")!.Evaluate();
         Assert.Equal(6, g.Counts()["dot"]); // 2 bars on each width face and 1 more on each depth face
-        var (x0, y0, x1, y1) = g.Bounds()!.Value;
-        Assert.Equal(230, x1 - x0, 6);
-        Assert.Equal(450, y1 - y0, 6);
-        Assert.Contains(g.Prims.OfType<TextPrim>(), t => t.Value.Contains("6-16 dia") && t.Value.Contains("@ 150 c/c") && t.Value.Contains("M25, Fe500"));
+        var outline = g.Prims.OfType<PolyPrim>().First();
+        Assert.Equal(230, outline.Pts.Max(p => p.X) - outline.Pts.Min(p => p.X), 6);
+        Assert.Equal(450, outline.Pts.Max(p => p.Y) - outline.Pts.Min(p => p.Y), 6);
+        var texts = g.Prims.OfType<TextPrim>().Select(t => t.Value).ToList();
+        Assert.Contains("6Y16", texts); // the bars, as a schedule writes them
+        Assert.Contains("Ties-Y8@6\"", texts); // the ties at 150 mm, in inches
+        Assert.Contains("M25, Fe500", texts);
+        Assert.Contains("9\"", texts); // the width and depth dimensions, in feet and inches
+        Assert.Contains("1'-5.5\"", texts);
+        // Bars are coloured by their place: ties and cross-ties green, the dimensions orange.
+        Assert.All(g.Prims.OfType<DotPrim>(), d => Assert.Equal(1, d.Color));
         var more = SmartBlockLibrary.Find("rcc.column.rect")!.Evaluate(new Dictionary<string, double> { ["ny"] = 4, ["bar"] = 20 });
         Assert.Equal(8, more.Counts()["dot"]);
+    }
+
+    [Fact]
+    public void Bars_of_two_diameters_are_named_and_coloured_apart()
+    {
+        var g = SmartBlockLibrary.Find("rcc.column.rect")!.Evaluate(new Dictionary<string, double> { ["nx"] = 4, ["ny"] = 3, ["bar"] = 20, ["bar2"] = 16 });
+        Assert.Contains(g.Prims.OfType<TextPrim>(), t => t.Value == "4Y20 + 6Y16");
+        Assert.Equal(4, g.Prims.OfType<DotPrim>().Count(d => d.Color == 1)); // the corners
+        Assert.Equal(6, g.Prims.OfType<DotPrim>().Count(d => d.Color == 6)); // the others
+        // Two intermediate bars on the width face make two cross-ties, one on the depth face makes one more.
+        Assert.Equal(2, g.Prims.OfType<LinePrim>().Count(l => l.Color == 4));
+        Assert.Equal(1, g.Prims.OfType<LinePrim>().Count(l => l.Color == 3));
+    }
+
+    [Theory]
+    [InlineData(229, "9\"")]
+    [InlineData(450, "1'-5.5\"")]
+    [InlineData(1830, "6'-0\"")]
+    [InlineData(38, "1.5\"")]
+    [InlineData(100, "4\"")]
+    public void Lengths_in_feet_and_inches_round_to_a_half_inch(double mm, string want) => Assert.Equal(want, SmartBlockDef.FeetInches(mm));
+
+    [Fact]
+    public void Dimensions_can_be_shown_in_millimetres()
+    {
+        var g = SmartBlockLibrary.Find("rcc.column.rect")!.Evaluate(new Dictionary<string, double> { ["ftin"] = 0 });
+        var texts = g.Prims.OfType<TextPrim>().Select(t => t.Value).ToList();
+        Assert.Contains("230", texts);
+        Assert.Contains("450", texts);
+        Assert.Contains("Ties-Y8@150", texts);
+    }
+
+    [Fact]
+    public void A_beam_in_elevation_has_its_stirrup_zones_and_curtailment_dimensions()
+    {
+        var g = SmartBlockLibrary.Find("rcc.beam.elevation")!.Evaluate();
+        var texts = g.Prims.OfType<TextPrim>().Select(t => t.Value).ToList();
+        Assert.Contains("5 nos @ 6\"", texts);
+        Assert.Contains("@ 7\"", texts);
+        Assert.Contains("2'-11.5\"", texts); // 900 mm of extra top bar from each support face
+        Assert.Contains("2Y12", texts);
+        Assert.Contains("1Y16", texts);
+        var vertical = g.Prims.OfType<TextPrim>().Count(t => t.RotationDeg == 90);
+        Assert.Equal(0, vertical);
     }
 
     [Fact]

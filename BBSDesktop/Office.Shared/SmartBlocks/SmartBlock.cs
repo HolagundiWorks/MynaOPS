@@ -19,7 +19,11 @@ public sealed record SmartParam(string Name, string Label, string Unit, double D
 public sealed record SmartVar(string Name, SmartNum Expr);
 
 /// <summary>One drawing item of a definition: a shape, shown only when <see cref="When"/> is above zero.</summary>
-public abstract record SmartItem(SmartNum? When);
+public abstract record SmartItem(SmartNum? When)
+{
+    /// <summary>An AutoCAD colour index for this item (bars by diameter, ties, dimensions); null for the reference's colour.</summary>
+    public int? Color { get; init; }
+}
 
 public sealed record LineItem(SmartNum? When, SmartNum[] A) : SmartItem(When);
 public sealed record RectItem(SmartNum? When, SmartNum[] A, bool Centred) : SmartItem(When);
@@ -30,12 +34,14 @@ public sealed record ArcItem(SmartNum? When, SmartNum[] A) : SmartItem(When);
 public sealed record TextItem(SmartNum? When, SmartNum[] At, SmartNum Height, string Value, bool Centred, SmartNum? Rotation) : SmartItem(When);
 public sealed record HatchItem(SmartNum? When, SmartNum[][] Pts, string Pattern, SmartNum? Scale) : SmartItem(When);
 public sealed record RingItem(SmartNum? When, SmartNum[] C, SmartNum R, SmartNum Count, SmartNum Dot) : SmartItem(When);
+public sealed record DimItem(SmartNum? When, SmartNum[] From, SmartNum[] To, SmartNum Off, SmartNum Height, string? Text) : SmartItem(When);
+public sealed record LeaderItem(SmartNum? When, SmartNum[] From, SmartNum[] To, SmartNum Height, string Text) : SmartItem(When);
 public sealed record RepeatItem(SmartNum? When, string Var, SmartNum Count, IReadOnlyList<SmartItem> Items) : SmartItem(When);
 
 /// <summary>A parametric block: parameters, derived values and the items that draw it (format <c>osas-smartblocks</c> version 1, as O-Draft reads it).</summary>
 public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadOnlyList<SmartParam> Params, IReadOnlyList<SmartVar> Vars, IReadOnlyList<SmartItem> Items)
 {
-    private static readonly string[] Shapes = ["line", "rect", "crect", "poly", "circle", "dot", "arc", "text", "hatch", "ring", "repeat"];
+    private static readonly string[] Shapes = ["line", "rect", "crect", "poly", "circle", "dot", "arc", "text", "hatch", "ring", "dim", "leader", "repeat"];
 
     public SmartParam? Param(string name) => Params.FirstOrDefault(p => p.Name == name);
 
@@ -90,11 +96,68 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
 
         private (double X, double Y) Pt(SmartNum[] p) => (N(p[0]), N(p[1]));
 
+        private int? color;
+
         private void Add(SmartPrim p)
         {
             if (Out.Count >= MaxObjects)
                 throw new SmartBlockException($"`{def.Id}` makes more than {MaxObjects} objects");
-            Out.Add(p);
+            Out.Add(p with { Color = color });
+        }
+
+        /// <summary>Whether lengths are shown in feet and inches (the <c>ftin</c> parameter above zero) rather than millimetres.</summary>
+        private string Length(double mm) => vars.TryGetValue("ftin", out var f) && f > 0 ? FeetInches(mm) : FormatNumber(mm);
+
+        private void Dim(DimItem d)
+        {
+            const int orange = 30;
+            color = d.Color ?? orange;
+            var (a, b, off, h) = (Pt(d.From), Pt(d.To), N(d.Off), N(d.Height));
+            if (h <= 0)
+                throw new SmartBlockException($"`{def.Id}`: dimension text height must be positive");
+            var horizontal = Math.Abs(b.X - a.X) >= Math.Abs(b.Y - a.Y);
+            var len = horizontal ? Math.Abs(b.X - a.X) : Math.Abs(b.Y - a.Y);
+            if (len < 1e-6)
+                return;
+            // m runs along the dimension and n across it; the dimension line is at off across.
+            (double X, double Y) At(double m, double n) => horizontal ? (m, n) : (n, m);
+            var (m0, m1) = horizontal ? (a.X, b.X) : (a.Y, b.Y);
+            var (n0, n1) = horizontal ? (a.Y, b.Y) : (a.X, b.X);
+            var side = off < 0 ? -1.0 : 1.0;
+            var lineN = n0 + off;
+            void Seg((double X, double Y) p, (double X, double Y) q) => Add(new LinePrim(p.X, p.Y, q.X, q.Y));
+            Seg(At(m0, lineN), At(m1, lineN));
+            foreach (var (m, n) in new[] { (m0, n0), (m1, n1) })
+            {
+                Seg(At(m, n + side * h * 0.3), At(m, lineN + side * h * 0.5));
+                var t = h * 0.45;
+                Seg(At(m - t, lineN - t), At(m + t, lineN + t));
+            }
+            var value = d.Text is { } text ? Substitute(text) : Length(len);
+            var mid = (m0 + m1) / 2;
+            if (horizontal)
+            {
+                var (x, y) = side > 0 ? (mid, lineN + h * 0.35) : (mid, lineN - h * 0.35);
+                Add(new TextPrim(x, y, h, value, false, 0, "c", side > 0 ? "b" : "t"));
+            }
+            else
+            {
+                var (x, y) = At(mid, lineN + side * h * 0.35);
+                Add(new TextPrim(x, y, h, value, false, 90, "c", side > 0 ? "t" : "b"));
+            }
+        }
+
+        private void Leader(LeaderItem l)
+        {
+            const int orange = 30;
+            color = l.Color ?? orange;
+            var (a, b, h) = (Pt(l.From), Pt(l.To), N(l.Height));
+            if (h <= 0)
+                throw new SmartBlockException($"`{def.Id}`: leader text height must be positive");
+            var side = b.X < a.X ? -1.0 : 1.0;
+            var land = (X: b.X + side * h * 1.5, Y: b.Y);
+            Add(new PolyPrim([a, b, land], false));
+            Add(new TextPrim(land.X + side * h * 0.3, land.Y - h * 0.35, h, Substitute(l.Text), false, 0, side < 0 ? "r" : "l", "b"));
         }
 
         private int Count(SmartNum n)
@@ -109,7 +172,9 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
             {
                 if (it.When is { } w && N(w) <= 0)
                     continue;
+                color = it.Color;
                 Item(it);
+                color = null;
             }
         }
 
@@ -189,6 +254,12 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
                     }
                     break;
                 }
+                case DimItem d:
+                    Dim(d);
+                    break;
+                case LeaderItem l:
+                    Leader(l);
+                    break;
                 case RepeatItem rep:
                 {
                     var n = Count(rep.Count);
@@ -226,7 +297,8 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
                     break;
                 }
                 var name = after[..j].ToString();
-                sb.Append(Label(name) ?? "{" + name + "}");
+                var shown = name.EndsWith(":len", StringComparison.Ordinal) ? (vars.TryGetValue(name[..^4], out var mm) ? Length(mm) : null) : Label(name);
+                sb.Append(shown ?? "{" + name + "}");
                 rest = after[(j + 1)..];
             }
             sb.Append(rest);
@@ -241,6 +313,15 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
             var c = p?.Choices.FirstOrDefault(c => c.Value == v);
             return c is not null ? c.Label : FormatNumber(v);
         }
+    }
+
+    /// <summary>A length in feet and inches to the nearest half inch: <c>1'-6"</c>, <c>9"</c>, <c>1.5"</c>.</summary>
+    public static string FeetInches(double mm)
+    {
+        var inches = Math.Round(mm / 25.4 * 2, MidpointRounding.AwayFromZero) / 2;
+        var feet = Math.Floor(inches / 12);
+        var rest = FormatNumber(inches - feet * 12);
+        return feet >= 1 ? $"{FormatNumber(feet)}'-{rest}\"" : $"{rest}\"";
     }
 
     public static string FormatNumber(double v)
@@ -311,6 +392,12 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
         var when = e.TryGetProperty("when", out var w) ? Num(w) : null;
         var shape = Shapes.FirstOrDefault(s => e.TryGetProperty(s, out _)) ?? throw new SmartBlockException("an item has no shape");
         var v = e.GetProperty(shape);
+        var color = e.TryGetProperty("color", out var cc) && cc.ValueKind == JsonValueKind.Number ? cc.GetInt32() : (int?)null;
+        return (Shaped(shape, when, v, e)) with { Color = color };
+    }
+
+    private static SmartItem Shaped(string shape, SmartNum? when, JsonElement v, JsonElement e)
+    {
         switch (shape)
         {
             case "line": return new LineItem(when, Nums(v));
@@ -330,6 +417,10 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
                     v.TryGetProperty("rotation", out var r) ? Num(r) : null);
             case "hatch":
                 return new HatchItem(when, Pts(v.GetProperty("pts")), v.GetProperty("pattern").GetString() ?? "SOLID", v.TryGetProperty("scale", out var s) ? Num(s) : null);
+            case "dim":
+                return new DimItem(when, Nums(v.GetProperty("from")), Nums(v.GetProperty("to")), Num(v.GetProperty("off")), Num(v.GetProperty("height")), v.TryGetProperty("text", out var dt) ? dt.GetString() : null);
+            case "leader":
+                return new LeaderItem(when, Nums(v.GetProperty("from")), Nums(v.GetProperty("to")), Num(v.GetProperty("height")), v.GetProperty("text").GetString() ?? "");
             case "ring":
                 return new RingItem(when, Nums(v.GetProperty("c")), Num(v.GetProperty("r")), Num(v.GetProperty("count")), Num(v.GetProperty("dot")));
             default:
@@ -339,7 +430,11 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
 }
 
 /// <summary>A drawn element of an evaluated block.</summary>
-public abstract record SmartPrim;
+public abstract record SmartPrim
+{
+    /// <summary>An AutoCAD colour index, or null for the colour of the reference.</summary>
+    public int? Color { get; init; }
+}
 
 public sealed record LinePrim(double X1, double Y1, double X2, double Y2) : SmartPrim;
 
@@ -352,15 +447,29 @@ public sealed record DotPrim(double X, double Y, double R) : SmartPrim;
 
 public sealed record ArcPrim(double X, double Y, double R, double StartDeg, double EndDeg) : SmartPrim;
 
-public sealed record TextPrim(double X, double Y, double Height, string Value, bool Centred, double RotationDeg) : SmartPrim;
+/// <summary>Text at a point. <see cref="Centred"/> is the older middle-centre anchor; otherwise <see cref="H"/> (l, c, r) and <see cref="V"/> (b baseline, t top, m middle) say where the point is.</summary>
+public sealed record TextPrim(double X, double Y, double Height, string Value, bool Centred, double RotationDeg, string H = "l", string V = "b") : SmartPrim;
 
 public sealed record HatchPrim(IReadOnlyList<(double X, double Y)> Pts, string Pattern, double Scale) : SmartPrim;
 
 /// <summary>An evaluated block: its parameter and derived values, and what it draws.</summary>
 public sealed record SmartGeometry(string Id, IReadOnlyDictionary<string, double> Values, IReadOnlyList<SmartPrim> Prims)
 {
-    /// <summary>The extents of the lines, polylines, circles, dots and arcs (not text or hatch), or null when there are none.</summary>
-    public (double MinX, double MinY, double MaxX, double MaxY)? Bounds()
+    /// <summary>The box a text takes, from its anchor and an average character width of 0.6 of its height.</summary>
+    public static (double MinX, double MinY, double MaxX, double MaxY) TextBox(TextPrim t)
+    {
+        var w = t.Value.Length * t.Height * 0.6;
+        var (h, v) = t.Centred ? ("c", "m") : (t.H, t.V);
+        var x0 = h switch { "c" => -w / 2, "r" => -w, _ => 0 };
+        var y0 = v switch { "m" => -t.Height / 2, "t" => -t.Height, _ => 0 };
+        var (x1, y1) = (x0 + w, y0 + t.Height);
+        if (Math.Abs(t.RotationDeg - 90) < 1e-6)
+            (x0, y0, x1, y1) = (-y1, x0, -y0, x1);
+        return (t.X + x0, t.Y + y0, t.X + x1, t.Y + y1);
+    }
+
+    /// <summary>The extents of the lines, polylines, circles, dots and arcs (and the boxes of the texts when <paramref name="withText"/>), or null when there are none.</summary>
+    public (double MinX, double MinY, double MaxX, double MaxY)? Bounds(bool withText = false)
     {
         double x0 = double.MaxValue, y0 = double.MaxValue, x1 = double.MinValue, y1 = double.MinValue;
         void Grow(double x, double y)
@@ -394,6 +503,13 @@ public sealed record SmartGeometry(string Id, IReadOnlyDictionary<string, double
                     Grow(a.X - a.R, a.Y - a.R);
                     Grow(a.X + a.R, a.Y + a.R);
                     break;
+                case TextPrim t when withText:
+                {
+                    var b = TextBox(t);
+                    Grow(b.MinX, b.MinY);
+                    Grow(b.MaxX, b.MaxY);
+                    break;
+                }
             }
         }
         return x0 <= x1 ? (x0, y0, x1, y1) : null;
