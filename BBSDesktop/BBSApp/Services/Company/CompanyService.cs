@@ -32,7 +32,6 @@ public sealed class SharedProjectLink
 public static class CompanyService
 {
     static SharedCompany? _company;
-    static long _lastDataVersion = -1;
 
     /// <summary>Folder for the engine's recent-companies list and temporary working copies.</summary>
     public static string AppDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "O-CoreOp", "office");
@@ -123,7 +122,6 @@ public static class CompanyService
         {
             Close();
             _company = SharedCompany.Open(AppDir, path, user, password, secret, unlock);
-            _lastDataVersion = -1;
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(RememberFile)!);
@@ -142,7 +140,6 @@ public static class CompanyService
         {
             Close();
             _company = SharedCompany.OpenWithTicket(AppDir, path, ticket);
-            _lastDataVersion = -1;
             Changed?.Invoke();
         });
 
