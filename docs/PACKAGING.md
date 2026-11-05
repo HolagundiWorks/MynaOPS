@@ -48,7 +48,8 @@ powershell -File BBSDesktop\installer\sign.ps1 BBSDesktop\artifacts\installer\O-
 
 The OSAS launcher can install this Setup.exe via
 `installer/install-suite.ps1 -ArtifactsDir …` when the file is named
-`O-CoreOp-Setup-*.exe`. The suite installer stages O-Studio, O-CoreOp, and O-Draft; see `docs/SUITE-PACKAGING.md`.
+`O-CoreOp-Setup-*.exe`. Prefer the unified **`O-Suite-Setup-*.exe`** from O-Studio
+(`installer/suite/README.md`): one wizard for install and remove of O-Studio, O-CoreOp, and O-Draft.
 
 ## Update channel (check-only)
 

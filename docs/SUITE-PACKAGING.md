@@ -1,13 +1,20 @@
-# O-CoreOp packaging (suite)
+# O-CoreOp in the unified suite installer
 
-**Status:** Updated after AORMS connector removal · **Updated:** 2026-10-28
+**Status:** Verified in tree 2026-11-04 · **Canonical suite doc:** O-Studio `installer/suite/README.md`
 
-**This repo** is the engine and WinUI app SoT: `bbs_engine`, `AQC.CadImport`, `Office.Shared`, reference `BBSApp` (assembly `O-CoreOp`).
+O-CoreOp is installed through **`O-Suite-Setup-<version>.exe`**, built in the O-Studio repository (`installer/suite/build-single.ps1`). That single package:
 
-Earlier Bridge-only stub hosts (`AQC.BBS`, `AQC.Estimation`, `AQC.PM`) and the shared `Aorms.Bridge` library were removed. Product-specific installers, if revived, should pin this repo and own their own UI without Bridge.
+- **Install mode:** checkbox **O-CoreOp** (or **Everything**); optional shared **Olmo 3 7B** model task (same file O-Draft uses).
+- **Remove mode:** run the same Setup again, choose **Remove applications**, select O-CoreOp only or with other apps; company files and the model stay unless the user removes them elsewhere.
 
-```bat
-dotnet build BBSDesktop\BBSApp\BBSApp.csproj -c Release -p:Platform=x64 -p:WindowsPackageType=None
+Build this app’s payload first:
+
+```powershell
+# From O-STUDIO repo: cargo build --release -p office-ffi  (or office-ffi folder)
+powershell -ExecutionPolicy Bypass -File BBSDesktop\installer\build-installer.ps1 `
+  -OfficeDllDir D:\path\to\O-STUDIO\office-ffi\target\release
 ```
 
-MSIX identities and WinUI domain screens remain follow-on work.
+Output: `BBSDesktop/artifacts/installer/O-CoreOp-Setup-<ver>.exe` (Inno Setup, per user). The suite builder copies it to `installer/suite/stage/` and runs it silently during O-Suite install.
+
+Per-app packaging, signing, and MSIX: [PACKAGING.md](PACKAGING.md).
