@@ -654,18 +654,18 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         {
             e.Handled = true;
             string text = (CalcInput.Text ?? "").Trim();
-            // Arithmetic stays the instant path; anything else goes to the assistant.
+            // The calculator only calculates. A question is typed in the Ask bar, never sent from here.
             if (QuickCalc.TryEvaluate(text, out var result))
             {
                 CalcResult.Text = result;
+                CalcResult.PlaceholderText = "Result";
                 CalcResult.Focus(FocusState.Programmatic);
                 CalcResult.SelectAll();
             }
             else if (!string.IsNullOrWhiteSpace(text))
             {
-                CalcInput.Text = "";
-                AiInput.Text = text;
-                _ = AskAssistantAsync(text);
+                CalcResult.Text = "";
+                CalcResult.PlaceholderText = "Not a calculation";
             }
         }
         else if (e.Key == VirtualKey.Escape)

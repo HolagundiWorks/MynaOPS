@@ -184,8 +184,8 @@
 
                 <!-- Wired into StatusStrip in code -->
                 <StackPanel x:Name="BottomShellParts" Visibility="Collapsed">
-                    <Button x:Name="NavCalcBtn" AutomationProperties.Name="Calculator and ask" Style="{StaticResource HcwGhostButton}" MinWidth="40"
-                            Click="CalcFab_Click" ToolTipService.ToolTip="Calculator · Ask" VerticalAlignment="Center">
+                    <Button x:Name="NavCalcBtn" AutomationProperties.Name="Calculator" Style="{StaticResource HcwGhostButton}" MinWidth="40"
+                            Click="CalcFab_Click" ToolTipService.ToolTip="Calculator" VerticalAlignment="Center">
                         <FontIcon Glyph="&#xE1D0;" FontSize="{StaticResource SuiteIconSize}" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </Button>
                     <StackPanel x:Name="BottomShellRight" Orientation="Horizontal" Spacing="8">
@@ -239,7 +239,7 @@
                 <Border CornerRadius="{StaticResource SuiteCornerControl}" Background="{ThemeResource HcwSoftBrush}" Padding="12">
                     <StackPanel Spacing="{StaticResource SuiteStackGap}">
                         <Grid>
-                            <TextBlock Text="Calculator · Ask"
+                            <TextBlock Text="Calculator"
                                        FontSize="{StaticResource SuiteFontBody}" FontWeight="SemiBold"
                                        FontFamily="{StaticResource HcwFontFamily}"
                                        Foreground="{ThemeResource HcwInkBrush}"
@@ -256,8 +256,8 @@
                             </Button>
                         </Grid>
                         <TextBox x:Name="CalcInput"
-                                 PlaceholderText="Calculate or ask a question"
-                                 AutomationProperties.Name="Calculator or ask input"
+                                 PlaceholderText="Calculate, for example 12*3.5+2"
+                                 AutomationProperties.Name="Calculator input"
                                  FontSize="{StaticResource SuiteFontBody}" MinHeight="{StaticResource SuiteControlMinHeight}"
                                  AcceptsReturn="False" TextWrapping="NoWrap"
                                  KeyDown="CalcInput_KeyDown"
@@ -269,7 +269,7 @@
                                  IsReadOnly="True" AcceptsReturn="False"
                                  Foreground="{ThemeResource HcwAccentTextBrush}"/>
                         <TextBlock FontSize="11" Foreground="{ThemeResource HcwMutedBrush}"
-                                   Text="Enter to calculate · anything else goes to the Ask bar"/>
+                                   Text="Enter selects the result · Esc clears. Questions go to the Ask bar, not here."/>
                     </StackPanel>
                 </Border>
             </Grid>

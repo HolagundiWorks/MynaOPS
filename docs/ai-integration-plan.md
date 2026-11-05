@@ -200,6 +200,8 @@ Smallest change with the widest reach: upgrade the existing floating calculator
 (`CalcInput` / `EvaluateCalc`, `MainWindow.xaml.cs:584`) into an **Ask / command**
 bar.
 
+> **Decision 2026-11-05:** the calculator and Ask are separate. The calculator only calculates; questions go to the Ask bar. This section describes the earlier plan.
+
 - If `QuickCalc.TryEvaluate` succeeds → show the arithmetic result (today's behavior, unchanged).
 - Otherwise → hand the text to `AssistantService.AskAsync` and render the reply,
   with a subtle "working" state while the tool loop runs.

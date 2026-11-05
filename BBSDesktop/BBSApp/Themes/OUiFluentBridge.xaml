@@ -1,5 +1,5 @@
 <!--
-  Bridge Fluent ThemeResource keys → suite glass (light) / graphite (dark) + O-CoreOp blue accent.
+  Bridge Fluent ThemeResource keys → the suite palette (O.Ui tokens: neutrals, ink) and O-CoreOp's accent, Dusk.
   Also hosts Hcw* brushes so shell XAML can use ThemeResource and follow dark/light.
 -->
 <ResourceDictionary
@@ -8,39 +8,39 @@
 
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Default">
-            <SolidColorBrush x:Key="ApplicationPageBackgroundThemeBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="SolidBackgroundFillColorBaseBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="SolidBackgroundFillColorSecondaryBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="#202020"/>
-            <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="#242424"/>
-            <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="SurfaceStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#F3F3F3"/>
-            <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#C8C8C8"/>
-            <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#9A9A9A"/>
-            <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#2F2F2F"/>
-            <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#242424"/>
-            <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#2F2F2F"/>
-            <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#6A42BF"/>
-            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#5A36A8"/>
-            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#B79CF0"/>
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#B79CF0"/>
-            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#202020"/>
-            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="HcwFogBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="HcwSoftBrush" Color="#202020"/>
-            <SolidColorBrush x:Key="HcwWhiteBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="HcwInkBrush" Color="#F3F3F3"/>
-            <SolidColorBrush x:Key="HcwMutedBrush" Color="#C8C8C8"/>
-            <SolidColorBrush x:Key="HcwEdgeBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="HcwAccentBrush" Color="#6A42BF"/>
-            <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#6A42BF"/>
-            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#B79CF0"/>
+            <SolidColorBrush x:Key="ApplicationPageBackgroundThemeBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="SolidBackgroundFillColorBaseBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="SolidBackgroundFillColorSecondaryBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="#242A36"/>
+            <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="#2A3140"/>
+            <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="SurfaceStrokeColorDefaultBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#EEF2F8"/>
+            <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#A8B0BD"/>
+            <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#A8B0BD"/>
+            <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#2A3140"/>
+            <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#242A36"/>
+            <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#2A3140"/>
+            <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#5630A0"/>
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#4A289A"/>
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#9E78D8"/>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#9E78D8"/>
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="HcwFogBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="HcwSoftBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="HcwWhiteBrush" Color="#242A36"/>
+            <SolidColorBrush x:Key="HcwInkBrush" Color="#EEF2F8"/>
+            <SolidColorBrush x:Key="HcwMutedBrush" Color="#A8B0BD"/>
+            <SolidColorBrush x:Key="HcwEdgeBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="HcwAccentBrush" Color="#5630A0"/>
+            <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#5630A0"/>
+            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#9E78D8"/>
             <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="HcwDangerBrush" Color="#FF99A4"/>
+            <SolidColorBrush x:Key="HcwDangerBrush" Color="#F87171"/>
             <SolidColorBrush x:Key="HcwNeuDarkBrush" Color="#00000000"/>
             <SolidColorBrush x:Key="HcwNeuLightBrush" Color="#00000000"/>
             <CornerRadius x:Key="ControlCornerRadius">2</CornerRadius>
@@ -55,9 +55,9 @@
             <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="#F1F5FA"/>
             <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="#D8DEE8"/>
             <SolidColorBrush x:Key="SurfaceStrokeColorDefaultBrush" Color="#D8DEE8"/>
-            <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#102C80"/>
-            <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#3E56A0"/>
-            <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#546B88"/>
+            <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#1A2332"/>
+            <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#5D6B82"/>
+            <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#5D6B82"/>
             <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#F1F5FA"/>
             <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#EEF2F8"/>
             <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#FFFFFF"/>
@@ -72,53 +72,53 @@
             <SolidColorBrush x:Key="HcwFogBrush" Color="#E4EAF2"/>
             <SolidColorBrush x:Key="HcwSoftBrush" Color="#EEF2F8"/>
             <SolidColorBrush x:Key="HcwWhiteBrush" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="HcwInkBrush" Color="#102C80"/>
-            <SolidColorBrush x:Key="HcwMutedBrush" Color="#3E56A0"/>
+            <SolidColorBrush x:Key="HcwInkBrush" Color="#1A2332"/>
+            <SolidColorBrush x:Key="HcwMutedBrush" Color="#5D6B82"/>
             <SolidColorBrush x:Key="HcwEdgeBrush" Color="#D8DEE8"/>
             <SolidColorBrush x:Key="HcwAccentBrush" Color="#5630A0"/>
             <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#5630A0"/>
             <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#5630A0"/>
             <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="HcwDangerBrush" Color="#B83A26"/>
+            <SolidColorBrush x:Key="HcwDangerBrush" Color="#C42B1C"/>
             <SolidColorBrush x:Key="HcwNeuDarkBrush" Color="#00000000"/>
             <SolidColorBrush x:Key="HcwNeuLightBrush" Color="#00000000"/>
             <CornerRadius x:Key="ControlCornerRadius">2</CornerRadius>
             <CornerRadius x:Key="OverlayCornerRadius">2</CornerRadius>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-            <SolidColorBrush x:Key="ApplicationPageBackgroundThemeBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="SolidBackgroundFillColorBaseBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="SolidBackgroundFillColorSecondaryBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="#202020"/>
-            <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="#242424"/>
-            <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="SurfaceStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#F3F3F3"/>
-            <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#C8C8C8"/>
-            <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#9A9A9A"/>
-            <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#2F2F2F"/>
-            <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#242424"/>
-            <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#2F2F2F"/>
-            <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#6A42BF"/>
-            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#5A36A8"/>
-            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#B79CF0"/>
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#B79CF0"/>
-            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#202020"/>
-            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="HcwFogBrush" Color="#1B1B1B"/>
-            <SolidColorBrush x:Key="HcwSoftBrush" Color="#202020"/>
-            <SolidColorBrush x:Key="HcwWhiteBrush" Color="#2C2C2C"/>
-            <SolidColorBrush x:Key="HcwInkBrush" Color="#F3F3F3"/>
-            <SolidColorBrush x:Key="HcwMutedBrush" Color="#C8C8C8"/>
-            <SolidColorBrush x:Key="HcwEdgeBrush" Color="#3D3D3D"/>
-            <SolidColorBrush x:Key="HcwAccentBrush" Color="#6A42BF"/>
-            <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#6A42BF"/>
-            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#B79CF0"/>
+            <SolidColorBrush x:Key="ApplicationPageBackgroundThemeBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="SolidBackgroundFillColorBaseBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="SolidBackgroundFillColorSecondaryBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="#242A36"/>
+            <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="#2A3140"/>
+            <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="SurfaceStrokeColorDefaultBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#EEF2F8"/>
+            <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#A8B0BD"/>
+            <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#A8B0BD"/>
+            <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#2A3140"/>
+            <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="ControlFillColorDefaultBrush" Color="#242A36"/>
+            <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#2A3140"/>
+            <SolidColorBrush x:Key="ControlStrokeColorDefaultBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#5630A0"/>
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#4A289A"/>
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#9E78D8"/>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#9E78D8"/>
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="HcwFogBrush" Color="#1B1F28"/>
+            <SolidColorBrush x:Key="HcwSoftBrush" Color="#151922"/>
+            <SolidColorBrush x:Key="HcwWhiteBrush" Color="#242A36"/>
+            <SolidColorBrush x:Key="HcwInkBrush" Color="#EEF2F8"/>
+            <SolidColorBrush x:Key="HcwMutedBrush" Color="#A8B0BD"/>
+            <SolidColorBrush x:Key="HcwEdgeBrush" Color="#3A4250"/>
+            <SolidColorBrush x:Key="HcwAccentBrush" Color="#5630A0"/>
+            <SolidColorBrush x:Key="HcwAccentEdgeBrush" Color="#5630A0"/>
+            <SolidColorBrush x:Key="HcwAccentTextBrush" Color="#9E78D8"/>
             <SolidColorBrush x:Key="HcwOnAccentBrush" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="HcwDangerBrush" Color="#FF99A4"/>
+            <SolidColorBrush x:Key="HcwDangerBrush" Color="#F87171"/>
             <SolidColorBrush x:Key="HcwNeuDarkBrush" Color="#00000000"/>
             <SolidColorBrush x:Key="HcwNeuLightBrush" Color="#00000000"/>
             <CornerRadius x:Key="ControlCornerRadius">2</CornerRadius>
