@@ -16,7 +16,7 @@ public static class SmartBlockPainter
     /// <summary>The brushes a detail is drawn with, taken from the theme by the caller.</summary>
     public sealed record Ink(Brush Outline, Brush Text, Brush Hatch, Func<double, Brush> Bar);
 
-    /// <summary>The AutoCAD colour of a primitive, as drawn on a dark or light page: the few indices the blocks use, otherwise the outline brush.</summary>
+    /// <summary>The AutoCAD colours the blocks use, as drawn on a dark or light page: 7 follows the page ink, 8 is a mid grey.</summary>
     private static Brush Colour(int? aci, Ink ink) => aci switch
     {
         1 => new SolidColorBrush(Color.FromArgb(255, 230, 40, 40)),
@@ -24,9 +24,27 @@ public static class SmartBlockPainter
         4 => new SolidColorBrush(Color.FromArgb(255, 20, 180, 190)),
         5 => new SolidColorBrush(Color.FromArgb(255, 70, 100, 245)),
         6 => new SolidColorBrush(Color.FromArgb(255, 200, 50, 200)),
+        8 => new SolidColorBrush(Color.FromArgb(255, 140, 147, 160)),
         30 => new SolidColorBrush(Color.FromArgb(255, 235, 130, 20)),
         _ => ink.Outline,
     };
+
+    /// <summary>The colour, dashes and thickness of a primitive: its own colour, else the colour of its layer; the linetype and the lineweight (pen width) of the layer.</summary>
+    private static (Brush Stroke, double Thickness, DoubleCollection? Dashes) Pen(SmartPrim prim, SmartGeometry g, Ink ink)
+    {
+        var layer = prim.Layer is { } n && g.Layers is { } ls && ls.TryGetValue(n, out var l) ? l : null;
+        var stroke = Colour(prim.Color ?? layer?.Color, ink);
+        // Pen widths of the ISO 128 series, scaled for a small detail: 0.18 mm reads as a hairline, 0.50 mm as the heavy outline.
+        var thickness = layer is null ? 1.2 : Math.Max(0.7, layer.Lineweight / 100.0 * 2.4);
+        var dashes = (layer?.Linetype.ToUpperInvariant()) switch
+        {
+            "HIDDEN" or "HIDDEN2" or "DASHED" => new DoubleCollection { 4, 2 },
+            "CENTER" or "CENTER2" or "DASHDOT" => new DoubleCollection { 10, 2, 2, 2 },
+            "PHANTOM" => new DoubleCollection { 10, 2, 2, 2, 2, 2 },
+            _ => null,
+        };
+        return (stroke, thickness, dashes);
+    }
 
     /// <summary>Paint <paramref name="g"/> into <paramref name="canvas"/> (cleared first) and return the pixels per millimetre.</summary>
     public static double Paint(Canvas canvas, SmartGeometry g, Ink ink)
@@ -52,11 +70,11 @@ public static class SmartBlockPainter
         }
         foreach (var prim in g.Prims)
         {
-            var stroke = Colour(prim.Color, ink);
+            var (stroke, weight, dashes) = Pen(prim, g, ink);
             switch (prim)
             {
                 case LinePrim l:
-                    canvas.Children.Add(new Line { X1 = X(l.X1), Y1 = Y(l.Y1), X2 = X(l.X2), Y2 = Y(l.Y2), Stroke = stroke, StrokeThickness = prim.Color == 30 ? 0.8 : 1.2 });
+                    canvas.Children.Add(new Line { X1 = X(l.X1), Y1 = Y(l.Y1), X2 = X(l.X2), Y2 = Y(l.Y2), Stroke = stroke, StrokeThickness = weight, StrokeDashArray = dashes });
                     break;
                 case PolyPrim p:
                 {
@@ -65,22 +83,23 @@ public static class SmartBlockPainter
                     foreach (var (x, y) in p.Pts)
                         pts.Add(new Windows.Foundation.Point(X(x), Y(y)));
                     s.Stroke = stroke;
-                    s.StrokeThickness = prim.Color == 30 ? 0.8 : 1.2;
+                    s.StrokeThickness = weight;
+                    s.StrokeDashArray = dashes;
                     s.StrokeLineJoin = PenLineJoin.Round;
                     canvas.Children.Add(s);
                     break;
                 }
                 case CirclePrim c:
-                    Ellipse(canvas, X(c.X), Y(c.Y), c.R * scale, stroke, null, 1.2);
+                    Ellipse(canvas, X(c.X), Y(c.Y), c.R * scale, stroke, null, weight);
                     break;
                 case DotPrim d:
-                    Ellipse(canvas, X(d.X), Y(d.Y), Math.Max(d.R * scale, 1.6), null, prim.Color is null ? ink.Bar(d.R * 2) : stroke, 0);
+                    Ellipse(canvas, X(d.X), Y(d.Y), Math.Max(d.R * scale, 1.6), null, prim.Color is null && prim.Layer is null ? ink.Bar(d.R * 2) : stroke, 0);
                     break;
                 case ArcPrim a:
-                    canvas.Children.Add(Arc(a, X, Y, scale, stroke));
+                    canvas.Children.Add(Arc(a, X, Y, scale, stroke, weight));
                     break;
                 case TextPrim t:
-                    Text(canvas, t, X, Y, scale, prim.Color is null ? ink.Text : stroke);
+                    Text(canvas, t, X, Y, scale, prim.Color is null && prim.Layer is null ? ink.Text : (prim.Layer == "S-ANNO-TEXT" ? ink.Text : stroke));
                     break;
             }
         }
@@ -115,7 +134,7 @@ public static class SmartBlockPainter
         canvas.Children.Add(e);
     }
 
-    private static Microsoft.UI.Xaml.Shapes.Path Arc(ArcPrim a, Func<double, double> x, Func<double, double> y, double scale, Brush stroke)
+    private static Microsoft.UI.Xaml.Shapes.Path Arc(ArcPrim a, Func<double, double> x, Func<double, double> y, double scale, Brush stroke, double weight)
     {
         double Rad(double d) => d * Math.PI / 180;
         var (s, e) = (Rad(a.StartDeg), Rad(a.EndDeg));
@@ -132,6 +151,6 @@ public static class SmartBlockPainter
             IsLargeArc = sweep > Math.PI,
         };
         var fig = new PathFigure { StartPoint = start, Segments = { seg } };
-        return new Microsoft.UI.Xaml.Shapes.Path { Data = new PathGeometry { Figures = { fig } }, Stroke = stroke, StrokeThickness = 1.2 };
+        return new Microsoft.UI.Xaml.Shapes.Path { Data = new PathGeometry { Figures = { fig } }, Stroke = stroke, StrokeThickness = weight };
     }
 }

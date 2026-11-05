@@ -18,11 +18,17 @@ public sealed record SmartParam(string Name, string Label, string Unit, double D
 
 public sealed record SmartVar(string Name, SmartNum Expr);
 
+/// <summary>A layer a block draws on: AutoCAD colour index, linetype name and lineweight in hundredths of a millimetre.</summary>
+public sealed record SmartLayer(string Name, int Color, string Linetype, int Lineweight, string Description);
+
 /// <summary>One drawing item of a definition: a shape, shown only when <see cref="When"/> is above zero.</summary>
 public abstract record SmartItem(SmartNum? When)
 {
     /// <summary>An AutoCAD colour index for this item (bars by diameter, ties, dimensions); null for the reference's colour.</summary>
     public int? Color { get; init; }
+
+    /// <summary>The layer this item is drawn on (its colour, linetype and lineweight come from the block's layer table), or null.</summary>
+    public string? Layer { get; init; }
 }
 
 public sealed record LineItem(SmartNum? When, SmartNum[] A) : SmartItem(When);
@@ -39,7 +45,7 @@ public sealed record LeaderItem(SmartNum? When, SmartNum[] From, SmartNum[] To, 
 public sealed record RepeatItem(SmartNum? When, string Var, SmartNum Count, IReadOnlyList<SmartItem> Items) : SmartItem(When);
 
 /// <summary>A parametric block: parameters, derived values and the items that draw it (format <c>osas-smartblocks</c> version 1, as O-Draft reads it).</summary>
-public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadOnlyList<SmartParam> Params, IReadOnlyList<SmartVar> Vars, IReadOnlyList<SmartItem> Items)
+public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadOnlyList<SmartParam> Params, IReadOnlyList<SmartVar> Vars, IReadOnlyList<SmartItem> Items, IReadOnlyList<SmartLayer>? Layers = null)
 {
     private static readonly string[] Shapes = ["line", "rect", "crect", "poly", "circle", "dot", "arc", "text", "hatch", "ring", "dim", "leader", "repeat"];
 
@@ -78,7 +84,7 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
             vars[v.Name] = v.Expr.Eval(vars);
         var cx = new Eval(this, vars);
         cx.Items(Items);
-        return new SmartGeometry(Id, vars, cx.Out);
+        return new SmartGeometry(Id, vars, cx.Out, (Layers ?? []).ToDictionary(l => l.Name));
     }
 
     private sealed class Eval(SmartBlockDef def, Dictionary<string, double> vars)
@@ -97,12 +103,13 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
         private (double X, double Y) Pt(SmartNum[] p) => (N(p[0]), N(p[1]));
 
         private int? color;
+        private string? layer;
 
         private void Add(SmartPrim p)
         {
             if (Out.Count >= MaxObjects)
                 throw new SmartBlockException($"`{def.Id}` makes more than {MaxObjects} objects");
-            Out.Add(p with { Color = color });
+            Out.Add(p with { Color = color, Layer = layer });
         }
 
         /// <summary>Whether lengths are shown in feet and inches (the <c>ftin</c> parameter above zero) rather than millimetres.</summary>
@@ -111,7 +118,7 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
         private void Dim(DimItem d)
         {
             const int orange = 30;
-            color = d.Color ?? orange;
+            color = d.Color ?? (d.Layer is null ? orange : null);
             var (a, b, off, h) = (Pt(d.From), Pt(d.To), N(d.Off), N(d.Height));
             if (h <= 0)
                 throw new SmartBlockException($"`{def.Id}`: dimension text height must be positive");
@@ -150,7 +157,7 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
         private void Leader(LeaderItem l)
         {
             const int orange = 30;
-            color = l.Color ?? orange;
+            color = l.Color ?? (l.Layer is null ? orange : null);
             var (a, b, h) = (Pt(l.From), Pt(l.To), N(l.Height));
             if (h <= 0)
                 throw new SmartBlockException($"`{def.Id}`: leader text height must be positive");
@@ -173,8 +180,10 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
                 if (it.When is { } w && N(w) <= 0)
                     continue;
                 color = it.Color;
+                layer = it.Layer;
                 Item(it);
                 color = null;
+                layer = null;
             }
         }
 
@@ -357,13 +366,21 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
                 e.TryGetProperty("layer", out var l) ? l.GetString() ?? "" : "",
                 ps,
                 vs,
-                e.GetProperty("items").EnumerateArray().Select(Item).ToList());
+                e.GetProperty("items").EnumerateArray().Select(Item).ToList(),
+                e.TryGetProperty("layers", out var ls) ? ls.EnumerateArray().Select(LayerOf).ToList() : []);
         }
         catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or FormatException)
         {
             throw new SmartBlockException($"smart block `{id}`: {ex.Message}");
         }
     }
+
+    private static SmartLayer LayerOf(JsonElement e) => new(
+        e.GetProperty("name").GetString() ?? "",
+        e.TryGetProperty("color", out var c) ? c.GetInt32() : 7,
+        e.TryGetProperty("linetype", out var t) ? t.GetString() ?? "Continuous" : "Continuous",
+        e.TryGetProperty("lineweight", out var w) ? w.GetInt32() : 25,
+        e.TryGetProperty("description", out var d) ? d.GetString() ?? "" : "");
 
     private static double? Opt(JsonElement e, string k) => e.TryGetProperty(k, out var v) && v.ValueKind == JsonValueKind.Number ? v.GetDouble() : null;
 
@@ -393,7 +410,8 @@ public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadO
         var shape = Shapes.FirstOrDefault(s => e.TryGetProperty(s, out _)) ?? throw new SmartBlockException("an item has no shape");
         var v = e.GetProperty(shape);
         var color = e.TryGetProperty("color", out var cc) && cc.ValueKind == JsonValueKind.Number ? cc.GetInt32() : (int?)null;
-        return (Shaped(shape, when, v, e)) with { Color = color };
+        var layer = e.TryGetProperty("layer", out var ly) && ly.ValueKind == JsonValueKind.String ? ly.GetString() : null;
+        return (Shaped(shape, when, v, e)) with { Color = color, Layer = layer };
     }
 
     private static SmartItem Shaped(string shape, SmartNum? when, JsonElement v, JsonElement e)
@@ -434,6 +452,9 @@ public abstract record SmartPrim
 {
     /// <summary>An AutoCAD colour index, or null for the colour of the reference.</summary>
     public int? Color { get; init; }
+
+    /// <summary>The layer it is drawn on, or null.</summary>
+    public string? Layer { get; init; }
 }
 
 public sealed record LinePrim(double X1, double Y1, double X2, double Y2) : SmartPrim;
@@ -453,7 +474,7 @@ public sealed record TextPrim(double X, double Y, double Height, string Value, b
 public sealed record HatchPrim(IReadOnlyList<(double X, double Y)> Pts, string Pattern, double Scale) : SmartPrim;
 
 /// <summary>An evaluated block: its parameter and derived values, and what it draws.</summary>
-public sealed record SmartGeometry(string Id, IReadOnlyDictionary<string, double> Values, IReadOnlyList<SmartPrim> Prims)
+public sealed record SmartGeometry(string Id, IReadOnlyDictionary<string, double> Values, IReadOnlyList<SmartPrim> Prims, IReadOnlyDictionary<string, SmartLayer>? Layers = null)
 {
     /// <summary>The box a text takes, from its anchor and an average character width of 0.6 of its height.</summary>
     public static (double MinX, double MinY, double MaxX, double MaxY) TextBox(TextPrim t)

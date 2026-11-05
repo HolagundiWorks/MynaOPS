@@ -86,7 +86,7 @@ public sealed class SmartBlockTests
         Assert.Contains("9\"", texts); // the width and depth dimensions, in feet and inches
         Assert.Contains("1'-5.5\"", texts);
         // Bars are coloured by their place: ties and cross-ties green, the dimensions orange.
-        Assert.All(g.Prims.OfType<DotPrim>(), d => Assert.Equal(1, d.Color));
+        Assert.All(g.Prims.OfType<DotPrim>(), d => Assert.Equal("S-REBR-MAIN", d.Layer));
         var more = SmartBlockLibrary.Find("rcc.column.rect")!.Evaluate(new Dictionary<string, double> { ["ny"] = 4, ["bar"] = 20 });
         Assert.Equal(8, more.Counts()["dot"]);
     }
@@ -96,11 +96,11 @@ public sealed class SmartBlockTests
     {
         var g = SmartBlockLibrary.Find("rcc.column.rect")!.Evaluate(new Dictionary<string, double> { ["nx"] = 4, ["ny"] = 3, ["bar"] = 20, ["bar2"] = 16 });
         Assert.Contains(g.Prims.OfType<TextPrim>(), t => t.Value == "4Y20 + 6Y16");
-        Assert.Equal(4, g.Prims.OfType<DotPrim>().Count(d => d.Color == 1)); // the corners
-        Assert.Equal(6, g.Prims.OfType<DotPrim>().Count(d => d.Color == 6)); // the others
+        Assert.Equal(4, g.Prims.OfType<DotPrim>().Count(d => d.Layer == "S-REBR-MAIN")); // the corners
+        Assert.Equal(6, g.Prims.OfType<DotPrim>().Count(d => d.Layer == "S-REBR-EXTR")); // the others
         // Two intermediate bars on the width face make two cross-ties, one on the depth face makes one more.
-        Assert.Equal(2, g.Prims.OfType<LinePrim>().Count(l => l.Color == 4));
-        Assert.Equal(1, g.Prims.OfType<LinePrim>().Count(l => l.Color == 3));
+        Assert.Equal(2, g.Prims.OfType<LinePrim>().Count(l => l.Layer == "S-REBR-XTRA"));
+        Assert.Equal(1, g.Prims.OfType<LinePrim>().Count(l => l.Layer == "S-REBR-LINK" && l.Y1 == l.Y2 && Math.Abs(l.X2 - l.X1) > 100));
     }
 
     [Theory]
@@ -110,6 +110,32 @@ public sealed class SmartBlockTests
     [InlineData(38, "1.5\"")]
     [InlineData(100, "4\"")]
     public void Lengths_in_feet_and_inches_round_to_a_half_inch(double mm, string want) => Assert.Equal(want, SmartBlockDef.FeetInches(mm));
+
+    [Fact]
+    public void Every_layer_a_block_draws_on_is_in_its_table_with_a_pen_and_a_linetype()
+    {
+        foreach (var b in SmartBlockLibrary.All)
+        {
+            var g = b.Evaluate();
+            Assert.NotEmpty(g.Layers!);
+            foreach (var layer in g.Prims.Select(p => p.Layer).Distinct())
+            {
+                Assert.NotNull(layer);
+                Assert.True(g.Layers!.TryGetValue(layer!, out var l), $"{b.Id}: layer {layer} is not in the table");
+                Assert.InRange(l!.Lineweight, 9, 100); // the ISO 128 pen widths, 0.09 to 1.00 mm
+                Assert.StartsWith("S-", l.Name);
+                Assert.Contains(l.Linetype, new[] { "Continuous", "HIDDEN", "CENTER" });
+            }
+        }
+        var column = SmartBlockLibrary.Find("rcc.column.rect")!.Evaluate();
+        Assert.Equal("S-CONC-OUTL", column.Prims.OfType<PolyPrim>().First().Layer);
+        Assert.Equal(50, column.Layers!["S-CONC-OUTL"].Lineweight);
+        Assert.Equal("S-ANNO-DIMS", column.Prims.OfType<TextPrim>().First(t => t.Value == "9\"").Layer);
+        var footing = SmartBlockLibrary.Find("rcc.footing.section")!.Evaluate();
+        Assert.Equal("HIDDEN", SmartBlockLibrary.Find("rcc.footing.plan")!.Evaluate().Layers!["S-CONC-HIDD"].Linetype); // the PCC projection, concealed
+        Assert.Equal("CENTER", footing.Layers!["S-GRND"].Linetype);
+        Assert.Contains(footing.Prims.OfType<HatchPrim>(), h => h.Pattern == "AR-CONC" && h.Layer == "S-SOIL-HATCH"); // the PCC
+    }
 
     [Fact]
     public void Dimensions_can_be_shown_in_millimetres()
