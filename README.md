@@ -16,6 +16,22 @@ Quantities follow IS 456 / IS 1200–derived conventions — always cross-check 
 
 **Version:** 1.1.0 · **License:** [AGPL-3.0](LICENSE) (Community) or [Commercial](LICENSING.md) · see also [NOTICE](NOTICE) · [CHANGELOG](CHANGELOG.md) · [ROADMAP](docs/ROADMAP.md) · [UI sizing](docs/UI-SIZING.md) · [Data model](docs/DATA-MODEL-COMPONENTS.md) · [CPWD DSR case study](docs/CPWD-DSR-CASE-STUDY.md)
 
+## The interface
+
+![O-CoreOp before a project is loaded: module tabs, sub-tabs, and a card that sends you to the launcher](docs/images/coreop-start.png)
+
+O-CoreOp works on **one project at a time, chosen in the O-Studio launcher**. Started without one it shows the card above; **Open the launcher** takes you there, and once a project is locked O-CoreOp opens on it with the company's details read from O-Studio.
+
+| Area | What it is |
+|---|---|
+| Menu bar | **File**, **Edit**, **Help**. |
+| Module tabs | **Project**, **RCC steel**, **Civil BOQ**, **Schedule**, **Contracts**, **Stores** and **Outputs**. Each opens its own row of sub-tabs below. |
+| Project | **Dashboard**, **Levels** and **Take-off (O-Draft)**: the quantities O-Draft recorded in the project file (`.osp`), read as they are. |
+| RCC steel | One sub-tab per member: **Columns**, **Beams**, **Pedestals**, **Lintels**, **Slabs**, **Footings**, **Retaining walls** and **Stairs**. The Beams, Columns, Slabs, Footings and Lintels pages also show the **structural details drawn in O-Draft** (read only; see below). |
+| Status bar | A calculator, the light/dark theme, the AI assistant, and the open company (here "Company: not open"). |
+
+**Details from O-Draft.** When O-Draft saves a drawing into the project file it records every reinforced concrete block it contains, with the parameters it was drawn with. The element pages list those details, draw the chosen one in the same style as the drawing (bars by diameter, ties, dimensions, bar notation) and say so when there is none. O-CoreOp never edits a drawing: a detail changes in O-Draft only.
+
 ## Stack
 
 | Layer | Tech |
