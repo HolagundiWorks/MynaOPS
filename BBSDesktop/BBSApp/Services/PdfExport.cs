@@ -873,6 +873,69 @@ public static class PdfExport
         return list;
     }
 
+    /// <summary>
+    /// One sheet PDF: the nameplate and the print block placed on the layout.
+    /// The model geometry is not redrawn; it stays in the project file.
+    /// </summary>
+    public static bool ExportSheetLayout(string path, ProjectStore store, ProjectMapSheet map, PlacedLayout layout, out string? error)
+    {
+        error = null;
+        try
+        {
+            var info = store.Info;
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A3.Landscape());
+                    page.Margin(28);
+                    page.DefaultTextStyle(x => x.FontSize(11).FontFamily(Fonts.Calibri));
+                    page.Content().Column(col =>
+                    {
+                        col.Item().Text(info.CompanyName).FontSize(14).SemiBold();
+                        col.Item().Text(info.Name).FontSize(16);
+                        col.Item().PaddingTop(8).Text(map.Name).FontSize(12);
+                        col.Item().PaddingTop(18).Text(layout.Name).FontSize(22).SemiBold();
+                        col.Item().PaddingTop(10).Text("Print block  " + layout.PrintBlock
+                            + (string.IsNullOrWhiteSpace(layout.PrintDescription) ? "" : "  —  " + layout.PrintDescription));
+                        if (!string.IsNullOrWhiteSpace(layout.PrintDrawing))
+                            col.Item().PaddingTop(4).Text("Drawing  " + layout.PrintDrawing).FontSize(10);
+                        col.Item().PaddingTop(16).Text(
+                            "This page records the sheet, the print block and the nameplate. The drawing geometry stays in the project file.")
+                            .FontSize(10).Italic();
+                        col.Item().PaddingTop(28).Border(1).BorderColor(Colors.Grey.Darken1).Padding(10).Table(table =>
+                        {
+                            table.ColumnsDefinition(c =>
+                            {
+                                c.ConstantColumn(120);
+                                c.RelativeColumn();
+                            });
+                            void Row(string label, string value)
+                            {
+                                table.Cell().PaddingVertical(3).Text(label).SemiBold();
+                                table.Cell().PaddingVertical(3).Text(string.IsNullOrWhiteSpace(value) ? "—" : value);
+                            }
+                            Row("Project", info.Name);
+                            Row("Client", info.ClientName);
+                            Row("Drawing title", layout.Title);
+                            Row("Sheet", layout.Number);
+                            Row("Scale", layout.Scale);
+                            Row("Drawn by", layout.DrawnBy);
+                            Row("Date", layout.Date);
+                            Row("Print block", layout.PrintBlock);
+                        });
+                    });
+                });
+            }).GeneratePdf(path);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            return false;
+        }
+    }
+
     private static void ReportHeader(IContainer container, ProjectStore store, string subtitle)
     {
         var info = store.Info;

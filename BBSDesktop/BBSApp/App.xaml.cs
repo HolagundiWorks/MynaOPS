@@ -21,15 +21,8 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         Services.RateBookStore.Current.EnsureLoaded();
-        // The launcher chooses the project and starts this app on it. Started any other way, ask the launcher to start O-CoreOp once a company is
-        // signed in and a project is locked, and stop here. OSTUDIO_STANDALONE=1 skips this for development and automated tests.
+        // O-CoreOp opens the shared .osp itself. A launcher lock is optional. Sign-in and Push to O-Studio happen inside this app.
         var locked = Office.Shared.SuiteProjectLock.FromEnvironment();
-        var standalone = Office.Shared.SuiteProjectLock.Standalone || (locked is null && !Office.Shared.SuiteProjectLock.RequestLauncher("O-CoreOp"));
-        if (locked is null && !standalone)
-        {
-            Exit();
-            return;
-        }
 
         MainWindow = new MainWindow();
         MainWindow.Activate();

@@ -102,6 +102,9 @@ public sealed class ProjectStore
     /// <summary>Derivation rules linking trades (masonry→plaster→paint, flooring→skirting …).</summary>
     public LinkRuleBook LinkRules { get; } = new();
 
+    /// <summary>Page layouts composed in O-CoreOp from print blocks drawn in O-Draft.</summary>
+    public SheetLayoutBook Sheets { get; } = new();
+
     /// <summary>Last calculated estimate snapshot (qty × rates).</summary>
     public EstimateResult? LastEstimate { get; set; }
     public string? LastEstimateRateBookVersionId { get; set; }
@@ -321,6 +324,7 @@ public sealed class ProjectStore
             ["stores"] = Stores.ToJson(),
             ["org"] = Org.ToJson(),
             ["link_rules"] = LinkRules.ToJson(),
+            ["sheet_layouts"] = Sheets.ToJson(),
             ["last_estimate"] = LastEstimate is null ? null : EstimateCalculator.ToJson(LastEstimate),
             ["last_estimate_rate_book_version_id"] = LastEstimateRateBookVersionId ?? ""
         };
@@ -405,6 +409,7 @@ public sealed class ProjectStore
         Org.LoadFrom(root["org"] as JsonObject);
         LinkRules.LoadFrom(root["link_rules"] as JsonArray);
         LinkRules.SeedIfEmpty();
+        Sheets.LoadFrom(root["sheet_layouts"] as JsonObject);
         LastEstimate = EstimateCalculator.FromJson(root["last_estimate"] as JsonObject);
         LastEstimateRateBookVersionId = root["last_estimate_rate_book_version_id"]?.GetValue<string>();
         if (root["levels"] is JsonArray la)
@@ -630,6 +635,7 @@ public sealed class ProjectStore
         Stores.Clear();
         Org.Clear();
         LinkRules.ResetToDefaults();
+        Sheets.Clear();
         Levels.Clear();
         LastSummary = null;
         LastBbs = null;

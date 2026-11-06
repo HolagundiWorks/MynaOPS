@@ -1,6 +1,6 @@
 # O-CoreOp WinUI shell (O-Studio suite)
 
-**Status:** compact density from O-UI · text-tab ribbons · **Updated:** 2026-10-29  
+**Status:** compact density from O-UI · text-tab ribbons · **Updated:** 2026-11-06  
 **App:** `BBSDesktop/BBSApp` (assembly `O-CoreOp` · display **O-CoreOp**)  
 **Canon:** esti [`DESKTOP-WINUI-UX.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/DESKTOP-WINUI-UX.md) · [`o-ui-UX-PRINCIPLES.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/o-ui-UX-PRINCIPLES.md)
 
@@ -34,6 +34,7 @@ Notice row and calculator row — docked above the status strip, they push the p
 | **Data model page** | Outputs > Data model: the work items and link rules as a graph, with an icon ribbon, a right-click *Add component* menu and a component and link inspector. See [DATA-MODEL-COMPONENTS.md](DATA-MODEL-COMPONENTS.md) |
 | **Page tabs** | A page whose pivot tabs are the sub ribbon's own pages hides its pivot header (`Controls/PivotTabs.cs`) so each page is named once |
 | **Take-off page bar** | A flat text-only bar (Source, Read and Annotated groups with dividers), the same look as O-Draft's take-off bar (Draw, Compute, Sync, Phases). No icons |
+| **Layout page** | Outputs > Layout. Left: project map and layouts. Right: print blocks read from the open project file. Insert, Update nameplate, Export PDF. The PDF is the sheet record; the model stays in the project file. The page was built; it was not opened in a window |
 | **Status strip** | Calculator · theme switch · company chip |
 | **UI scale** | 1×. The shell follows the system text size and display scale (`UiScale` in `MainWindow.xaml.cs`) |
 | **Narrow windows** | Both ribbons scroll sideways when the window is narrower than their tabs. Page headers and toolbars wrap (`O.Ui` `FlexBar`); the element page's section sketch gives its column back under 700 px. Page titles are level 2 headings and section headers level 3, under the level 1 page line |

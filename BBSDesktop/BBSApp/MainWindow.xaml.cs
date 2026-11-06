@@ -246,6 +246,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             Cmd("datamodel", "Data model", Glyph("\uE8AB")),           // MapLayers
             Cmd("ratebook", "Rate book", Glyph("\uE82D")),             // Bookmarks
             Cmd("report", "Report", Glyph("\uE9F9")),                  // ReportDocument
+            Cmd("layout", "Layout", Glyph("\uE7C3")),                  // Page
         }));
 
         _navTags.Clear();
@@ -558,6 +559,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             "datamodel" => new DataModelPage(),
             "ratebook" => new RateBookPage(),
             "report" => new ReportPage(),
+            "layout" => new LayoutPage(),
             "settings" or "settings_project" => new SettingsPage(SettingsPage.SettingsTab.Project),
             "settings_engineering" => new SettingsPage(SettingsPage.SettingsTab.Engineering),
             "settings_cost" => new SettingsPage(SettingsPage.SettingsTab.CostPercent),
