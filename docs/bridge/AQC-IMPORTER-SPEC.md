@@ -1,6 +1,6 @@
 # Spec: the AQC importer for hcw-aqc-bridge v1
 
-For whoever builds the importer in the AQC repo (Phase 3 of [../AQC-BRIDGE-PLAN.md](../AQC-BRIDGE-PLAN.md)). **Written by Agent 2 (hcwCAD-KIT, MIT) on 2026-10-07 from the contract and from [../AQC-FINDINGS.md](../AQC-FINDINGS.md), which was read from AQC's source and never run.** It copies no AQC code. Nothing in it has been checked against a running AQC, so anything marked *check* must be confirmed when the importer is first run. Whether the AQC repo may be changed at all is an open owner question (QUEUE.md, question 3).
+For whoever builds the importer in the AQC repo (Phase 3 of `AQC-BRIDGE-PLAN.md` (removed)). **Written by Agent 2 (hcwCAD-KIT, MIT) on 2026-10-07 from the contract and from `AQC-FINDINGS.md` (removed), which was read from AQC's source and never run.** It copies no AQC code. Nothing in it has been checked against a running AQC, so anything marked *check* must be confirmed when the importer is first run. Whether the AQC repo may be changed at all is an open owner question (QUEUE.md, question 3).
 
 Inputs: the file in [README.md](README.md), the schema [hcw-aqc-bridge.schema.json](hcw-aqc-bridge.schema.json) and the two sample files in [fixtures](fixtures).
 
@@ -60,4 +60,4 @@ AQC rows are free-form string dictionaries; numbers may be written as strings or
 
 ## 6. What still needs a decision or a running AQC
 
-Owner questions 2, 3, 4 and 6 in [../work/QUEUE.md](../work/QUEUE.md); *check* items above; and the round trip (export, import, change the drawing, export, import) needs AQC built, which has not been possible on the machines available so far.
+Owner questions 2, 3, 4 and 6 in `work/QUEUE.md` (removed); *check* items above; and the round trip (export, import, change the drawing, export, import) needs AQC built, which has not been possible on the machines available so far.

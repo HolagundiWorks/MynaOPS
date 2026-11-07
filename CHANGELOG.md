@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-> **Naming (2026-10-30):** Older bullets below may say ShilpiDB or `.vdb`; the product now uses the **`.osp` project file** only. See [MIGRATION-OSP.md](MIGRATION-OSP.md).
+> **Naming (2026-10-30):** Older bullets below may say ShilpiDB or `.vdb`; the product now uses the **`.osp` project file** only. See [MIGRATION-OSP.md](docs/MIGRATION-OSP.md).
 
 ### Changed (2026-10-29)
 - **2026-10-31:** Restored company-file **`aqc.project`** summary mirror and **Share draft to Kivo** (estimate + RA). Abstracts sync on save/calculate; approval drafts use `aqc.estimate.draft` / `aqc.ra.draft.*`.

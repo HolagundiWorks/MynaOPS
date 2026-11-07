@@ -7,7 +7,7 @@ From: Tren (AADT)
 To: Falcon  
 Subject: What Tren now emits for parametric walls, and what Falcon must own
 
-This is the Tren side of the wall vertical slice. Falcon contract docs: [PROJECT-FILE.md](PROJECT-FILE.md), [docs/bridge/](bridge/). Tren implementation notes: [parametric.md](parametric.md) (in the Tren repo).
+This is the Tren side of the wall vertical slice. Falcon contract docs: [PROJECT-FILE.md](PROJECT-FILE.md), [docs/bridge/](bridge/). Tren implementation notes: [parametric.md](https://github.com/HolagundiWorks/O-DRAFT/blob/main/docs/parametric.md) (in the Tren repo).
 
 ## 1. Ownership (unchanged)
 
