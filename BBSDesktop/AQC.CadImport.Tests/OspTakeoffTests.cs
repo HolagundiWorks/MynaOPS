@@ -291,12 +291,12 @@ public class OspTakeoffTests
         };
         var stack = new JsonObject
         {
-            ["ref"] = "PSabc-SUP", ["source"] = "TK-01", ["kind"] = "TK", ["service"] = "SUP", ["level"] = "Ground",
+            ["ref"] = "PSabc-CW", ["source"] = "TK-01", ["kind"] = "TK", ["service"] = "CW", ["level"] = "Ground",
             ["european_wc"] = 1, ["indian_wc"] = 0, ["basin"] = 1, ["sink"] = 0, ["shower"] = 0, ["floor_trap"] = 0, ["pipe_m"] = 6.0,
         };
         var fixture = new JsonObject
         {
-            ["ref"] = "PFdef", ["fixture"] = "WB-01", ["kind"] = "WB", ["supply"] = "TK-01", ["drain"] = "", ["level"] = "Ground",
+            ["ref"] = "PFdef", ["fixture"] = "WB-01", ["kind"] = "WB", ["cold"] = "TK-01", ["hot"] = "", ["drain"] = "", ["level"] = "Ground",
         };
         var recs = new List<TakeoffRecord>
         {
