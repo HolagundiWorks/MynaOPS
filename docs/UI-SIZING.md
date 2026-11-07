@@ -1,6 +1,6 @@
 # UI sizing
 
-O-CoreOp follows the suite's compact density, set in the shared UI library **O-UI** (`O.Ui`, `Themes/SuiteStyles.xaml` and `SuiteScale`) and taken from O-Draft's shell. O-Studio, O-Draft and O-CoreOp use the same numbers. This page lists them and says where O-CoreOp reads them from. When the library changes, change these lists to match; do not set a size in a page when a token exists.
+Falcon follows the suite's compact density, set in the shared UI library **O-UI** (`O.Ui`, `Themes/SuiteStyles.xaml` and `SuiteScale`) and taken from Tren's shell. Kivo, Tren and Falcon use the same numbers. This page lists them and says where Falcon reads them from. When the library changes, change these lists to match; do not set a size in a page when a token exists.
 
 ## The scale
 
@@ -24,7 +24,7 @@ All values are DIPs.
 | `SuiteCornerControl` / `Button` / `Card` / `Chip` | 4 | Every corner |
 | `SuitePaneWidth` / `SuiteRailWidth` | 240 / 56 | Side panes (the data-model inspector is wider, 300, because it holds a specification) |
 
-## Where O-CoreOp reads them
+## Where Falcon reads them
 
 | What | How |
 |---|---|
@@ -33,7 +33,7 @@ All values are DIPs.
 | Code-built UI | `O.Ui.SuiteScale` (`FontBody`, `FontCaption`, `FontSection`, `ControlMinHeight`, `TabHeight`, `PropertyRowHeight`, `CornerControl`). Used by the ribbons (`MainWindow.xaml.cs`), the take-off bar (`TakeoffPage.cs`), the tables (`ResultTable.cs`) and the data-model screen (`DataModelPage.cs`) |
 | Shell | `MainWindow.xaml` uses `SuiteMenuBarHeight`, `SuiteFontBody`, `SuiteFontSection` and `SuiteStatusBarHeight` |
 
-## What changed from the earlier O-CoreOp sizes
+## What changed from the earlier Falcon sizes
 
 | | Before | Now |
 |---|---|---|

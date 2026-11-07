@@ -14,12 +14,12 @@ using WinRT.Interop;
 namespace BBSApp;
 
 /// <summary>
-/// The company file belongs to O-Studio. O-CoreOp signs in as an O-Studio user and pushes project items
-/// (<c>aqc.project</c>) when the open <c>.osp</c> is linked to an O-Studio project. O-Draft does not open the company file.
+/// The company file belongs to Kivo. Falcon signs in as a Kivo user and pushes project items
+/// (<c>aqc.project</c>) when the open <c>.osp</c> is linked to a Kivo project. Tren does not open the company file.
 /// </summary>
 public sealed partial class MainWindow
 {
-    /// <summary>Opens the company file read-only when Studio launched this app with a ticket. O-CoreOp never asks for a company password.</summary>
+    /// <summary>Opens the company file read-only when Kivo launched this app with a ticket. Falcon never asks for a company password.</summary>
     async Task StartFromSuiteAsync()
     {
         var path = Environment.GetEnvironmentVariable(SuiteWire.EnvCompany);
@@ -29,40 +29,40 @@ public sealed partial class MainWindow
             return;
         if (string.IsNullOrWhiteSpace(ticket))
         {
-            AppNotify.Info("Company", "Sign in to the company in Studio, then open O-CoreOp from its card to read the company's details.");
+            AppNotify.Info("Company", "Sign in to the company in Kivo, then open Falcon from its card to read the company's details.");
             return;
         }
         await Task.Delay(800);
         try
         {
             await CompanyService.OpenWithTicketAsync(path, ticket);
-            AppNotify.Success("Company", $"{CompanyService.Current!.Name}: details are read from Studio's company file.");
-            await LinkOpenProjectToStudioAsync();
+            AppNotify.Success("Company", $"{CompanyService.Current!.Name}: details are read from Kivo's company file.");
+            await LinkOpenProjectToKivoAsync();
         }
         catch (OfficeException ex)
         {
-            AppNotify.Warning("Company", ex.Message + " Open O-CoreOp again from Studio while signed in.");
+            AppNotify.Warning("Company", ex.Message + " Open Falcon again from Kivo while signed in.");
         }
     }
 
     O.Ui.Controls.SuiteWelcomeCard? _welcome;
 
-    /// <summary>The first screen when O-CoreOp runs without a locked project (development and tests): the suite's welcome card, over the work area until a project opens.</summary>
+    /// <summary>The first screen when Falcon runs without a locked project (development and tests): the suite's welcome card, over the work area until a project opens.</summary>
     internal void ShowWelcome()
     {
         var lockup = Path.Combine(AppContext.BaseDirectory, "Assets", "lockup.png");
         if (_welcome is not null || !File.Exists(lockup))
             return;
-        _welcome = new O.Ui.Controls.SuiteWelcomeCard("O-CoreOp", lockup,
-            "O-CoreOp and O-Draft share one project file (.osp). Open that file here. Sign in as an O-Studio user to push items to O-Studio.");
+        _welcome = new O.Ui.Controls.SuiteWelcomeCard("Falcon", lockup,
+            "Falcon and Tren share one project file (.osp). Open that file here. Sign in as a Kivo user to push items to Kivo.");
         var open = new Button { Content = "Open project…" };
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var style) && style is Style accent)
             open.Style = accent;
         open.Click += async (_, _) => await OpenSharedProjectAsync();
-        var signIn = new Button { Content = "Sign in to O-Studio…" };
-        signIn.Click += async (_, _) => await SignInToStudioAsync();
-        var push = new Button { Content = "Push to O-Studio" };
-        push.Click += async (_, _) => await PushItemsToStudioAsync();
+        var signIn = new Button { Content = "Sign in to Kivo…" };
+        signIn.Click += async (_, _) => await SignInToKivoAsync();
+        var push = new Button { Content = "Push to Kivo" };
+        push.Click += async (_, _) => await PushItemsToKivoAsync();
         _welcome.Actions.Children.Add(open);
         _welcome.Actions.Children.Add(signIn);
         _welcome.Actions.Children.Add(push);
@@ -106,15 +106,15 @@ public sealed partial class MainWindow
         CompanyBadgeText.Text = CompanyService.StatusText;
         AutomationProperties.SetName(CompanyBadge, CompanyService.StatusText);
         ToolTipService.SetToolTip(CompanyBadge, CompanyService.IsOpen
-            ? $"{CompanyService.Current!.Path}. Signed in. Push to O-Studio sends this project's items."
-            : "Sign in as an O-Studio user to push items. The project file is shared with O-Draft.");
+            ? $"{CompanyService.Current!.Path}. Signed in. Push to Kivo sends this project's items."
+            : "Sign in as a Kivo user to push items. The project file is shared with Tren.");
     }
 
     /// <summary>
-    /// Take the open project's details from Studio. The project is the one the take-off header names (company and project id); a header
+    /// Take the open project's details from Kivo. The project is the one the take-off header names (company and project id); a header
     /// of another company, or none, leaves the details as they are.
     /// </summary>
-    internal async Task LinkOpenProjectToStudioAsync(string? companyUuid = null, long? projectId = null)
+    internal async Task LinkOpenProjectToKivoAsync(string? companyUuid = null, long? projectId = null)
     {
         if (!CompanyService.IsOpen) return;
         if (companyUuid is null || projectId is null)
@@ -147,18 +147,18 @@ public sealed partial class MainWindow
     {
         var text = CompanyService.IsOpen
             ? $"{CompanyService.Current!.Name}\nSigned in as {CompanyService.Current.User}\n{CompanyService.Current.Path}\n\n"
-              + (ProjectStore.Current.Shared is { } link ? $"This project is linked to O-Studio project {link.ProjectId}. Push to O-Studio sends its items." : "This project is not linked yet. Push to O-Studio and choose the O-Studio project.")
-            : "Sign in as an O-Studio user in O-CoreOp, then push items. O-Draft does not talk to O-Studio.";
+              + (ProjectStore.Current.Shared is { } link ? $"This project is linked to Kivo project {link.ProjectId}. Push to Kivo sends its items." : "This project is not linked yet. Push to Kivo and choose the Kivo project.")
+            : "Sign in as a Kivo user in Falcon, then push items. Tren does not talk to Kivo.";
         await new ContentDialog { Title = "Company", Content = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap, IsTextSelectionEnabled = true }, CloseButtonText = "Close", XamlRoot = Content.XamlRoot }.ShowAsync();
     }
 
     async void OpenProject_Click(object sender, RoutedEventArgs e) => await OpenSharedProjectAsync();
 
-    async void SignInStudio_Click(object sender, RoutedEventArgs e) => await SignInToStudioAsync();
+    async void SignInKivo_Click(object sender, RoutedEventArgs e) => await SignInToKivoAsync();
 
-    async void PushStudio_Click(object sender, RoutedEventArgs e) => await PushItemsToStudioAsync();
+    async void PushKivo_Click(object sender, RoutedEventArgs e) => await PushItemsToKivoAsync();
 
-    /// <summary>Open the project file shared with O-Draft.</summary>
+    /// <summary>Open the project file shared with Tren.</summary>
     async Task OpenSharedProjectAsync()
     {
         var picker = new FileOpenPicker { ViewMode = PickerViewMode.List, SuggestedStartLocation = PickerLocationId.DocumentsLibrary };
@@ -170,12 +170,12 @@ public sealed partial class MainWindow
         OpenProjectFile(file.Path);
     }
 
-    /// <summary>Sign in to the company file as an O-Studio user. The password stays in this sign-in; it is not sent to O-Draft.</summary>
-    internal async Task SignInToStudioAsync()
+    /// <summary>Sign in to the company file as a Kivo user. The password stays in this sign-in; it is not sent to Tren.</summary>
+    internal async Task SignInToKivoAsync()
     {
         if (!CompanyService.EngineAvailable)
         {
-            AppNotify.Warning("O-Studio", CompanyService.MissingEngine);
+            AppNotify.Warning("Kivo", CompanyService.MissingEngine);
             return;
         }
         var pathBox = new TextBox { Header = "Company file (.osas)", Text = CompanyService.LastPath ?? CompanyService.SuitePath() ?? "" };
@@ -190,12 +190,12 @@ public sealed partial class MainWindow
             if (file is not null)
                 pathBox.Text = file.Path;
         };
-        var user = new TextBox { Header = "O-Studio user" };
+        var user = new TextBox { Header = "Kivo user" };
         var password = new PasswordBox { Header = "Password" };
         var panel = new StackPanel { Spacing = 8, Children = { pathBox, browse, user, password } };
         var dlg = new ContentDialog
         {
-            Title = "Sign in to O-Studio",
+            Title = "Sign in to Kivo",
             Content = panel,
             PrimaryButtonText = "Sign in",
             CloseButtonText = "Cancel",
@@ -206,39 +206,39 @@ public sealed partial class MainWindow
             return;
         if (string.IsNullOrWhiteSpace(pathBox.Text) || !File.Exists(pathBox.Text.Trim()))
         {
-            AppNotify.Warning("O-Studio", "Choose the company file (.osas).");
+            AppNotify.Warning("Kivo", "Choose the company file (.osas).");
             return;
         }
         if (string.IsNullOrWhiteSpace(user.Text) || password.Password.Length == 0)
         {
-            AppNotify.Warning("O-Studio", "Enter the O-Studio user and password.");
+            AppNotify.Warning("Kivo", "Enter the Kivo user and password.");
             return;
         }
         try
         {
             await CompanyService.OpenAsync(pathBox.Text.Trim(), user.Text.Trim(), password.Password);
             RefreshCompanyBadge();
-            AppNotify.Success("O-Studio", $"Signed in as {CompanyService.Current!.User}.");
+            AppNotify.Success("Kivo", $"Signed in as {CompanyService.Current!.User}.");
         }
         catch (Exception ex)
         {
-            AppNotify.Warning("O-Studio", ex.Message);
+            AppNotify.Warning("Kivo", ex.Message);
         }
     }
 
-    /// <summary>Push the open project's items into the company file after an O-Studio sign-in.</summary>
-    internal async Task PushItemsToStudioAsync()
+    /// <summary>Push the open project's items into the company file after a Kivo sign-in.</summary>
+    internal async Task PushItemsToKivoAsync()
     {
         if (!CompanyService.IsOpen)
         {
-            await SignInToStudioAsync();
+            await SignInToKivoAsync();
             if (!CompanyService.IsOpen)
                 return;
         }
         var path = ProjectStore.Current.FilePath;
         if (!ProjectFiles.IsOdp(path) || !File.Exists(path))
         {
-            AppNotify.Warning("Push to O-Studio", "Open the shared project file (.osp) first.");
+            AppNotify.Warning("Push to Kivo", "Open the shared project file (.osp) first.");
             return;
         }
         if (ProjectStore.Current.Shared is null)
@@ -250,21 +250,21 @@ public sealed partial class MainWindow
             }
             catch (OfficeException ex)
             {
-                AppNotify.Warning("Push to O-Studio", ex.Message);
+                AppNotify.Warning("Push to Kivo", ex.Message);
                 return;
             }
             if (projects.Count == 0)
             {
-                AppNotify.Warning("Push to O-Studio", "This company has no projects in O-Studio yet. Create one there, then push again.");
+                AppNotify.Warning("Push to Kivo", "This company has no projects in Kivo yet. Create one there, then push again.");
                 return;
             }
-            var box = new ComboBox { Header = "O-Studio project", HorizontalAlignment = HorizontalAlignment.Stretch };
+            var box = new ComboBox { Header = "Kivo project", HorizontalAlignment = HorizontalAlignment.Stretch };
             foreach (var project in projects)
                 box.Items.Add(new ComboBoxItem { Content = string.IsNullOrWhiteSpace(project.Code) ? project.Name : $"{project.Code} — {project.Name}", Tag = project.Id });
             box.SelectedIndex = 0;
             var pick = new ContentDialog
             {
-                Title = "Push to O-Studio",
+                Title = "Push to Kivo",
                 Content = box,
                 PrimaryButtonText = "Push",
                 CloseButtonText = "Cancel",
@@ -275,22 +275,22 @@ public sealed partial class MainWindow
                 return;
             if (!await CompanyService.LinkProjectAsync(CompanyService.Current!.Uuid, id))
             {
-                AppNotify.Warning("Push to O-Studio", "This project could not be linked to the company file.");
+                AppNotify.Warning("Push to Kivo", "This project could not be linked to the company file.");
                 return;
             }
         }
         var err = await Task.Run(() => CompanyService.TryPushProjectSummary(ProjectStore.Current));
         if (err is not null)
         {
-            AppNotify.Warning("Push to O-Studio", err);
+            AppNotify.Warning("Push to Kivo", err);
             return;
         }
         var draft = await Task.Run(() => CompanyService.TryShareEstimateDraft(ProjectStore.Current));
         if (draft is not null && draft != "Calculate an estimate first.")
         {
-            AppNotify.Warning("Push to O-Studio", "The project items were pushed. The estimate was not: " + draft);
+            AppNotify.Warning("Push to Kivo", "The project items were pushed. The estimate was not: " + draft);
             return;
         }
-        AppNotify.Success("Push to O-Studio", "Items were pushed to the signed-in company.");
+        AppNotify.Success("Push to Kivo", "Items were pushed to the signed-in company.");
     }
 }

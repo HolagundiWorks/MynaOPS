@@ -28,8 +28,8 @@
                         <Button Content="New RA bill" Click="NewBill_Click" AutomationProperties.Name="New running-account bill" Style="{StaticResource PrimaryButtonStyle}"/>
                         <Button Content="Save" Click="SaveBill_Click" AutomationProperties.Name="Save running-account bill" Style="{StaticResource SecondaryButtonStyle}"/>
                         <Button Content="Certify locally" Click="CertifyBill_Click" AutomationProperties.Name="Certify and number bill locally" Style="{StaticResource SecondaryButtonStyle}"
-                                ToolTipService.ToolTip="Interim local lock and number only. Suite approval is in O-Studio (Practice → Approvals)."/>
-                        <Button Content="Share draft to O-Studio" Click="ShareDraft_Click" AutomationProperties.Name="Share RA bill draft to O-Studio" Style="{StaticResource SecondaryButtonStyle}"/>
+                                ToolTipService.ToolTip="Interim local lock and number only. Suite approval is in Kivo (Practice → Approvals)."/>
+                        <Button Content="Share draft to Kivo" Click="ShareDraft_Click" AutomationProperties.Name="Share RA bill draft to Kivo" Style="{StaticResource SecondaryButtonStyle}"/>
                         <Button Content="Revise" Click="ReviseBill_Click" AutomationProperties.Name="Revise certified bill" Style="{StaticResource SecondaryButtonStyle}"
                                 ToolTipService.ToolTip="Open a certified bill for correction as its next revision. It keeps its number and must be certified again."/>
                         <Button Content="Issue payment certificate" Click="IssueCertificate_Click" AutomationProperties.Name="Issue payment certificate" Style="{StaticResource SecondaryButtonStyle}"
@@ -78,7 +78,7 @@
                                     <TextBox x:Name="PartyBox" Header="Contractor / party"/>
                                     <ComboBox x:Name="BillPhaseBox" Header="Running bill phase" HorizontalAlignment="Stretch" IsEditable="True"
                                               AutomationProperties.Name="Running bill phase this bill covers"
-                                              ToolTipService.ToolTip="The running-bill phase this bill covers (the names come from the phases chosen in O-Draft). Optional."/>
+                                              ToolTipService.ToolTip="The running-bill phase this bill covers (the names come from the phases chosen in Tren). Optional."/>
 
                                     <StackPanel Spacing="6">
                                         <Grid>

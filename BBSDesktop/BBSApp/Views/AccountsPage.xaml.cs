@@ -168,7 +168,7 @@ public sealed partial class AccountsPage : Page
         LockBar.IsOpen = locked;
     }
 
-    /// <summary>The running-bill phases to pick from (the defaults and any chosen in O-Draft), with this bill's own value kept.</summary>
+    /// <summary>The running-bill phases to pick from (the defaults and any chosen in Tren), with this bill's own value kept.</summary>
     private void FillBillPhases(string current)
     {
         var names = ProjectStore.Current.PhaseNames(billing: true);
@@ -271,7 +271,7 @@ public sealed partial class AccountsPage : Page
         if (err is not null)
             AppNotify.Warning("Share draft", err);
         else
-            AppNotify.Success("Share draft", "Running bill draft sent to O-Studio (Practice → Approvals).");
+            AppNotify.Success("Share draft", "Running bill draft sent to Kivo (Practice → Approvals).");
     }
 
     private async void CertifyBill_Click(object sender, RoutedEventArgs e)
@@ -282,8 +282,8 @@ public sealed partial class AccountsPage : Page
         var dlg = new ContentDialog
         {
             Title = "Certify RA bill locally",
-            Content = $"Assign local number {_book.PreviewBillNumber(_current, Company)} and lock this bill in O-CoreOp only? "
-                      + $"Suite approval is in O-Studio (Practice → Approvals). Net payable ₹ {_current.Net:N2}.",
+            Content = $"Assign local number {_book.PreviewBillNumber(_current, Company)} and lock this bill in Falcon only? "
+                      + $"Suite approval is in Kivo (Practice → Approvals). Net payable ₹ {_current.Net:N2}.",
             PrimaryButtonText = "Certify locally",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary,

@@ -12,9 +12,9 @@ powershell -File BBSDesktop\tests\e2e\e2e-draft-coreop-takeoff.ps1
 # Engine only (skip O-Draft WinUI launch): -SkipDraftWinUi
 ```
 
-**Take-off:** pass the `.osp` on the command line (as the script does) or **File › Open project…**, then **File › Take-off (O-Draft)…**.
+**Take-off:** pass the `.osp` on the command line (as the script does) or **File › Open project…**, then **File › Take-off (Tren)…**.
 
-**Draft → CoreOp:** `seed-fresh-osp.ps1` runs `scripts/e2e-house-takeoff.scr` plus `takeoff.record` via `aad-cli` (same command as WinUI **Architecture › Take-off › Record**). `e2e-draft-coreop-takeoff.ps1` builds `aad_host.dll` if needed, opens the same `.osp` in **O-Draft WinUI**, then runs the CoreOp UIA script with `-MinToAdd 1`.
+**Draft → CoreOp:** `seed-fresh-osp.ps1` runs `scripts/e2e-house-takeoff.scr` plus `takeoff.record` via `aad-cli` (same command as WinUI **Architecture › Take-off › Record**). `e2e-draft-coreop-takeoff.ps1` builds `aad_host.dll` if needed, opens the same `.osp` in **Tren WinUI**, then runs the CoreOp UIA script with `-MinToAdd 1`.
 
 **`bbs_engine.dll`:** Visual Studio 2022 Build Tools with C++ workload; from `BBSDesktop`: `vcvars64.bat` then `cmake -B build -G Ninja` and `cmake --build build`. Copy `build\bbs_engine.dll` next to `O-CoreOp.exe` ( `run-e2e.ps1` does this when the DLL exists).
 

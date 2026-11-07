@@ -88,7 +88,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         };
         if (!Office.Ai.SuiteAiCoordinator.PreferClient)
             _aiCore = Office.Ai.SuiteAiCoordinator.StartHostIfNeeded();
-        ServedProject.Changed += () => DispatcherQueue.TryEnqueue(() => AppNotify.Info("Take-off", "O-Draft updated the take-off. Open Take-off to review and import it."));
+        ServedProject.Changed += () => DispatcherQueue.TryEnqueue(() => AppNotify.Info("Take-off", "Tren updated the take-off. Open Take-off to review and import it."));
         StartActiveProjectWatch();
         if (Content is FrameworkElement root)
             root.KeyDown += Window_KeyDown;
@@ -183,7 +183,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         {
             Cmd("dashboard", "Dashboard", Glyph("\uE80F")),
             Cmd("levels", "Levels", Glyph("\uF158")),
-            Cmd("takeoff", "Take-off (O-Draft)", Glyph("\uE8A5")),
+            Cmd("takeoff", "Take-off (Tren)", Glyph("\uE8A5")),
         }));
         _tabs.Add(new RibbonTab("rcc", "RCC steel", new[]
         {
@@ -1097,7 +1097,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         var picker = new FileSavePicker();
         InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
         picker.SuggestedFileName = ProjectStore.Current.Name.Replace(' ', '_') + ".aqcbridge";
-        picker.FileTypeChoices.Add("O-CoreOp bridge file", new List<string> { ".json" });
+        picker.FileTypeChoices.Add("Falcon bridge file", new List<string> { ".json" });
         var file = await picker.PickSaveFileAsync();
         if (file is null) return;
         try
@@ -1163,7 +1163,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         // The project file is the locked project's; there is nowhere else to save to. Without one, start from the launcher.
         if (string.IsNullOrEmpty(ProjectStore.Current.FilePath) || !ProjectFiles.IsOdp(ProjectStore.Current.FilePath))
         {
-            AppNotify.Warning("Save", "There is no project file to save to. Choose and lock a project in the launcher, then open O-CoreOp from it.");
+            AppNotify.Warning("Save", "There is no project file to save to. Choose and lock a project in Myna, then open Falcon from it.");
             return;
         }
         if (!ProjectFiles.Save(ProjectStore.Current.FilePath, ProjectStore.Current.ToJson(), out var err))

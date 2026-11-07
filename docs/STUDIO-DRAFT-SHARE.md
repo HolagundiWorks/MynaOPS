@@ -1,6 +1,6 @@
 # Share estimate / RA bill drafts to Studio
 
-**Status (2026-10-31):** Working quantities and money stay in the **`.osp`** (`project_doc`). When a project is linked to the company file, O-CoreOp mirrors **abstracts** into `project_documents` kind **`aqc.project`** (`project_ref`, `last_estimate`, `accounts.bills`) so O-Studio dashboards and fee screens can read them. **Approval drafts** use separate kinds (`aqc.estimate.draft`, `aqc.ra.draft.*`) via **Share draft to O-Studio**. Studio Practice → Approvals lists and locks those drafts.  
+**Status (2026-10-31):** Working quantities and money stay in the **`.osp`** (`project_doc`). When a project is linked to the company file, Falcon mirrors **abstracts** into `project_documents` kind **`aqc.project`** (`project_ref`, `last_estimate`, `accounts.bills`) so Kivo dashboards and fee screens can read them. **Approval drafts** use separate kinds (`aqc.estimate.draft`, `aqc.ra.draft.*`) via **Share draft to Kivo**. Studio Practice → Approvals lists and locks those drafts.  
 **Product rules:** Studio owns company identity and approval; CoreOp generates and shares drafts.
 
 ## 1. What CoreOp does
@@ -43,7 +43,7 @@ Existing project quantities document remains `aqc.project` (unchanged).
 | `state` | CoreOp always writes `draft`. Studio may later set `pending_approval` / `approved_locked` / `superseded` (Studio-owned; CoreOp does not write those yet) |
 | `artifact_kind` | `estimate` or `ra_bill` |
 | `shared_at` / `shared_by` | UTC ISO-8601 and ticket username |
-| `artifact_ref` | Same shape as O-Studio `docs/contracts/refs.md` (`Office.Shared.ArtifactRefs`) |
+| `artifact_ref` | Same shape as Kivo `docs/contracts/refs.md` (`Office.Shared.ArtifactRefs`) |
 | `summary` | Inbox-friendly totals without parsing `body` |
 | `body` | Full estimate JSON (`EstimateCalculator.ToJson`) or RA bill JSON (`RunningBill.ToJson`). The estimate carries `revision` (0 for the first calculation) and each line its `phase` and `bill_phase`; the bill carries `revision` (0 for the first issue; a certified bill reopened with Revise keeps its number and takes the next) and `billing_phase`. These are CoreOp's own revision counters; `artifact_ref.revision` is the company-file document revision and is separate |
 
@@ -65,7 +65,7 @@ Existing project quantities document remains `aqc.project` (unchanged).
 | Revise | Require a new CoreOp share (new revision) rather than editing a locked body in place |
 | Company mutation | Keep firm / client / project editors in Studio only |
 
-## 5. Code map (O-CoreOp)
+## 5. Code map (Falcon)
 
 | Piece | Path |
 |---|---|

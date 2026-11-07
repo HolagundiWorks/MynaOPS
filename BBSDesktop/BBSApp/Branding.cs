@@ -4,22 +4,22 @@
 namespace BBSApp;
 
 /// <summary>
-/// Product branding — O-CoreOp, part of the O-Studio suite (Human Centric Works). Formerly AQC Core.
+/// Product branding — Falcon, part of Myna (Human Centric Works). Formerly AQC Core and O-CoreOp.
 /// Keep display strings aligned with suite nomenclature (docs/SUITE.md).
 /// </summary>
 public static class Branding
 {
-    /// <summary>Window · tile · about — suite style (space, not hyphen).</summary>
-    public const string AppName = "O-CoreOp";
+    /// <summary>Window · tile · about. Identifiers and the app-data folder stay O-CoreOp.</summary>
+    public const string AppName = "Falcon";
 
     /// <summary>Legacy hyphenated name (files · older docs).</summary>
     public const string LegacyAppName = "AQC-Core";
 
     /// <summary>Short mark for dense chrome.</summary>
-    public const string ShortName = "O-CoreOp";
+    public const string ShortName = "Falcon";
 
     public const string FullName = "Quantities, estimates and billing";
-    public const string SuiteLine = "O-Studio suite · Human Centric Works";
+    public const string SuiteLine = "Myna · Human Centric Works";
     public const string Tagline =
         "Estimation · BBS · BOQ — local quantities, estimates and billing";
     public const string HeroSupport =

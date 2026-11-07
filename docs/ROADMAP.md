@@ -62,7 +62,7 @@ notes):
 | 2 | Confirmed mutations: `add_element_row` (RCC), `update_setting` (covers, markups, RMC flag) | ✅ |
 | 3a | `create_correspondence` — drafts an editable, unnumbered office draft | ✅ |
 | 3b | `list_takeoff` + `commit_opening` — model-chosen opening→wall | ⛔ removed 2026-10-19 with the PDF take-off panel |
-| 3c | `read_drawing` — native-PDF vision read of the loaded takeoff | ⛔ removed 2026-10-19 (take-off is done in O-Draft) |
+| 3c | `read_drawing` — native-PDF vision read of the loaded takeoff | ⛔ removed 2026-10-19 (take-off is done in Tren) |
 | 4 | `list_link_rules` + `add_link_rule` / `apply_links` — drive the linked-item model | ✅ |
 | 5 | `list_levels` + `add_level` — read storeys and add one (confirmed); rows target a level by id | ✅ |
 | 6 | `add_civil_row` — confirmed civil-BOQ writes (masonry, plaster, flooring, painting, PCC, …) | ✅ |
@@ -81,37 +81,37 @@ Ordered roughly by value and by what unblocks what. Items marked **owner** need 
 **Run it for real first (nothing below is trustworthy until these are done)**
 
 1. ~~Add the repository secret `HCW_UI_TOKEN` so CI builds (2.1).~~ Done: CI clones public `HolagundiWorks/O-UI` (no token).
-2. Click through Import from CAD, Export for CAD and the Take-off page with a real take-off; CadImport and Office.Shared tests pass, the screens need a desktop click-through (2.4). Needs O-Draft to record a take-off first.
+2. Click through Import from CAD, Export for CAD and the Take-off page with a real take-off; CadImport and Office.Shared tests pass, the screens need a desktop click-through (2.4). Needs Tren to record a take-off first.
 3. Install the new installer on a clean machine and check the in-place upgrade (2.5).
 
 **Connect and sync (removed 2026-10-28)**
 
 AORMS Connect / Bridge (sign-in, Online projects, Push/Pull, Bind/Flush, outbox) were removed from this repository. Do not reintroduce without an owner decision. Company-file / OSAS ticket flow stays.
 
-**Take-off from O-Draft**
+**Take-off from Tren**
 
-7. ~~A check for two drawings that measure the same floor~~ O-CoreOp now warns in the import preview (`CadImporter.WarnAboutOverlap`, 5 tests); whether O-Draft should also warn when recording is **owner**'s call (see overlap notes in `docs/PROJECT-FILE.md`).
-8. A notice when O-Draft has re-recorded a drawing since it was imported.
-9. O-Draft side (not in this repository): `takeoff.record`, stable `refs`, slab spans, `takeoff.annotate`, room/entity level, `wall_ref` on deduct openings, A-WALL face thickness, and take-off honesty notes are built. Still open there: product E2E against live CoreOp on a shared `.osp`, scanned-PDF underlay polish, interactive company-file project picker UI. See [MIGRATION-OSP.md](MIGRATION-OSP.md).
+7. ~~A check for two drawings that measure the same floor~~ Falcon now warns in the import preview (`CadImporter.WarnAboutOverlap`, 5 tests); whether Tren should also warn when recording is **owner**'s call (see overlap notes in `docs/PROJECT-FILE.md`).
+8. A notice when Tren has re-recorded a drawing since it was imported.
+9. Tren side (not in this repository): `takeoff.record`, stable `refs`, slab spans, `takeoff.annotate`, room/entity level, `wall_ref` on deduct openings, A-WALL face thickness, and take-off honesty notes are built. Still open there: product E2E against live CoreOp on a shared `.osp`, scanned-PDF underlay polish, interactive company-file project picker UI. See [MIGRATION-OSP.md](MIGRATION-OSP.md).
 
-**Suite joins** (O-STUDIO roadmap numbers): shared company file + live sync (2.2); `ProjectRef` / estimate `ArtifactRef` stamped on company-file saves and Estimate page (2.3); O-Studio fee proposals + RA summary via `project_estimate_summary` / `project_ra_summary` (2.4); **share estimate / RA drafts to Studio** via `aqc.estimate.draft` / `aqc.ra.draft.*` ([STUDIO-DRAFT-SHARE.md](STUDIO-DRAFT-SHARE.md)); Studio inbox approve/lock still open; MCP server still open (2.5). Suite-linked CoreOp no longer creates clients/projects (use Studio). Next trust gate: human/Windows GUI E2E.
+**Suite joins** (O-STUDIO roadmap numbers): shared company file + live sync (2.2); `ProjectRef` / estimate `ArtifactRef` stamped on company-file saves and Estimate page (2.3); Kivo fee proposals + RA summary via `project_estimate_summary` / `project_ra_summary` (2.4); **share estimate / RA drafts to Studio** via `aqc.estimate.draft` / `aqc.ra.draft.*` ([STUDIO-DRAFT-SHARE.md](STUDIO-DRAFT-SHARE.md)); Studio inbox approve/lock still open; MCP server still open (2.5). Suite-linked CoreOp no longer creates clients/projects (use Studio). Next trust gate: human/Windows GUI E2E.
 
 **Product**
 
 10. Streaming AI replies (`Messages.CreateStreaming`; touches the `AskAsync` tool loop and the command-bar UI).
 11. Signing certs + hosted update channel (hooks/`sign.ps1`/Check for updates stub landed); automated UI tests in CI (3.2); check quantities and purchase orders against a real project (3.3).
 12. Accessibility passes still open: Narrator and NVDA, 520 px on every page, 200% text and high contrast, keyboard order (3.1 to 3.7 in the hand-off).
-13. **counsel:** review dual AGPL+commercial; rename product in `LICENSING.md` / `CONTRIBUTING.md` from AQC-Core → O-CoreOp when approved.
+13. **counsel:** review dual AGPL+commercial; rename product in `LICENSING.md` / `CONTRIBUTING.md` from AQC-Core → Falcon when approved.
 
 ## Done recently ✅
 
-- Take-off moved to O-Draft; the PDF take-off panel and canvas removed; the Take-off page reads the open `.osp` (several drawings per project) and stores the annotated drawing PDF; **the stored PDFs are embedded in the project report and the estimate PDF**.
+- Take-off moved to Tren; the PDF take-off panel and canvas removed; the Take-off page reads the open `.osp` (several drawings per project) and stores the annotated drawing PDF; **the stored PDFs are embedded in the project report and the estimate PDF**.
 - Engine builds with clang/MinGW as well as MSVC (the installer script no longer needs Visual Studio for it).
-- CAD import and export; `.osp` take-off; the O-CoreOp shell and the shared design; company-file / OSAS ticket flow.
+- CAD import and export; `.osp` take-off; the Falcon shell and the shared design; company-file / OSAS ticket flow.
 
 ## Deferred 💤
 
-- **Pixel-level take-off auto-detection.** Detecting geometry from a drawing is now O-Draft's to do; it is not planned here.
+- **Pixel-level take-off auto-detection.** Detecting geometry from a drawing is now Tren's to do; it is not planned here.
 
 ---
 
@@ -135,13 +135,13 @@ AORMS Connect / Bridge (sign-in, Online projects, Push/Pull, Bind/Flush, outbox)
 
 ## CAD take-off and project file (2026-10-30; Connect removed 2026-10-28)
 
-Take-off from drawings and PDFs is done in **O-Draft**, recorded in the shared **`.osp`**, and read here ([PROJECT-FILE.md](PROJECT-FILE.md), [AADT.md](AADT.md)). AORMS portal sign-in / Online projects / project sync were removed.
+Take-off from drawings and PDFs is done in **Tren**, recorded in the shared **`.osp`**, and read here ([PROJECT-FILE.md](PROJECT-FILE.md), [AADT.md](AADT.md)). AORMS portal sign-in / Online projects / project sync were removed.
 
 | Step | What | State |
 |------|------|-------|
 | Bridge contract | `hcw-aqc-bridge` v1 schema, samples and spec in [bridge/](bridge/README.md) | ✅ |
 | Import from CAD | `AQC.CadImport` + File > Import from CAD…, preview, idempotent, one undo | ✅ |
 | Export for CAD | File > Export for CAD… (levels, project, beam depths) | ✅ |
-| Take-off (O-Draft) | Take-off page reads the open `.osp`; several drawings; company-file grouping | ✅ |
-| Annotated drawing | Fetch, verify (SHA-256) and store O-Draft's PDF | ✅ |
-| O-Draft writes the take-off | `takeoff.record` / annotate into `.osp` | ✅ built; E2E / underlay polish open |
+| Take-off (Tren) | Take-off page reads the open `.osp`; several drawings; company-file grouping | ✅ |
+| Annotated drawing | Fetch, verify (SHA-256) and store Tren's PDF | ✅ |
+| Tren writes the take-off | `takeoff.record` / annotate into `.osp` | ✅ built; E2E / underlay polish open |

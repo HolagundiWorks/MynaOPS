@@ -25,8 +25,8 @@
                         HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Button Content="Calculate" Style="{StaticResource PrimaryButtonStyle}"
                         Click="Calculate_Click" AutomationProperties.Name="Calculate estimate"/>
-                <Button Content="Share draft to O-Studio" Style="{StaticResource SecondaryButtonStyle}"
-                        Click="ShareDraft_Click" AutomationProperties.Name="Share estimate draft to O-Studio"/>
+                <Button Content="Share draft to Kivo" Style="{StaticResource SecondaryButtonStyle}"
+                        Click="ShareDraft_Click" AutomationProperties.Name="Share estimate draft to Kivo"/>
                 <Button Content="Export PDF" Style="{StaticResource SecondaryButtonStyle}"
                         Click="ExportPdf_Click" AutomationProperties.Name="Export estimate PDF"/>
                 <Button Content="CSV" Style="{StaticResource SecondaryButtonStyle}"
@@ -67,7 +67,7 @@
                               AutomationProperties.Name="Rate book version for estimate"/>
                     <ComboBox x:Name="PhaseCombo" Header="Estimation phase" MinWidth="180"
                               AutomationProperties.Name="Estimation phase to estimate"
-                              ToolTipService.ToolTip="Estimate only the items given this phase in O-Draft. All phases estimates everything; items without a phase are left out of a single phase."/>
+                              ToolTipService.ToolTip="Estimate only the items given this phase in Tren. All phases estimates everything; items without a phase are left out of a single phase."/>
                 </StackPanel>
                 <TextBlock x:Name="TotalText" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,8"
                            Style="{StaticResource PageTitleStyle}" FontSize="20"/>

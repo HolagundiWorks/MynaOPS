@@ -1,11 +1,11 @@
-# O-CoreOp in the unified suite installer
+# Falcon in the unified suite installer
 
-**Status:** Verified in tree 2026-11-04 · **Canonical suite doc:** O-Studio `installer/suite/README.md`
+**Status:** Verified in tree 2026-11-04 · **Canonical suite doc:** Kivo `installer/suite/README.md`
 
-O-CoreOp is installed through **`O-Suite-Setup-<version>.exe`**, built in the O-Studio repository (`installer/suite/build-single.ps1`). That single package:
+Falcon is installed through **`O-Suite-Setup-<version>.exe`**, built in the Kivo repository (`installer/suite/build-single.ps1`). That single package:
 
-- **Install mode:** checkbox **O-CoreOp** (or **Everything**); optional shared **Olmo 3 7B** model task (same file O-Draft uses).
-- **Remove mode:** run the same Setup again, choose **Remove applications**, select O-CoreOp only or with other apps; company files and the model stay unless the user removes them elsewhere.
+- **Install mode:** checkbox **Falcon** (or **Everything**); optional shared **Olmo 3 7B** model task (same file Tren uses).
+- **Remove mode:** run the same Setup again, choose **Remove applications**, select Falcon only or with other apps; company files and the model stay unless the user removes them elsewhere.
 
 Build this app’s payload first:
 

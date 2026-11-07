@@ -1,4 +1,4 @@
-# O-CoreOp packaging and signing
+# Falcon packaging and signing
 
 ## Installers
 
@@ -48,8 +48,8 @@ powershell -File BBSDesktop\installer\sign.ps1 BBSDesktop\artifacts\installer\O-
 
 The OSAS launcher can install this Setup.exe via
 `installer/install-suite.ps1 -ArtifactsDir …` when the file is named
-`O-CoreOp-Setup-*.exe`. Prefer the unified **`O-Suite-Setup-*.exe`** from O-Studio
-(`installer/suite/README.md`): one wizard for install and remove of O-Studio, O-CoreOp, and O-Draft.
+`Falcon-Setup-*.exe`. Prefer the unified **`O-Suite-Setup-*.exe`** from Kivo
+(`installer/suite/README.md`): one wizard for install and remove of Kivo, Falcon, and Tren.
 
 ## Update channel (check-only)
 
@@ -65,7 +65,7 @@ updates yet.
 - App CI: `.github/workflows/ci.yml` (build/test only).
 - Packaging: `.github/workflows/packaging-windows.yml` (`workflow_dispatch` or tag `v*`)
   installs Inno, runs `build-installer.ps1`, maps the shared signing secret names,
-  uploads `O-CoreOp-Setup-<ver>.exe` or `…-unsigned.exe`.
+  uploads `Falcon-Setup-<ver>.exe` or `…-unsigned.exe`.
 - Do not fail packaging solely because signing material is missing.
 - Once org/repo secrets exist, re-run packaging — signing turns on with no code change.
 - Full suite ops checklist (Azure vs EV enrollment for Vishwabhiram): Project doc

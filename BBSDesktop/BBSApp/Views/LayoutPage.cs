@@ -12,7 +12,7 @@ using WinRT.Interop;
 namespace BBSApp.Views;
 
 /// <summary>
-/// Drawing output. Print blocks are named in O-Draft. This page places one on a layout of a project map,
+/// Drawing output. Print blocks are named in Tren. This page places one on a layout of a project map,
 /// fills the nameplate, and writes a sheet PDF. The PDF records the sheet; it does not redraw the model.
 /// </summary>
 public sealed class LayoutPage : Page
@@ -118,7 +118,7 @@ public sealed class LayoutPage : Page
         var intro = new TextBlock
         {
             TextWrapping = TextWrapping.Wrap,
-            Text = "Print blocks are created in O-Draft. Select a project map and a layout, such as Ground floor working drawing, insert the related print block, update the nameplate, then export the PDF.",
+            Text = "Print blocks are created in Tren. Select a project map and a layout, such as Ground floor working drawing, insert the related print block, update the nameplate, then export the PDF.",
         };
         Grid.SetRow(heading, 0);
         Grid.SetRow(intro, 1);
@@ -296,7 +296,7 @@ public sealed class LayoutPage : Page
         var block = Related(layout) ?? SelectedBlock;
         if (block is null)
         {
-            SetStatus("No print block matches this layout. Select one on the right, or create it in O-Draft and reload.");
+            SetStatus("No print block matches this layout. Select one on the right, or create it in Tren and reload.");
             return;
         }
         layout.PrintBlock = block.Name;
@@ -382,7 +382,7 @@ public sealed class LayoutPage : Page
         if (path is null || !File.Exists(path))
         {
             _blocks.ItemsSource = new List<string>();
-            SetStatus("Open the project file. Print blocks are created in O-Draft and saved into that file.");
+            SetStatus("Open the project file. Print blocks are created in Tren and saved into that file.");
             return;
         }
         try
@@ -404,7 +404,7 @@ public sealed class LayoutPage : Page
         _blocks.ItemsSource = _printBlocks.Select(b =>
             string.IsNullOrEmpty(b.Description) ? b.Name : b.Name + "  —  " + b.Description).ToList();
         if (_printBlocks.Count == 0)
-            SetStatus("No print blocks in this drawing. Create one in O-Draft, save the project file, then reload. A DWG that does not carry the project text will not list them.");
+            SetStatus("No print blocks in this drawing. Create one in Tren, save the project file, then reload. A DWG that does not carry the project text will not list them.");
         else
             SetStatus(_printBlocks.Count + " print block(s) from the project file.");
     }

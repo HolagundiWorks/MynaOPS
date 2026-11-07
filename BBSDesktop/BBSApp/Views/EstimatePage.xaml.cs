@@ -193,7 +193,7 @@ public sealed partial class EstimatePage : Page
             return;
         }
         Info.Title = "Share draft";
-        Info.Message = "Estimate draft sent to O-Studio (Practice → Approvals). BOQ and estimate abstracts on the project dashboard were updated.";
+        Info.Message = "Estimate draft sent to Kivo (Practice → Approvals). BOQ and estimate abstracts on the project dashboard were updated.";
         Info.Severity = InfoBarSeverity.Success;
         Info.IsOpen = true;
     }
@@ -259,7 +259,7 @@ public sealed partial class EstimatePage : Page
         var rev = artifact?["revision"]?.GetValue<uint>() ?? 0;
         ProjectRefText.Text =
             $"Company project · {company.Name} · project id {link.ProjectId} · ProjectRef v1 · estimate ArtifactRef revision {rev}. " +
-            "O-Studio reads BOQ, estimate and running-bill abstracts from the company file (updated on save or calculate).";
+            "Kivo reads BOQ, estimate and running-bill abstracts from the company file (updated on save or calculate).";
     }
 
     private async void ExportPdf_Click(object sender, RoutedEventArgs e)
