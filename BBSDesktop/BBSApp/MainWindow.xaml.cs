@@ -1155,7 +1155,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         UpdatePersonaBadge();
         SelectNavTag("dashboard");
         AppNotify.Success("Project opened", $"{ProjectStore.Current.Name}  ·  {Path.GetFileName(path)}");
-        _ = LinkOpenProjectToStudioAsync();
+        _ = LinkOpenProjectToKivoAsync();
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)

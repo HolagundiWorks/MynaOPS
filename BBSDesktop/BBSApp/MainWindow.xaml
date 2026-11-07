@@ -68,12 +68,12 @@
                         <FontIcon Glyph="&#xE8E5;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Sign in to Kivo…" Click="SignInStudio_Click">
+                <MenuFlyoutItem Text="Sign in to Kivo…" Click="SignInKivo_Click">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE77B;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Push to Kivo" Click="PushStudio_Click">
+                <MenuFlyoutItem Text="Push to Kivo" Click="PushKivo_Click">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE898;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
