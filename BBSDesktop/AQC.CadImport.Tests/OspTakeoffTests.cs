@@ -280,6 +280,47 @@ public class OspTakeoffTests
     }
 
     [Fact]
+    public void Plumbing_rows_are_read_and_do_not_disturb_the_import_of_the_rest()
+    {
+        const uint slot = 77;
+        var header = new JsonObject
+        {
+            ["format"] = OspTakeoff.HeaderFormatWire, ["version"] = 1, ["units"] = "mm", ["state"] = "complete",
+            ["source"] = new JsonObject { ["drawing_id"] = "plumb-demo", ["drawing"] = "bath.dwg" },
+            ["levels"] = new JsonArray { new JsonObject { ["name"] = "Ground", ["height_mm"] = 3150 } },
+        };
+        var stack = new JsonObject
+        {
+            ["ref"] = "PSabc-SUP", ["source"] = "TK-01", ["kind"] = "TK", ["service"] = "SUP", ["level"] = "Ground",
+            ["european_wc"] = 1, ["indian_wc"] = 0, ["basin"] = 1, ["sink"] = 0, ["shower"] = 0, ["floor_trap"] = 0, ["pipe_m"] = 6.0,
+        };
+        var fixture = new JsonObject
+        {
+            ["ref"] = "PFdef", ["fixture"] = "WB-01", ["kind"] = "WB", ["supply"] = "TK-01", ["drain"] = "", ["level"] = "Ground",
+        };
+        var recs = new List<TakeoffRecord>
+        {
+            new(OspTakeoff.HeaderId(slot), 0, 0, 0, 0, header.ToJsonString()),
+            new(OspTakeoff.MakeId(OspTakeoff.KindPlumbingStack, slot, 1), 0, 0, 0, 0, stack.ToJsonString()),
+            new(OspTakeoff.MakeId(OspTakeoff.KindPlumbingFixture, slot, 2), 0, 0, 0, 0, fixture.ToJsonString()),
+        };
+        var read = OspTakeoff.Read(recs, slot);
+        Assert.Empty(read.Skipped);
+        Assert.Single(read.File.Plumbing);
+        Assert.Single(read.File.PlumbingFixtures);
+        Assert.Equal("TK-01", read.File.Plumbing[0]!["source"]!.GetValue<string>());
+        Assert.Equal(6.0, read.File.Plumbing[0]!["pipe_m"]!.GetValue<double>());
+        Assert.Equal("WB-01", read.File.PlumbingFixtures[0]!["fixture"]!.GetValue<string>());
+
+        // The importer has no plumbing sheet yet: planning and applying leave the model alone.
+        var m = EmptyModel();
+        m.Levels[0].Name = "Ground";
+        var plan = CadImporter.Plan(read.File, m);
+        CadImporter.Apply(plan, m);
+        Assert.Empty(m.Sheet("plumbing"));
+    }
+
+    [Fact]
     public void Openings_that_already_name_their_wall_are_not_reassigned_by_position()
     {
         var read = OspTakeoff.Read(RecordsFromFixture());

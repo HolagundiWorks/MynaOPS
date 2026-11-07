@@ -27,6 +27,10 @@ public sealed class BridgeFile
     public List<JsonObject> Slabs { get; init; } = new();
     public List<JsonObject> Electrical { get; init; } = new();
     public List<JsonObject> ElectricalCircuits { get; init; } = new();
+    /// <summary>Plumbing sources (tank, riser, chamber) with the fixtures each serves and its pipe length, one row per source and service.</summary>
+    public List<JsonObject> Plumbing { get; init; } = new();
+    /// <summary>One row per plumbing fixture: its supply source and its drain.</summary>
+    public List<JsonObject> PlumbingFixtures { get; init; } = new();
 
     public static BridgeFile Parse(string json)
     {
@@ -78,6 +82,8 @@ public sealed class BridgeFile
         Fill(root, "slabs", f.Slabs);
         Fill(root, "electrical", f.Electrical);
         Fill(root, "electrical_circuits", f.ElectricalCircuits);
+        Fill(root, "plumbing", f.Plumbing);
+        Fill(root, "plumbing_fixtures", f.PlumbingFixtures);
         return f;
     }
 
