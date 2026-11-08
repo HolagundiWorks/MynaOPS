@@ -91,10 +91,14 @@ public sealed class DbServiceClient
         return new DbProjectStatus(v["local_revision"]?.GetValue<long>(), v["remote_revision"]?.GetValue<long>(), v["state"]?.GetValue<string>() ?? "", v["pending"]?.GetValue<long>() ?? 0);
     }
 
-    /// <summary>Send the saved revision; the service reads the file from the path registered at connect.</summary>
-    public async Task<long> Push(string token, string projectId, long revision)
+    /// <summary>
+    /// Send the saved revision; the service reads the file from the path registered at connect. Null means the service keeps project files on
+    /// this PC (<c>local_only</c>): there is nothing to send and the local file is the shared database.
+    /// </summary>
+    public async Task<long?> Push(string token, string projectId, long revision)
     {
         var v = await Send(HttpMethod.Post, $"v1/projects/{Uri.EscapeDataString(projectId)}/push", token, new JsonObject { ["revision"] = revision }).ConfigureAwait(false);
+        if (v["local_only"]?.GetValue<bool>() == true) return null;
         return v["remote_revision"]?.GetValue<long>() ?? revision;
     }
 }

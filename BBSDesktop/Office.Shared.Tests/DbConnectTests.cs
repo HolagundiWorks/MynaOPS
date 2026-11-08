@@ -277,6 +277,24 @@ public class DbConnectTests : IDisposable
     }
 
     [Fact]
+    public void A_service_that_keeps_files_local_is_not_an_error()
+    {
+        var (path, _) = Project();
+        using var myna = new FakeMyna(r => r.Path switch
+        {
+            "/v1/projects/connect" => (200, """{"connected":true,"remote_revision":null,"action":"none"}"""),
+            var p when p.EndsWith("/push") => (200, """{"remote_revision":null,"local_only":true}"""),
+            _ => (200, """{"local_revision":1,"remote_revision":null,"state":"synced","pending":0}"""),
+        });
+        var c = Connector(new FakeKivo(), myna.Url);
+        c.ConnectBlocking(path);
+        c.PushNow(4);
+        Assert.Equal(DbState.Connected, c.Snapshot.State);
+        Assert.Contains("stay on this PC", c.Snapshot.Detail);
+        Assert.Equal("Database: connected", c.Snapshot.Label);
+    }
+
+    [Fact]
     public void Several_saves_in_a_row_go_as_one_push()
     {
         var (path, _) = Project();

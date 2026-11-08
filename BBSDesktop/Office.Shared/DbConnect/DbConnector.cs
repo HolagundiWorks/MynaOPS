@@ -306,7 +306,9 @@ public sealed class DbConnector
                 var remote = _service.Push(token, project.Id, revision).GetAwaiter().GetResult();
                 long pending = 0;
                 try { pending = _service.Project(token, project.Id).GetAwaiter().GetResult().Pending; } catch (ServiceException) { }
-                Set(DbState.Connected, $"{project.Name}: revision {remote} sent to the suite database.", pending);
+                Set(DbState.Connected,
+                    remote is { } r ? $"{project.Name}: revision {r} sent to the suite database." : $"{project.Name}: saved. Project files stay on this PC; the local file is the shared database.",
+                    pending);
                 return;
             }
             catch (ServiceException e) when (e.Failure == ServiceFailure.Unauthorized && !fresh)
