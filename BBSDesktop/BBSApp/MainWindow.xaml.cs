@@ -71,8 +71,6 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         NavigateTo("dashboard");
         UpdatePersonaBadge();
         SetWindowTitle(Branding.WindowTitle(ProjectStore.Current.Name, ProjectStore.Current.IsDirty));
-        StartCompanyPolling();
-        _ = StartFromSuiteAsync();
         AppNotify.Raised += OnAppNotify;
         ProjectStore.Current.Changed += OnStoreChanged;
         Closed += (_, _) =>
@@ -1057,9 +1055,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             .Where(i => i.Action != Aqc.CadImport.PlanAction.Unchanged)
             .Select(i => $"{i.Action,-17} {i.Section,-17} {(i.Mark.Length > 0 ? i.Mark : i.Ref)}{(i.Reason.Length > 0 ? "  - " + i.Reason : "")}")
             .ToList();
-        var companyUuid = BBSApp.Services.Company.CompanyService.Current?.Uuid;
-        var openProjectId = ProjectStore.Current.Shared?.ProjectId;
-        var projectRefLine = prep.File.ProjectRefCaption(companyUuid, openProjectId);
+        var projectRefLine = prep.File.ProjectRefCaption(null, null);
         var other = "\n" + projectRefLine + "\n";
         if (plan.OtherDrawingId is not null)
             other += "\nThis project already holds rows from a different drawing; importing adds this drawing's rows alongside them.\n";
@@ -1155,16 +1151,18 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         UpdatePersonaBadge();
         SelectNavTag("dashboard");
         AppNotify.Success("Project opened", $"{ProjectStore.Current.Name}  ·  {Path.GetFileName(path)}");
-        _ = LinkOpenProjectToKivoAsync();
     }
 
-    private void Save_Click(object sender, RoutedEventArgs e)
+    private async void Save_Click(object sender, RoutedEventArgs e)
     {
-        // The project file is the locked project's; there is nowhere else to save to. Without one, start from the launcher.
+        // A project that has no file yet is saved to a new project file that Tren can open too.
         if (string.IsNullOrEmpty(ProjectStore.Current.FilePath) || !ProjectFiles.IsOdp(ProjectStore.Current.FilePath))
         {
-            AppNotify.Warning("Save", "There is no project file to save to. Choose and lock a project in Myna, then open Falcon from it.");
-            return;
+            var chosen = await ChooseNewProjectFileAsync();
+            if (string.IsNullOrEmpty(chosen))
+                return;
+            ProjectStore.Current.FilePath = chosen;
+            ProjectStore.Current.Info.OspPath = chosen;
         }
         if (!ProjectFiles.Save(ProjectStore.Current.FilePath, ProjectStore.Current.ToJson(), out var err))
             AppNotify.Error("Save failed", err ?? "Could not save.");
@@ -1173,9 +1171,6 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             ProjectStore.Current.IsDirty = false;
             RefreshWindowTitle();
             AppNotify.Success("Saved", Path.GetFileName(ProjectStore.Current.FilePath));
-            var companyErr = BBSApp.Services.Company.CompanyService.TryPushProjectSummary(ProjectStore.Current);
-            if (companyErr is not null)
-                AppNotify.Warning("Company file", companyErr);
         }
     }
 

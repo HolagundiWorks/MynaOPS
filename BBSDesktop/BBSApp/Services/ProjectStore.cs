@@ -21,7 +21,6 @@ public sealed class ProjectStore
     public string? FilePath { get; set; }
 
     /// <summary>Set when this project lives in the shared company file; saving then writes there. Not part of the project data.</summary>
-    public BBSApp.Services.Company.SharedProjectLink? Shared { get; set; }
     public bool IsDirty { get; set; }
 
     /// <summary>Project identity: client, company, prepared-by, logo.</summary>
@@ -328,10 +327,6 @@ public sealed class ProjectStore
             ["last_estimate"] = LastEstimate is null ? null : EstimateCalculator.ToJson(LastEstimate),
             ["last_estimate_rate_book_version_id"] = LastEstimateRateBookVersionId ?? ""
         };
-        // Suite identity: company file is the system of record (ProjectRef). Present when this project lives there.
-        if (Shared is not null && Company.CompanyService.Current is { } company && !string.IsNullOrWhiteSpace(company.Uuid))
-            // global:: — Office is also this store's OfficeRegister property.
-            root["project_ref"] = global::Office.Shared.ArtifactRefs.ProjectRef(company.Uuid, Shared.ProjectId);
         return root;
     }
 
@@ -619,7 +614,6 @@ public sealed class ProjectStore
         Markups.Reset();
         Name = Info.Name;
         FilePath = null;
-        Shared = null;
         Columns.Clear(); Beams.Clear(); Pedestals.Clear(); Lintels.Clear();
         Slabs.Clear(); Footings.Clear(); Walls.Clear(); Stairs.Clear();
         MasonryWalls.Clear(); MasonryOpenings.Clear(); Plaster.Clear(); FinishPropose.Clear(); PccBeds.Clear(); Earthwork.Clear(); SizeStone.Clear();

@@ -21,18 +21,10 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         Services.RateBookStore.Current.EnsureLoaded();
-        // Falcon opens the shared .osp itself. A launcher lock is optional. Sign-in and Push to Kivo happen inside this app.
-        var locked = Office.Shared.SuiteProjectLock.FromEnvironment();
-
+        // Falcon opens the shared .osp itself; it needs no launcher, no sign-in and no Kivo.
         MainWindow = new MainWindow();
         MainWindow.Activate();
-        if (locked is not null)
-        {
-            MainWindow.DispatcherQueue.TryEnqueue(() => MainWindow.OpenLockedProject(locked));
-            return;
-        }
-
-        // Standalone only: a project file given on the command line is opened once the window is up.
+        // A project file given on the command line is opened once the window is up.
         var file = Environment.GetCommandLineArgs().Skip(1).FirstOrDefault(a => Services.ProjectFiles.IsOdp(a) && System.IO.File.Exists(a));
         if (file is not null)
             MainWindow.DispatcherQueue.TryEnqueue(() => MainWindow.OpenProjectFile(System.IO.Path.GetFullPath(file)));

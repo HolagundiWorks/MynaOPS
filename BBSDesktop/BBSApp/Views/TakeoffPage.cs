@@ -180,13 +180,9 @@ public sealed class TakeoffPage : Page
     void FillList()
     {
         var selected = Selected?.Slot;
-        var shared = ProjectStore.Current.Shared;
-        var companyUuid = BBSApp.Services.Company.CompanyService.Current?.Uuid;
-        // A drawing belongs to the open project when it names the project in the company file.
-        bool Mine(TakeoffDrawing d) =>
-            shared is not null && d.ProjectRefId == shared.ProjectId && !string.IsNullOrEmpty(companyUuid) && d.ProjectRefCompany == companyUuid;
-        bool Other(TakeoffDrawing d) =>
-            !Mine(d) && shared is not null && d.ProjectRefId is not null;
+        // Every drawing in the project file belongs to this project; there is no company file to match against.
+        static bool Mine(TakeoffDrawing d) => true;
+        static bool Other(TakeoffDrawing d) => false;
         _drawings.Items.Clear();
         // this project's drawings first, then the others
         foreach (var d in _list.OrderByDescending(Mine).ThenBy(d => d.Drawing, StringComparer.OrdinalIgnoreCase))
@@ -206,9 +202,6 @@ public sealed class TakeoffPage : Page
             if (d.Slot == selected) _drawings.SelectedItem = item;
         }
         if (_drawings.SelectedItem is null && _drawings.Items.Count > 0) _drawings.SelectedIndex = 0;
-        // a drawing recorded from a Studio project names it: take that project's details from the company file
-        if (_list.FirstOrDefault(d => d.ProjectRefId is not null) is { } named)
-            _ = App.MainWindow!.LinkOpenProjectToKivoAsync(named.ProjectRefCompany, named.ProjectRefId);
         UpdateButtons();
     }
 
@@ -269,8 +262,6 @@ public sealed class TakeoffPage : Page
                     : force
                         ? $"Reloaded: {_list.Count} drawing(s) with a recorded take-off."
                         : $"{_list.Count} drawing(s) with a recorded take-off.";
-                if (_list.Count > 0 && ProjectStore.Current.Shared is null)
-                    text += " This project file is not linked to a Studio project yet; drawings from a linked take-off header will match once the company file link is set.";
                 _status.Text = text;
             }
         }

@@ -68,16 +68,6 @@
                         <FontIcon Glyph="&#xE8E5;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Sign in to Kivo…" Click="SignInKivo_Click">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE77B;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-                <MenuFlyoutItem Text="Push to Kivo" Click="PushKivo_Click">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE898;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
                 <MenuFlyoutItem Text="Save" Click="Save_Click" AccessKey="S">
                     <MenuFlyoutItem.Icon>
@@ -211,14 +201,6 @@
                                 Background="Transparent" CornerRadius="4" VerticalAlignment="Center"
                                 Click="AiChip_Click" AutomationProperties.Name="AI assistant" ToolTipService.ToolTip="AI assistant: ask about this project">
                             <ouiroot:SuiteDrawnIcon Kind="agent"/>
-                        </Button>
-                        <Button x:Name="CompanyBadge" Style="{StaticResource HcwGhostButton}" Padding="12,0"
-                                Click="CompanyBadge_Click"
-                                AutomationProperties.Name="Company file"
-                                ToolTipService.ToolTip="The company file shared with Kivo — open its projects">
-                            <TextBlock x:Name="CompanyBadgeText" VerticalAlignment="Center" FontSize="{StaticResource SuiteFontBody}"
-                                       Foreground="{ThemeResource HcwInkBrush}" MaxWidth="190" TextTrimming="CharacterEllipsis"
-                                       Text="Company · not open"/>
                         </Button>
                     </StackPanel>
                 </StackPanel>

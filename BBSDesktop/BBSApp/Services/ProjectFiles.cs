@@ -82,7 +82,6 @@ public static class ProjectFiles
             store.IsDirty = true;
         }
         store.FilePath = path;
-        store.Shared = null;
         if (IsOdp(path)) store.Info.OspPath = path;
         return true;
     }

@@ -4,7 +4,6 @@
 using System.Text;
 using BBSApp.Controls;
 using BBSApp.Services;
-using BBSApp.Services.Company;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Office.Shared;
@@ -43,10 +42,6 @@ public sealed partial class EstimatePage : Page
         RefreshPhaseCombo();
         if (ProjectStore.Current.LastEstimate is { } last)
             ShowResult(last);
-        else
-            ProjectRefText.Text = ProjectStore.Current.Shared is null
-                ? "Company project: not linked."
-                : $"Company project linked (id {ProjectStore.Current.Shared.ProjectId}). Calculate to attach a ProjectRef / ArtifactRef.";
         ProjectStore.Current.Changed += OnStoreChanged;
     }
 
@@ -165,37 +160,11 @@ public sealed partial class EstimatePage : Page
         result.Phase = phase;
         // The first calculation is Rev 0; calculating again makes the next revision.
         result.Revision = ProjectStore.Current.LastEstimate is { } previous ? Office.Shared.RevisionLabels.Next(previous.Revision) : 0;
-        EstimateCalculator.AttachCompanyArtifactRef(result, ProjectStore.Current);
         ProjectStore.Current.LastEstimate = result;
         ProjectStore.Current.LastEstimateRateBookVersionId = ver.Id;
         ProjectStore.Current.IsDirty = true;
         ProjectStore.Current.Notify();
         ShowResult(result);
-        var companyErr = CompanyService.TryPushProjectSummary(ProjectStore.Current);
-        if (companyErr is not null)
-        {
-            Info.Title = "Company file";
-            Info.Message = companyErr;
-            Info.Severity = InfoBarSeverity.Warning;
-            Info.IsOpen = true;
-        }
-    }
-
-    private void ShareDraft_Click(object sender, RoutedEventArgs e)
-    {
-        var err = CompanyService.TryShareEstimateDraft(ProjectStore.Current);
-        if (err is not null)
-        {
-            Info.Title = "Share draft";
-            Info.Message = err;
-            Info.Severity = InfoBarSeverity.Warning;
-            Info.IsOpen = true;
-            return;
-        }
-        Info.Title = "Share draft";
-        Info.Message = "Estimate draft sent to Kivo (Practice → Approvals). BOQ and estimate abstracts on the project dashboard were updated.";
-        Info.Severity = InfoBarSeverity.Success;
-        Info.IsOpen = true;
     }
 
     /// <summary>Two extra lines under the totals: the civil items by estimation phase and by running-bill phase. Empty when no item has a phase.</summary>
@@ -218,7 +187,6 @@ public sealed partial class EstimatePage : Page
             $"Plumb {mk.PlumbingPct:0.##}% ₹ {mk.PlumbingAmount:N2}  ·  Esc {mk.EscalationPct:0.##}% ₹ {mk.EscalationAmount:N2}  ·  " +
             $"Fees {mk.ConsultingFeePct:0.##}% ₹ {mk.ConsultingFeeAmount:N2}"
             + PhaseSummary(result);
-        RefreshProjectRefCaption(result);
         CivilTitle.Text = $"Abstract of cost — Civil / finishes / doors / windows ({result.Civil.Count})";
         MatTitle.Text = $"Abstract of cost — Materials ({result.Materials.Count})";
         SteelTitle.Text = $"Abstract of cost — Steel ({result.Steel.Count})";
@@ -236,30 +204,10 @@ public sealed partial class EstimatePage : Page
             ? "all item codes priced"
             : $"{result.MissingCodes.Count} missing rate(s): {string.Join(", ", result.MissingCodes.Take(8))}"
               + (result.MissingCodes.Count > 8 ? "…" : "");
-        var link = ProjectStore.Current.Shared is null
-            ? "not linked to a Studio project — link via take-off from a Studio drawing or open from Studio"
-            : "linked — abstracts sync to the company file when you calculate or save the project file";
+        var link = "export the CSV for Kivo when it is ready";
         Info.Message = $"{result.RateBookVersionName} · grand total ₹ {result.GrandTotal:N2} · {miss} · {link}";
-        Info.Severity = result.MissingCodes.Count > 0 || ProjectStore.Current.Shared is null
-            ? InfoBarSeverity.Warning
-            : InfoBarSeverity.Success;
+        Info.Severity = result.MissingCodes.Count > 0 ? InfoBarSeverity.Warning : InfoBarSeverity.Success;
         Info.IsOpen = true;
-    }
-
-    private void RefreshProjectRefCaption(EstimateResult result)
-    {
-        var company = BBSApp.Services.Company.CompanyService.Current;
-        var link = ProjectStore.Current.Shared;
-        if (company is null || link is null)
-        {
-            ProjectRefText.Text = "Studio project: not linked. A take-off recorded from a Studio project links it and puts a ProjectRef on this estimate.";
-            return;
-        }
-        var artifact = result.ArtifactRef;
-        var rev = artifact?["revision"]?.GetValue<uint>() ?? 0;
-        ProjectRefText.Text =
-            $"Company project · {company.Name} · project id {link.ProjectId} · ProjectRef v1 · estimate ArtifactRef revision {rev}. " +
-            "Kivo reads BOQ, estimate and running-bill abstracts from the company file (updated on save or calculate).";
     }
 
     private async void ExportPdf_Click(object sender, RoutedEventArgs e)

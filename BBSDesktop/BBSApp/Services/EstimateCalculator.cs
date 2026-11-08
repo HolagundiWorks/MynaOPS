@@ -321,23 +321,6 @@ public static class EstimateCalculator
         return json;
     }
 
-    /// <summary>
-    /// Stamps a suite ArtifactRef onto the estimate when the open project is linked to the company file.
-    /// Call after Calculate so Kivo can name the same estimate once it is saved to the company file.
-    /// </summary>
-    public static void AttachCompanyArtifactRef(EstimateResult result, ProjectStore store)
-    {
-        result.ArtifactRef = null;
-        var company = Company.CompanyService.Current;
-        var link = store.Shared;
-        if (company is null || link is null)
-            return;
-        var project = ArtifactRefs.ProjectRef(company.Uuid, link.ProjectId);
-        var body = ToJson(result);
-        var revision = (uint)Math.Max(1, link.Revision + 1);
-        result.ArtifactRef = ArtifactRefs.Estimate(project, "last_estimate", revision, ArtifactRefs.EstimateChecksumBody(body));
-    }
-
     public static EstimateResult? FromJson(JsonObject? o)
     {
         if (o is null) return null;

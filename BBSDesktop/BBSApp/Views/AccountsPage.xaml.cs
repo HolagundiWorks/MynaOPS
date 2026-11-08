@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using BBSApp.Services;
-using BBSApp.Services.Company;
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -258,20 +257,6 @@ public sealed partial class AccountsPage : Page
         ProjectStore.Current.Notify();
         RefreshLedgerParties();
         AppNotify.Success("Saved", "RA bill");
-        var companyErr = CompanyService.TryPushProjectSummary(ProjectStore.Current);
-        if (companyErr is not null)
-            AppNotify.Warning("Company file", companyErr);
-    }
-
-    private void ShareDraft_Click(object sender, RoutedEventArgs e)
-    {
-        if (_current is null) { AppNotify.Info("Nothing to share", "Select an RA bill first."); return; }
-        SaveBill();
-        var err = CompanyService.TryShareRaBillDraft(ProjectStore.Current, _current);
-        if (err is not null)
-            AppNotify.Warning("Share draft", err);
-        else
-            AppNotify.Success("Share draft", "Running bill draft sent to Kivo (Practice → Approvals).");
     }
 
     private async void CertifyBill_Click(object sender, RoutedEventArgs e)

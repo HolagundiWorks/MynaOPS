@@ -96,35 +96,13 @@ public sealed class ProjectInfo
         LogoPath = "";
         OspPath = "";
         AnnotatedDrawings.Clear();
-        FromCompanyFile = false;
     }
 
     /// <summary>
-    /// True while the project is linked to the shared company file: the company's name, address, contacts and registrations come from
-    /// The company name on documents comes from Kivo; the project's name, site and client come from the company file. They are read for every document and are not edited here.
-    /// Not saved with the project; it is true only after a read of the company file.
+    /// Always false: Falcon no longer reads Kivo's company file, so the company's and the project's details are edited in Settings and kept in
+    /// the project file. Kept so the Settings page and the party book keep one code path.
     /// </summary>
-    public bool FromCompanyFile { get; private set; }
-
-    /// <summary>Takes the company's and the project's details from the company file. Registrations that Falcon alone keeps (CIN, logo) stay as they are.</summary>
-    public void ApplyCompanyFile(Office.Shared.DocumentContext context)
-    {
-        var c = context.Company;
-        if (!string.IsNullOrWhiteSpace(c.Name)) CompanyName = c.Name;
-        Address = c.Address;
-        ContactPhone = c.Phone;
-        ContactEmail = c.Email;
-        Gstin = c.Gstin;
-        Pan = c.Pan;
-        if (context.Project is { } p)
-        {
-            if (!string.IsNullOrWhiteSpace(p.Name)) Name = p.Name;
-            Location = p.SiteAddress;
-            Summary = p.Summary;
-            ClientName = p.ClientName;
-        }
-        FromCompanyFile = true;
-    }
+    public bool FromCompanyFile => false;
 
     /// <summary>"GSTIN: … · CIN: … · PAN: …" for the present IDs, or empty.</summary>
     public string RegistrationLine
