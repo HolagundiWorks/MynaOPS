@@ -342,6 +342,54 @@ public sealed partial class EstimatePage : Page
         Info.IsOpen = true;
     }
 
+    /// <summary>The CSV Kivo imports (contract <c>osas-falcon-csv/1</c>): estimate, measured-to-date, and the take-off from the project's .osp. Nothing is written when it is refused.</summary>
+    private async void ExportKivoCsv_Click(object sender, RoutedEventArgs e)
+    {
+        void Show(string message, InfoBarSeverity severity)
+        {
+            Info.Title = "Export for Kivo";
+            Info.Message = message;
+            Info.Severity = severity;
+            Info.IsOpen = true;
+        }
+        try
+        {
+            var store = ProjectStore.Current;
+            if (_result is null) { Show("Calculate an estimate first.", InfoBarSeverity.Warning); return; }
+            var (meta, rows) = FalconCsvExport.ReadOsp(store.Info.OspPath);
+
+            var lines = _result.Civil.Concat(_result.Materials).Concat(_result.Steel)
+                .Select(l => new FalconCsvEstimateLine(l.Category, l.Code, l.Description, l.Unit, l.Qty, l.Rate))
+                .ToList();
+            var bills = store.Accounts.Bills.Where(b => b.Certified).OrderBy(b => b.Date).ThenBy(b => b.CreatedUtc)
+                .Select(b => (IReadOnlyList<(string, string, double)>)b.Lines.Select(x => (x.Description, x.Unit, x.Qty)).ToList())
+                .ToList();
+            var measured = FalconCsvExport.MeasuredFromBills(lines, bills);
+            var version = typeof(EstimatePage).Assembly.GetName().Version?.ToString(3) ?? "";
+            var now = DateTimeOffset.UtcNow;
+
+            // Build before the picker so a refusal shows its reason without asking for a file.
+            var bytes = FalconCsvExport.Build(meta, lines, measured, rows, now, version);
+
+            var picker = new FileSavePicker();
+            InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(App.MainWindow!));
+            picker.SuggestedFileName = System.IO.Path.GetFileNameWithoutExtension(FalconCsvExport.FileName(meta.Name.Length > 0 ? meta.Name : store.Name, now, meta.Revision));
+            picker.FileTypeChoices.Add("CSV", new List<string> { ".csv" });
+            var file = await picker.PickSaveFileAsync();
+            if (file is null) return;
+            await System.IO.File.WriteAllBytesAsync(file.Path, bytes);
+            Show($"Saved {file.Path} ({lines.Count} estimate lines, {measured.Count} measured, {rows.Count} take-off rows). Import it in Kivo.", InfoBarSeverity.Success);
+        }
+        catch (FalconCsvException ex)
+        {
+            Show(ex.Message, InfoBarSeverity.Warning);
+        }
+        catch (System.IO.IOException ex)
+        {
+            Show("Could not write the file: " + ex.Message, InfoBarSeverity.Error);
+        }
+    }
+
     private static string Csv(string s)
     {
         if (s.Contains('"') || s.Contains(',') || s.Contains('\n'))

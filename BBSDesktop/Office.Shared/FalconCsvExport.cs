@@ -131,6 +131,28 @@ public static class FalconCsvExport
         return new UTF8Encoding(true).GetPreamble().Concat(new UTF8Encoding(false).GetBytes(sb.ToString())).ToArray();
     }
 
+    /// <summary>
+    /// Measured rows from the certified running bills, oldest first (each bill is its lines as description, unit, quantity of that bill). The last bill is
+    /// <c>this_period</c>, the ones before it add up to <c>previous</c>. A bill line is matched to an estimate line by description and unit (bill lines carry
+    /// no item code); a line that matches nothing is left out. No bill, no measured rows.
+    /// </summary>
+    public static List<FalconCsvMeasured> MeasuredFromBills(IReadOnlyList<FalconCsvEstimateLine> estimate, IReadOnlyList<IReadOnlyList<(string Description, string Unit, double Qty)>> billsOldestFirst)
+    {
+        var result = new List<FalconCsvMeasured>();
+        if (billsOldestFirst.Count == 0) return result;
+        static string Key(string d, string u) => d.Trim().ToLowerInvariant() + "|" + u.Trim().ToLowerInvariant();
+        var last = billsOldestFirst[^1];
+        foreach (var l in estimate)
+        {
+            var key = Key(l.Description, l.Unit);
+            var period = last.Where(b => Key(b.Description, b.Unit) == key).Sum(b => b.Qty);
+            var previous = billsOldestFirst.Take(billsOldestFirst.Count - 1).SelectMany(b => b).Where(b => Key(b.Description, b.Unit) == key).Sum(b => b.Qty);
+            if (period == 0 && previous == 0) continue;
+            result.Add(new FalconCsvMeasured(l.ItemCode, l.Description, l.Unit, period, previous));
+        }
+        return result;
+    }
+
     /// <summary>Reads the project file's meta and every take-off row (all drawings). Throws <see cref="FalconCsvException"/> when there is no usable file.</summary>
     public static (OdpMeta Meta, List<OdpTakeoffRow> Rows) ReadOsp(string? ospPath)
     {

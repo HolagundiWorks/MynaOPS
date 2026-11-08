@@ -31,6 +31,8 @@
                         Click="ExportPdf_Click" AutomationProperties.Name="Export estimate PDF"/>
                 <Button Content="CSV" Style="{StaticResource SecondaryButtonStyle}"
                         Click="ExportCsv_Click" AutomationProperties.Name="Export estimate CSV"/>
+                <Button Content="Export for Kivo (CSV)" Style="{StaticResource SecondaryButtonStyle}"
+                        Click="ExportKivoCsv_Click" AutomationProperties.Name="Export estimate and take-off as CSV for Kivo"/>
             </StackPanel>
         </Grid>
 

@@ -149,6 +149,19 @@ public class FalconCsvExportTests
     }
 
     [Fact]
+    public void Measured_comes_from_certified_bills_last_bill_is_this_period()
+    {
+        var bills = new List<IReadOnlyList<(string, string, double)>>
+        {
+            new List<(string, string, double)> { ("Excavation in ordinary soil", "m3", 30) },
+            new List<(string, string, double)> { ("excavation in ordinary soil ", "M3", 12.5), ("Unknown work", "m", 4) },
+        };
+        var m = Assert.Single(FalconCsvExport.MeasuredFromBills(Estimate(), bills));
+        Assert.Equal(("EXC-001", 12.5, 30.0), (m.ItemCode, m.ThisPeriod, m.Previous));
+        Assert.Empty(FalconCsvExport.MeasuredFromBills(Estimate(), new List<IReadOnlyList<(string, string, double)>>()));
+    }
+
+    [Fact]
     public void File_name_follows_the_contract()
     {
         Assert.Equal("Demo Villa-falcon-20261108-r12.csv", FalconCsvExport.FileName("Demo Villa", At, 12));
