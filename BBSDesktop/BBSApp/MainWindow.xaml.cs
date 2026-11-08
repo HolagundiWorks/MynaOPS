@@ -111,6 +111,26 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             StatusStrip.Right.Children.Add(child);
         }
         BottomShellParts.Children.Clear();
+        ShowDatabaseState();
+    }
+
+    /// <summary>The status bar says whether the open project is connected to the suite database (Kivo signs in, Myna hosts the service).</summary>
+    private void ShowDatabaseState()
+    {
+        var text = new TextBlock { VerticalAlignment = VerticalAlignment.Center, Visibility = Visibility.Collapsed };
+        AutomationProperties.SetName(text, "Database connection");
+        StatusStrip.Left.Children.Add(text);
+        void Apply(Office.Shared.DbConnect.DbSnapshot snap)
+        {
+            var label = snap.Label;
+            text.Visibility = label.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+            text.Text = label;
+            ToolTipService.SetToolTip(text, snap.Detail.Length == 0 ? label : snap.Detail);
+        }
+
+        Office.Shared.DbConnect.DbConnector.Instance.Changed += snap => DispatcherQueue.TryEnqueue(() => Apply(snap));
+        Office.Shared.DbConnect.DbConnector.Instance.Enable();
+        Apply(Office.Shared.DbConnect.DbConnector.Instance.Snapshot);
     }
 
     private void OnSuiteThemeChanged(Microsoft.UI.Xaml.ElementTheme _)

@@ -56,6 +56,8 @@ public static class ProjectFiles
         {
             using var odp = File.Exists(path) ? OdpFile.Open(path) : OdpFile.Create(path, Path.GetFileNameWithoutExtension(path));
             ServedProject.NoteOwnRevision(path, odp.SetProjectDoc(project.ToJsonString()));
+            // The saved revision goes to the suite database in the background (Kivo gives the session, Myna hosts the service).
+            if (IsOdp(path)) Office.Shared.DbConnect.DbConnector.Instance.ProjectSaved(path);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or HttpRequestException or Microsoft.Data.Sqlite.SqliteException)
@@ -83,7 +85,12 @@ public static class ProjectFiles
         }
         store.FilePath = path;
         store.Shared = null;
-        if (IsOdp(path)) store.Info.OspPath = path;
+        if (IsOdp(path))
+        {
+            store.Info.OspPath = path;
+            // Connect the project to the suite database; never blocks and never changes the file. Off until the window turns it on.
+            Office.Shared.DbConnect.DbConnector.Instance.ProjectOpened(path);
+        }
         return true;
     }
 }
