@@ -7,9 +7,9 @@ powershell -File BBSDesktop\tests\e2e\run-e2e.ps1
 # Fixture .osp (take-off already in file):
 powershell -File BBSDesktop\tests\e2e\uia-osp-takeoff.ps1 -Exe $exe -Osp (Resolve-Path BBSDesktop\Office.Shared.Tests\Fixtures\small.osp)
 
-# Fresh .osp: O-Draft engine takeoff.record → O-CoreOp import (needs O-DRAFT-main beside repo):
+# Fresh .osp: Tren engine takeoff.record → Falcon import (needs O-DRAFT-main beside repo):
 powershell -File BBSDesktop\tests\e2e\e2e-draft-coreop-takeoff.ps1
-# Engine only (skip O-Draft WinUI launch): -SkipDraftWinUi
+# Engine only (skip Tren WinUI launch): -SkipDraftWinUi
 ```
 
 **Take-off:** pass the `.osp` on the command line (as the script does) or **File › Open project…**, then **File › Take-off (Tren)…**.

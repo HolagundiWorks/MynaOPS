@@ -74,8 +74,8 @@ try {
   for ($i = 0; $i -lt 25; $i++) {
     [void](Safe-Invoke (Find-Name $win "File"))
     Start-Sleep -Milliseconds 400
-    $to = Find-Name $root ("Take-off (O-Draft)" + $ELL) 1500
-    if (-not $to) { $to = Find-Like $root "*Take-off (O-Draft)*" 1000 }
+    $to = Find-Name $root ("Take-off (Tren)" + $ELL) 1500
+    if (-not $to) { $to = Find-Like $root "*Take-off (Tren)*" 1000 }
     if ($to -and (Safe-Invoke $to)) { $opened = $true; break }
     Start-Sleep -Milliseconds 500
   }

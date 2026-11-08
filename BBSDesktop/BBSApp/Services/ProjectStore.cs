@@ -102,7 +102,7 @@ public sealed class ProjectStore
     /// <summary>Derivation rules linking trades (masonry→plaster→paint, flooring→skirting …).</summary>
     public LinkRuleBook LinkRules { get; } = new();
 
-    /// <summary>Page layouts composed in O-CoreOp from print blocks drawn in O-Draft.</summary>
+    /// <summary>Page layouts composed in Falcon from print blocks drawn in Tren.</summary>
     public SheetLayoutBook Sheets { get; } = new();
 
     /// <summary>Last calculated estimate snapshot (qty × rates).</summary>
@@ -168,7 +168,7 @@ public sealed class ProjectStore
     public string[] LevelIds() => Levels.Select(l => l.Id).ToArray();
 
     /// <summary>
-    /// The phase names a user can pick: the defaults, then any other name found on the member sheets (set in O-Draft).
+    /// The phase names a user can pick: the defaults, then any other name found on the member sheets (set in Tren).
     /// <paramref name="billing"/> picks running-bill phases (<c>bill_phase</c>) instead of estimation phases (<c>phase</c>).
     /// </summary>
     public List<string> PhaseNames(bool billing)

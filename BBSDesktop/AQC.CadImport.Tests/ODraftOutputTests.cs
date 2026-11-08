@@ -5,8 +5,8 @@ using Xunit;
 namespace AQC.CadImport.Tests;
 
 /// <summary>
-/// The records O-Draft's own `takeoff.record` wrote on 2026-10-19 (fixtures/odraft-takeoff-records.json: ids, boxes and payloads
-/// exactly as the gateway returned them), read by O-CoreOp's reader. It differs from the contract's samples in ways that matter: the room has no
+/// The records Tren's own `takeoff.record` wrote on 2026-10-19 (fixtures/odraft-takeoff-records.json: ids, boxes and payloads
+/// exactly as the gateway returned them), read by Falcon's reader. It differs from the contract's samples in ways that matter: the room has no
 /// level and no length or breadth, the walls have no thickness, the openings have no wall_ref.
 /// </summary>
 public class ODraftOutputTests

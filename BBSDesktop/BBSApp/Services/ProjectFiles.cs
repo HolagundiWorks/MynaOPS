@@ -8,7 +8,7 @@ using Office.Shared;
 namespace BBSApp.Services;
 
 /// <summary>
-/// Opening and saving a project. A project is a project file (<c>.osp</c>): one SQLite file that holds the drawing, the take-off O-Draft recorded
+/// Opening and saving a project. A project is a project file (<c>.osp</c>): one SQLite file that holds the drawing, the take-off Tren recorded
 /// and the project itself (estimate, running bills, tasks, quantities, purchase orders, the rest). A project file from before (<c>.bbsproj</c>,
 /// <c>.json</c>) still opens, and Save as puts it in a project file.
 /// </summary>
@@ -22,7 +22,7 @@ public static class ProjectFiles
     public sealed record Opened(JsonObject? Project, bool FromDrawingOnly);
 
     /// <summary>
-    /// Read the project in a file. A project file that holds a take-off but no project yet (O-Draft made it) opens as a new project
+    /// Read the project in a file. A project file that holds a take-off but no project yet (Tren made it) opens as a new project
     /// named after the file; <see cref="Opened.FromDrawingOnly"/> says so.
     /// </summary>
     public static Opened? Open(string path, out string? error)
@@ -66,7 +66,7 @@ public static class ProjectFiles
     }
 
     /// <summary>
-    /// Make a project file the open project, as File > Open and "open O-Draft's project" both do. Returns false and says why when the file
+    /// Make a project file the open project, as File > Open and "open Tren's project" both do. Returns false and says why when the file
     /// cannot be read.
     /// </summary>
     public static bool OpenInto(ProjectStore store, string path, out string? error)

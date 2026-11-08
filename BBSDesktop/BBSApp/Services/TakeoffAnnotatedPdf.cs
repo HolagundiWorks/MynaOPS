@@ -84,7 +84,7 @@ public static class TakeoffAnnotatedPdf
                 container.Column(col =>
                 {
                     col.Item().Text("Annotated drawing").SemiBold().FontSize(11);
-                    col.Item().Text("Imported PDF could not be rendered (file missing or unreadable). This drawing came from the old PDF take-off; take-off is now measured in O-Draft.")
+                    col.Item().Text("Imported PDF could not be rendered (file missing or unreadable). This drawing came from the old PDF take-off; take-off is now measured in Tren.")
                         .FontSize(8).FontColor(Colors.Grey.Darken1);
                 });
             }

@@ -8,13 +8,13 @@ using Office.Shared.SmartBlocks;
 namespace BBSApp.Services;
 
 /// <summary>
-/// The structural details O-Draft drew: reinforced concrete blocks (<c>rcc.beam.section</c>, <c>rcc.column.rect</c> and the others) placed in the
-/// drawing and recorded in the project file when O-Draft saves it. O-CoreOp reads them and draws each as the detail of its beam, column, slab, footing or
-/// lintel. It never writes them and never draws a detail of its own: a drawing is changed in O-Draft only.
+/// The structural details Tren drew: reinforced concrete blocks (<c>rcc.beam.section</c>, <c>rcc.column.rect</c> and the others) placed in the
+/// drawing and recorded in the project file when Tren saves it. Falcon reads them and draws each as the detail of its beam, column, slab, footing or
+/// lintel. It never writes them and never draws a detail of its own: a drawing is changed in Tren only.
 /// </summary>
 public static class StructuralDetail
 {
-    /// <summary>The element pages that show details from O-Draft.</summary>
+    /// <summary>The element pages that show details from Tren.</summary>
     public static bool Supports(string kind) => kind is "beams" or "columns" or "slabs" or "footings" or "lintels";
 
     /// <summary>The details of one kind recorded in the project file (none for no file, a file that is not a project, or one being written).</summary>
@@ -33,7 +33,7 @@ public static class StructuralDetail
         }
     }
 
-    /// <summary>The drawing of a recorded detail: its block evaluated with the parameters O-Draft placed it with, or null when the block or the values are not usable.</summary>
+    /// <summary>The drawing of a recorded detail: its block evaluated with the parameters Tren placed it with, or null when the block or the values are not usable.</summary>
     public static SmartGeometry? Geometry(OdpDetail detail)
     {
         if (SmartBlockLibrary.Find(detail.Block) is not { } block)

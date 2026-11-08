@@ -13,13 +13,13 @@ public sealed record SharedProject(long Id, string Code, string Name, long Clien
 public sealed record SharedDocument(long Revision, string Body, string ChecksumSha256, string UpdatedBy, string UpdatedAt);
 
 /// <summary>
-/// The office company file that O-Studio and O-CoreOp share. Clients and projects are the office's records; O-CoreOp keeps each
+/// The office company file that Kivo and Falcon share. Clients and projects are the office's records; Falcon keeps each
 /// project's quantities and estimates as a document on that project (kind <see cref="DocumentKind"/>), saved by revision so a save
 /// that would overwrite someone else's is refused.
 /// </summary>
 public sealed class SharedCompany : IDisposable
 {
-    /// <summary>The kind O-CoreOp uses for a project's own data: the same JSON a project file holds.</summary>
+    /// <summary>The kind Falcon uses for a project's own data: the same JSON a project file holds.</summary>
     public const string DocumentKind = "aqc.project";
 
     private readonly OfficeSession _session;
@@ -171,7 +171,7 @@ public sealed class SharedCompany : IDisposable
         return new DocumentContext(company, Text(c, "prepared_on"), project);
     }
 
-    /// <summary>The suite's reference to a project (docs/contracts/refs.md in the O-Studio repository), as JSON text.</summary>
+    /// <summary>The suite's reference to a project (docs/contracts/refs.md in the Kivo repository), as JSON text.</summary>
     public string ProjectRef(long projectId) =>
         _session.Call("project_ref", new JsonObject { ["project_id"] = projectId })!.ToJsonString();
 

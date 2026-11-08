@@ -8,7 +8,7 @@ using Xunit;
 namespace Office.Shared.Tests;
 
 /// <summary>
-/// These talk to the real office engine. They need office.dll (built from office-ffi in the O-Studio repository with
+/// These talk to the real office engine. They need office.dll (built from office-ffi in the Kivo repository with
 /// `cargo build --release`). Point OFFICE_DLL_DIR at the folder that holds it; without it the tests do nothing and say so.
 /// </summary>
 public class SharedCompanyTests : IDisposable

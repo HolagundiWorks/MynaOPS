@@ -10,7 +10,7 @@ public sealed class ProjectInfo
 {
     public string Name { get; set; } = "Untitled Project";
     public string Location { get; set; } = "";
-    /// <summary>Short project description from O-Studio (title plates, estimate covers, report headers).</summary>
+    /// <summary>Short project description from Kivo (title plates, estimate covers, report headers).</summary>
     public string Summary { get; set; } = "";
     public string ClientName { get; set; } = "";
     /// <summary>Engineer, Architect, or PMC.</summary>
@@ -101,12 +101,12 @@ public sealed class ProjectInfo
 
     /// <summary>
     /// True while the project is linked to the shared company file: the company's name, address, contacts and registrations come from
-    /// The company name on documents comes from O-Studio; the project's name, site and client come from the company file. They are read for every document and are not edited here.
+    /// The company name on documents comes from Kivo; the project's name, site and client come from the company file. They are read for every document and are not edited here.
     /// Not saved with the project; it is true only after a read of the company file.
     /// </summary>
     public bool FromCompanyFile { get; private set; }
 
-    /// <summary>Takes the company's and the project's details from the company file. Registrations that O-CoreOp alone keeps (CIN, logo) stay as they are.</summary>
+    /// <summary>Takes the company's and the project's details from the company file. Registrations that Falcon alone keeps (CIN, logo) stay as they are.</summary>
     public void ApplyCompanyFile(Office.Shared.DocumentContext context)
     {
         var c = context.Company;

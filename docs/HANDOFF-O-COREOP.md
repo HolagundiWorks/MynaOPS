@@ -11,7 +11,7 @@ Merged on 2026-10-19 (merge commit `a0aa37d`):
 - The OSAS shell: menu bar, grouped left navigation pane, work area, status strip. The pane is open from 900 px, an icon rail from 560 px, and a menu button below that. See `docs/WINUI-SHELL.md`.
 - The shared `O.Ui` design (blue accent), referenced from a sibling checkout of the public `HolagundiWorks/O-UI` repository (`..\..\..\o-ui` from the app folder). The build fails without it.
 - Accessibility fixes from the WCAG 2.2 AA audit: names on sheet cells and icon buttons, targets of 24 px or more, headings, a polite notice host, 1x scale.
-- The rename to Falcon. The program is now `O-CoreOp.exe` and keeps its settings in `%LocalAppData%\O-CoreOp` (copied from `AQCCore` on first run).
+- The rename to Falcon. The program is now `O-CoreOp.exe` and keeps its settings in `%LocalAppData%\Falcon` (copied from `AQCCore` on first run).
 - **AORMS Connect / Bridge removed (2026-10-28):** sign-in, Online projects, Push/Pull, Bind/Flush, sync badges, `Aorms.Connect` / `Aorms.Bridge`, FakeAorms e2e, and Bridge stub hosts are gone. Company-file / OSAS ticket flow, CAD import, and `.osp` take-off remain.
 - CI (`.github/workflows/ci.yml`): CadImport + Office.Shared tests, and a BBSApp build.
 

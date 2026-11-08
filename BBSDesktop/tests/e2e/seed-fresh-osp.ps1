@@ -1,5 +1,5 @@
 # Build a new .osp with take-off rows (same scene as engine takeoff_record tests / scripts/e2e-house-takeoff.scr).
-# Uses O-Draft aad-cli (same takeoff.record command as WinUI Architecture > Take-off > Record).
+# Uses Tren aad-cli (same takeoff.record command as WinUI Architecture > Take-off > Record).
 param(
   [string]$OutOsp = (Join-Path $env:TEMP "e2e-fresh-house.osp"),
   [string]$ODraftRoot

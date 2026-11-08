@@ -18,7 +18,7 @@ public sealed class OfficeException : Exception
 }
 
 /// <summary>
-/// One session with the office engine (office.dll). It follows the contract in the O-Studio repository, docs/office-abi.md:
+/// One session with the office engine (office.dll). It follows the contract in the Kivo repository, docs/office-abi.md:
 /// create a session, call operations by name with a JSON object, destroy the session. A session holds at most one company file open.
 /// </summary>
 public sealed class OfficeSession : IDisposable

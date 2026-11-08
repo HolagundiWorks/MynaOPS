@@ -1,4 +1,4 @@
-﻿# DEMO.dwg → O-Draft take-off → shared .osp → CoreOp import plan (headless).
+﻿# DEMO.dwg → Tren take-off → shared .osp → CoreOp import plan (headless).
 param(
   [string]$Dwg = "$env:USERPROFILE\OneDrive\Documents\OSAS TEST\DEMO.dwg",
   [string]$Osp = "$env:TEMP\demo-dwg.osp",
@@ -28,11 +28,11 @@ $utf8 = New-Object System.Text.UTF8Encoding $false
 $body = [IO.File]::ReadAllText($scr).TrimEnd() + "`ntakeoff.record {`"path`":`"$esc`",`"annotate`":false}`n"
 [IO.File]::WriteAllText($runScr, $body, $utf8)
 
-Write-Host "=== O-Draft (aad-cli): $Dwg ==="
+Write-Host "=== Tren (aad-cli): $Dwg ==="
 $draftOut = cmd /c "`"$cli`" run `"$Dwg`" --script-file `"$runScr`" 2>&1"
 $draftOut | Select-String -Pattern 'Take-off recorded|BRICKWORK|SLABS|totals|written' | ForEach-Object { $_.Line }
 
-Write-Host "`n=== O-CoreOp (CadImport plan): $ospFull ==="
+Write-Host "`n=== Falcon (CadImport plan): $ospFull ==="
 $env:DEMO_OSP_PATH = $ospFull
 Push-Location (Join-Path $coreRoot "AQC.CadImport.Tests")
 try {
@@ -48,5 +48,5 @@ if ($LaunchApps) {
   $coreExe = "$env:TEMP\ocoreop\O-CoreOp.exe"
   if (Test-Path $draftExe) { Start-Process $draftExe -ArgumentList $ospFull }
   if (Test-Path $coreExe) { Start-Process $coreExe -ArgumentList $ospFull }
-  Write-Host "Launched WinUI with $ospFull — use File > Take-off (O-Draft) in CoreOp."
+  Write-Host "Launched WinUI with $ospFull — use File > Take-off (Tren) in CoreOp."
 }

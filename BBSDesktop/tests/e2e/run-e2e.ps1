@@ -1,4 +1,4 @@
-# Build O-CoreOp to $OutDir (if needed) and run UIA e2e scripts.
+# Build Falcon to $OutDir (if needed) and run UIA e2e scripts.
 param(
   [string]$OutDir = "$env:TEMP\ocoreop",
   [string]$Osp = (Resolve-Path "$PSScriptRoot\..\..\Office.Shared.Tests\Fixtures\small.osp").Path,

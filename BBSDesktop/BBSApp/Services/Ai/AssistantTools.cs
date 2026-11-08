@@ -275,7 +275,7 @@ public sealed class AssistantTools
                         + "coping: length,width,depth · vdf/plinth_protection: length,breadth,thickness · "
                         + "skirting: length,height · parapet: length,height,thickness. "
                         + "The user must approve the change in a dialog before it is applied — do not "
-                        + "ask in chat first. (Doors and windows come from the take-off imported from O-Draft, not from this tool.)",
+                        + "ask in chat first. (Doors and windows come from the take-off imported from Tren, not from this tool.)",
             InputSchema = new()
             {
                 Properties = new Dictionary<string, JsonElement>

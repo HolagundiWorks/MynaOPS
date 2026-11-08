@@ -1,8 +1,8 @@
 # Quantity-trust CadImport checks (Windows / CI).
-# Mirrors the O-Draft Linux harness half for CoreOp: known wall/opening checklist
+# Mirrors the Tren Linux harness half for CoreOp: known wall/opening checklist
 # through take-off records → CadImport assertions.
 #
-# Depends on QuantityTrustTests (O-CoreOp PR #26).
+# Depends on QuantityTrustTests (Falcon PR #26).
 # Full product E2E (WinUI Draft → .osp → CoreOp Take-off page + PDF)
 # is in the OSAS store runbook docs/takeoff-e2e-runbook.md — not automated here.
 #

@@ -10,7 +10,7 @@ using Office.Shared;
 namespace Office.Ai;
 
 /// <summary>
-/// Uses the suite AI Core on loopback (the launcher hosts Olmo; O-CoreOp and O-Draft connect here). Does not load weights in-process.
+/// Uses the suite AI Core on loopback (the launcher hosts Olmo; Falcon and Tren connect here). Does not load weights in-process.
 /// </summary>
 public sealed class RemoteLlm : IDisposable
 {

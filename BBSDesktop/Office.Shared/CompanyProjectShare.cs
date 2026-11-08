@@ -6,14 +6,14 @@ using System.Text.Json.Nodes;
 namespace Office.Shared;
 
 /// <summary>
-/// Mirrors O-CoreOp totals into the company file as <see cref="SharedCompany.DocumentKind"/> so O-Studio can read
+/// Mirrors Falcon totals into the company file as <see cref="SharedCompany.DocumentKind"/> so Kivo can read
 /// BOQ, estimate and running-bill abstracts without opening the <c>.osp</c>. Full quantities stay in the project file.
 /// </summary>
 public static class CompanyProjectShare
 {
     /// <summary>
     /// Builds the JSON body for <c>aqc.project</c>: <c>project_ref</c>, <c>last_estimate</c>, and <c>accounts.bills</c>
-    /// (the fields <c>project_*_summary</c> in O-Studio's engine read).
+    /// (the fields <c>project_*_summary</c> in Kivo's engine read).
     /// </summary>
     public static JsonObject BuildSummaryBody(JsonObject projectRoot)
     {

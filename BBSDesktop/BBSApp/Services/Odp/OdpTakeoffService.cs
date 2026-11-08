@@ -5,7 +5,7 @@ using Aqc.CadImport;
 
 namespace BBSApp.Services.Odp;
 
-/// <summary>Where the take-off is read from: a project file (<c>.osp</c>), the one O-Draft records into.</summary>
+/// <summary>Where the take-off is read from: a project file (<c>.osp</c>), the one Tren records into.</summary>
 public abstract record TakeoffSource
 {
     /// <summary>A project file, read directly. There is no server.</summary>
@@ -13,7 +13,7 @@ public abstract record TakeoffSource
 }
 
 /// <summary>
-/// Reads the take-off O-Draft recorded in the project file. The records are read in the shape the importer takes (<see cref="TakeoffRecord"/>,
+/// Reads the take-off Tren recorded in the project file. The records are read in the shape the importer takes (<see cref="TakeoffRecord"/>,
 /// headers and rows with the id <c>kind &lt;&lt; 56 | slot &lt;&lt; 32 | n</c>, the annotated PDF in chunk records), so the importer, the preview and the
 /// annotated-PDF check are the ones that always read a take-off; only where the records come from is the project file (<see cref="OdpTakeoffAdapter"/>).
 /// </summary>
@@ -34,7 +34,7 @@ public static class OdpTakeoffService
     public static async Task<OspTakeoff.Result> ReadDrawingAsync(TakeoffSource source, uint slot, IProgress<string>? status = null, CancellationToken ct = default) =>
         OspTakeoff.Read((await ReadFileAsync(source, ct).ConfigureAwait(false)).Where(r => OspTakeoff.SlotOf(r.Id) == slot && OspTakeoff.IsTakeoffRecord(r.Id)), slot);
 
-    /// <summary>Fetches and verifies the annotated PDF O-Draft recorded for a drawing.</summary>
+    /// <summary>Fetches and verifies the annotated PDF Tren recorded for a drawing.</summary>
     public static async Task<byte[]> FetchAnnotatedPdfAsync(TakeoffSource source, uint slot, IProgress<string>? status = null, CancellationToken ct = default) =>
         OspTakeoff.ReadAnnotatedPdf(await ReadFileAsync(source, ct).ConfigureAwait(false), slot);
 

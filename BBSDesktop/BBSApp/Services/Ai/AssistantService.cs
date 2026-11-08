@@ -41,7 +41,7 @@ public sealed class AssistantService
     public static string? LastProblem { get; private set; }
 
     /// <summary>
-    /// Create the assistant. Olmo 3 7B is used through O-Studio's AI Core when it is running, or in-process when this app hosts solo.
+    /// Create the assistant. Olmo 3 7B is used through Kivo's AI Core when it is running, or in-process when this app hosts solo.
     /// Without the model, a stored Anthropic key is the fallback.
     /// </summary>
     public static async Task<AssistantService?> TryCreateAsync(IAppCommandBus bus, IAssistantConfirm confirm, DispatcherQueue ui)
@@ -225,7 +225,7 @@ public sealed class AssistantService
     }
 
     private const string SystemPrompt =
-        "You are the built-in assistant for O-CoreOp, a Windows desktop app for construction "
+        "You are the built-in assistant for Falcon, a Windows desktop app for construction "
       + "quantity take-off and costing (RCC bar bending schedules, civil BOQ, estimates) by "
       + "Human Centric Works, Hospet.\n\n"
       + "Ground rules:\n"
@@ -245,8 +245,8 @@ public sealed class AssistantService
       + "- You can also edit_row and delete_row (RCC or civil), addressing a row by its kind and mark "
       + "(marks are unique within a sheet); both are confirmed and fail if the mark is missing or "
       + "ambiguous. Use get_project_summary / navigate to find the mark first if unsure.\n"
-      + "- Drawing take-off is done in O-Draft and recorded in the project file (.osp); the user reads it in with the "
-      + "Take-off page (Project › Take-off (O-Draft)). You cannot measure drawings or read PDFs.\n"
+      + "- Drawing take-off is done in Tren and recorded in the project file (.osp); the user reads it in with the "
+      + "Take-off page (Project › Take-off (Tren)). You cannot measure drawings or read PDFs.\n"
       + "- For linked estimation: link rules derive one trade's quantity from another (plaster from "
       + "masonry face area, painting from plaster, skirting from flooring perimeter). Use "
       + "list_link_rules to see the rules and what they currently derive, add_link_rule to create a "

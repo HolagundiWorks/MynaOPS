@@ -6,11 +6,11 @@ using System.Text.Json.Nodes;
 
 namespace Office.Shared;
 
-/// <summary>A print block named in O-Draft and stored in the drawing's project text.</summary>
+/// <summary>A print block named in Tren and stored in the drawing's project text.</summary>
 public sealed record DraftPrintBlock(string Drawing, string Name, string Description, string Handle);
 
 /// <summary>
-/// Reads print blocks from drawing bytes. O-Draft stores them under the project key
+/// Reads print blocks from drawing bytes. Tren stores them under the project key
 /// <c>printblocks1</c> inside the <c>AAD_PROJECT</c> payload. A DWG that does not carry that text yields nothing.
 /// </summary>
 public static class DraftPrintBlocks

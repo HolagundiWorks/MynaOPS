@@ -1,4 +1,4 @@
-# Launch O-Draft WinUI with a .osp on the command line (shared project file smoke).
+# Launch Tren WinUI with a .osp on the command line (shared project file smoke).
 param(
   [Parameter(Mandatory = $true)][string]$Exe,
   [Parameter(Mandatory = $true)][string]$Osp
@@ -24,10 +24,10 @@ try {
   for ($i = 0; $i -lt 80 -and -not $win; $i++) {
     Start-Sleep -Milliseconds 500
     $app.Refresh()
-    if ($app.HasExited) { Check "O-Draft starts" $false "exit $($app.ExitCode)"; break }
+    if ($app.HasExited) { Check "Tren starts" $false "exit $($app.ExitCode)"; break }
     $win = $root.FindFirst($TS::Children, (New-Object $PC($AE::ProcessIdProperty, $app.Id)))
   }
-  Check "O-Draft starts" ($win -ne $null)
+  Check "Tren starts" ($win -ne $null)
   Start-Sleep -Seconds 4
   $name = if ($win) { $win.Current.Name } else { "" }
   Check "main window" ($name.Length -gt 0) $name

@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Authenticode-sign O-CoreOp Setup.exe (or other payloads) when signing material exists.
+  Authenticode-sign Falcon Setup.exe (or other payloads) when signing material exists.
 
 .DESCRIPTION
   Same contract as the OSAS launcher installer\sign.ps1 — never invents a production cert.
@@ -51,7 +51,7 @@ function Assert-HasSignature([string[]] $Paths) {
 }
 
 function Ensure-SelfSignedPfx {
-    $dir = Join-Path $env:LOCALAPPDATA "O-CoreOp\dev-codesign"
+    $dir = Join-Path $env:LOCALAPPDATA "Falcon\dev-codesign"
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
     $pfxPath = Join-Path $dir "o-coreop-dev.pfx"
     $pwdFile = Join-Path $dir "pfx.password"
@@ -59,8 +59,8 @@ function Ensure-SelfSignedPfx {
         Write-Output "Creating self-signed code-signing certificate at $pfxPath"
         $cert = New-SelfSignedCertificate `
             -Type CodeSigningCert `
-            -Subject "CN=O-CoreOp Development (self-signed)" `
-            -FriendlyName "O-CoreOp development code signing" `
+            -Subject "CN=Falcon Development (self-signed)" `
+            -FriendlyName "Falcon development code signing" `
             -CertStoreLocation "Cert:\CurrentUser\My" `
             -KeyExportPolicy Exportable `
             -KeySpec Signature `

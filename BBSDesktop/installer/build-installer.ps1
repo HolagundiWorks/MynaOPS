@@ -25,7 +25,7 @@ $AppProj = Join-Path $DesktopDir "BBSApp\BBSApp.csproj"
 $EngineDll = Join-Path $DesktopDir "build\bbs_engine.dll"
 $PublishDir = Join-Path $DesktopDir "artifacts\publish"
 $InstallerOutDir = Join-Path $DesktopDir "artifacts\installer"
-$IssPath = Join-Path $InstallerDir "O-CoreOp.iss"
+$IssPath = Join-Path $InstallerDir "Falcon.iss"
 $LicensePath = Join-Path (Split-Path $DesktopDir -Parent) "LICENSE"
 
 function Get-AppVersionFromCsproj {

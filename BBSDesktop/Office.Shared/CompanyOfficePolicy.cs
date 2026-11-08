@@ -11,7 +11,7 @@ namespace Office.Shared;
 public static class CompanyOfficePolicy
 {
     public const string UseStudioForClientsProjects =
-        "Create clients and projects in Studio. O-CoreOp cannot change those office records when opened from the suite.";
+        "Create clients and projects in Studio. Falcon cannot change those office records when opened from the suite.";
 
     public const string UseStudioForCompanyDetails =
         "Company and project identity are kept in Studio. Open Studio to change them.";

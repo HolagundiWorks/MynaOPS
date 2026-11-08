@@ -11,7 +11,7 @@ public class OspTakeoffTests
 {
     static string Fixture(string n) => File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "fixtures", n));
 
-    /// <summary>What O-Draft is asked to write: a sample bridge file split into one record per row plus a header, in the given drawing slot.</summary>
+    /// <summary>What Tren is asked to write: a sample bridge file split into one record per row plus a header, in the given drawing slot.</summary>
     internal static List<TakeoffRecord> RecordsFromFixture(string name = "small-house.json", uint? slot = null, string? state = null,
         string? projectOfficeId = null, JsonObject? extraHeader = null, JsonObject? projectRef = null)
     {
@@ -46,7 +46,7 @@ public class OspTakeoffTests
         return b;
     }
 
-    /// <summary>Annotated PDF as chunk records plus the header descriptor O-Draft must write.</summary>
+    /// <summary>Annotated PDF as chunk records plus the header descriptor Tren must write.</summary>
     internal static (List<TakeoffRecord> records, byte[] pdf) WithPdf(uint slot, int chunkBytes = 1024, int size = 5000, string? sha = null)
     {
         var pdf = FakePdf(size);

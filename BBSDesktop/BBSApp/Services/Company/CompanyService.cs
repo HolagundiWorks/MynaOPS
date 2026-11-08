@@ -25,8 +25,8 @@ public sealed class SharedProjectLink
 }
 
 /// <summary>
-/// The company file shared with O-Studio (an .osas file; earlier .adms files open too). While one is open, a project can be opened from it and saved back to it,
-/// and O-Studio can have the same file open at the same time. O-CoreOp keeps a project's quantities in the company file as a
+/// The company file shared with Kivo (an .osas file; earlier .adms files open too). While one is open, a project can be opened from it and saved back to it,
+/// and Kivo can have the same file open at the same time. Falcon keeps a project's quantities in the company file as a
 /// document on that project; the clients and projects themselves are the office's records and are shared.
 /// </summary>
 public static class CompanyService
@@ -42,7 +42,7 @@ public static class CompanyService
 
     static string SuiteFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OSAS", "suite.json");
 
-    /// <summary>The company file chosen in O-Studio, if there is one and it still exists. The company is chosen only there.</summary>
+    /// <summary>The company file chosen in Kivo, if there is one and it still exists. The company is chosen only there.</summary>
     public static string? SuitePath()
     {
         try
@@ -58,7 +58,7 @@ public static class CompanyService
         }
     }
 
-    /// <summary>Starts O-Studio, where the company is chosen, created and signed in to. False when O-Studio is not installed.</summary>
+    /// <summary>Starts Kivo, where the company is chosen, created and signed in to. False when Kivo is not installed.</summary>
     public static bool StartStudio()
     {
         var folder = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\O-Studio", "InstallLocation", null) as string;
@@ -134,7 +134,7 @@ public static class CompanyService
             Changed?.Invoke();
         });
 
-    /// <summary>Opens a company file signed in by a one-time ticket from O-Studio.</summary>
+    /// <summary>Opens a company file signed in by a one-time ticket from Kivo.</summary>
     public static Task OpenWithTicketAsync(string path, string ticket) =>
         Task.Run(() =>
         {
@@ -152,7 +152,7 @@ public static class CompanyService
     }
 
     /// <summary>
-    /// Takes the company's details (kept in O-Studio) and the project's details (also in the company file) for the open project,
+    /// Takes the company's details (kept in Kivo) and the project's details (also in the company file) for the open project,
     /// so reports and title blocks print what those apps hold now. Does nothing when the project is not linked to the company file.
     /// </summary>
     public static async Task RefreshDetailsAsync()
@@ -207,14 +207,14 @@ public static class CompanyService
         return err;
     }
 
-    /// <summary>Shares the latest estimate as an approval draft in O-Studio (kind <c>aqc.estimate.draft</c>).</summary>
+    /// <summary>Shares the latest estimate as an approval draft in Kivo (kind <c>aqc.estimate.draft</c>).</summary>
     public static string? TryShareEstimateDraft(ProjectStore store)
     {
         var company = _company;
         var link = store.Shared;
         var estimate = store.LastEstimate;
         if (company is null || link is null)
-            return "Open the company from O-Studio and link this project first.";
+            return "Open the company from Kivo and link this project first.";
         if (estimate is null)
             return "Calculate an estimate first.";
         var payload = EstimateCalculator.ToJson(estimate);
@@ -244,7 +244,7 @@ public static class CompanyService
         var company = _company;
         var link = store.Shared;
         if (company is null || link is null)
-            return "Open the company from O-Studio and link this project first.";
+            return "Open the company from Kivo and link this project first.";
         var payload = bill.ToJson();
         var kind = StudioDraftShare.RaDraftKind(bill.Id);
         var title = string.IsNullOrWhiteSpace(bill.Number) ? "RA bill (draft)" : bill.Number;

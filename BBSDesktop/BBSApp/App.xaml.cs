@@ -21,7 +21,7 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         Services.RateBookStore.Current.EnsureLoaded();
-        // O-CoreOp opens the shared .osp itself. A launcher lock is optional. Sign-in and Push to O-Studio happen inside this app.
+        // Falcon opens the shared .osp itself. A launcher lock is optional. Sign-in and Push to Kivo happen inside this app.
         var locked = Office.Shared.SuiteProjectLock.FromEnvironment();
 
         MainWindow = new MainWindow();

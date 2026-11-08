@@ -16,11 +16,11 @@ public sealed record CompanyDetails(
     string LetterheadStyle,
     string AccentHex);
 
-/// <summary>A project's details, as O-Studio holds them: the project, its client, and the service in words.</summary>
+/// <summary>A project's details, as Kivo holds them: the project, its client, and the service in words.</summary>
 public sealed record ProjectDetails(long Id, string Code, string Name, string SiteAddress, string Summary, string ClientName, string Consultancy, string Status, string ProjectRef);
 
 /// <summary>
 /// What a document needs, read in one call: the company's details (kept in OSAS), today's date, and, when a project was named,
-/// that project's details (kept in O-Studio). O-CoreOp reports and O-Draft title plates print from this and never save it back.
+/// that project's details (kept in Kivo). Falcon reports and Tren title plates print from this and never save it back.
 /// </summary>
 public sealed record DocumentContext(CompanyDetails Company, string PreparedOn, ProjectDetails? Project);

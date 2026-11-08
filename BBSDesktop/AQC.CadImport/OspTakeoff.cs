@@ -19,21 +19,21 @@ public sealed record TakeoffDrawing(
     IReadOnlyDictionary<byte, int> Counts, AnnotatedPdfInfo? Annotated, string? Problem, string? ProjectRefCompany = null, long? ProjectRefId = null)
 {
     public bool IsComplete => State == "complete";
-    /// <summary>The drawing's name, or "drawing &lt;slot&gt;" when O-Draft recorded an unsaved drawing that has no name.</summary>
+    /// <summary>The drawing's name, or "drawing &lt;slot&gt;" when Tren recorded an unsaved drawing that has no name.</summary>
     public string DisplayName => string.IsNullOrWhiteSpace(Drawing) ? $"drawing {Slot}" : Drawing;
     public int Rows => Counts.Where(kv => kv.Key != OspTakeoff.KindHeader && kv.Key != OspTakeoff.KindAnnotatedChunk).Sum(kv => kv.Value);
 }
 
-/// <summary>The annotated drawing O-Draft generated once the take-off was complete: a PDF stored as numbered chunks in the project file.</summary>
+/// <summary>The annotated drawing Tren generated once the take-off was complete: a PDF stored as numbered chunks in the project file.</summary>
 public sealed record AnnotatedPdfInfo(string Sha256, long Bytes, int Chunks, int Pages, string? Generated);
 
 /// <summary>
-/// Take-off rows O-Draft records in a project file (`.osp` take-off tables), version 1. Each measured item is one record whose payload is the same JSON object
+/// Take-off rows Tren records in a project file (`.osp` take-off tables), version 1. Each measured item is one record whose payload is the same JSON object
 /// the hcw-aqc-bridge v1 file uses for that row, so the import rules, idempotence (source = hcwcad:&lt;drawing_id&gt;, source_ref = ref) and preview match the file importer.
 /// </summary>
 public static class OspTakeoff
 {
-    /// <summary>JSON <c>format</c> in take-off headers (wire name from O-Draft; unchanged for compatibility).</summary>
+    /// <summary>JSON <c>format</c> in take-off headers (wire name from Tren; unchanged for compatibility).</summary>
     public const string HeaderFormatWire = "hcw-takeoff-shilpi";
     public const int Version = 1;
 
@@ -116,7 +116,7 @@ public static class OspTakeoff
     {
         var all = records.ToList();
         var drawings = ListDrawings(all);
-        if (drawings.Count == 0) throw new BridgeFormatException("This project has no take-off header record. Record the take-off in O-Draft first.");
+        if (drawings.Count == 0) throw new BridgeFormatException("This project has no take-off header record. Record the take-off in Tren first.");
         if (drawings.Count > 1) throw new BridgeFormatException($"This project holds {drawings.Count} drawings; choose one.");
         return Read(all, drawings[0].Slot);
     }
@@ -130,7 +130,7 @@ public static class OspTakeoff
         var drawing = ListDrawings(mine).First();
         if (drawing.Problem is not null) throw new BridgeFormatException(drawing.Problem);
         if (!drawing.IsComplete)
-            throw new BridgeFormatException($"The take-off for {drawing.DisplayName} is still being recorded in O-Draft (state: {drawing.State}). Try again when it is complete.");
+            throw new BridgeFormatException($"The take-off for {drawing.DisplayName} is still being recorded in Tren (state: {drawing.State}). Try again when it is complete.");
 
         var h = ParseObject(header, "header");
         var root = new JsonObject
@@ -225,7 +225,7 @@ public static class OspTakeoff
         var info = drawing.Annotated ?? throw new BridgeFormatException($"{drawing.DisplayName}: no annotated drawing has been recorded yet.");
         var chunks = mine.Where(r => KindOf(r.Id) == KindAnnotatedChunk).OrderBy(r => NOf(r.Id)).ToList();
         if (chunks.Count != info.Chunks || chunks.Select((c, i) => NOf(c.Id) == (uint)i).Contains(false))
-            throw new BridgeFormatException($"{drawing.DisplayName}: the annotated drawing is incomplete ({chunks.Count} of {info.Chunks} parts). Try again when O-Draft has finished.");
+            throw new BridgeFormatException($"{drawing.DisplayName}: the annotated drawing is incomplete ({chunks.Count} of {info.Chunks} parts). Try again when Tren has finished.");
         using var ms = new MemoryStream();
         foreach (var c in chunks)
         {
@@ -244,7 +244,7 @@ public static class OspTakeoff
     {
         if (Str(o, "format") != HeaderFormatWire) throw new BridgeFormatException($"The header is not a {HeaderFormatWire} record.");
         if (!(o["version"] is JsonValue v && v.TryGetValue<int>(out var ver) && ver == Version))
-            throw new BridgeFormatException($"Unsupported take-off version {o["version"]} (this O-CoreOp reads version {Version}).");
+            throw new BridgeFormatException($"Unsupported take-off version {o["version"]} (this Falcon reads version {Version}).");
         if (!string.Equals(Str(o, "units"), "mm", StringComparison.OrdinalIgnoreCase))
             throw new BridgeFormatException($"Unsupported units '{Str(o, "units")}' (expected mm).");
         if (string.IsNullOrWhiteSpace(Str(o["source"] as JsonObject, "drawing_id")))

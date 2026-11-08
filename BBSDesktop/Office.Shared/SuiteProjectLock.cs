@@ -10,7 +10,7 @@ namespace Office.Shared;
 public sealed record LockedProject(long ProjectId, string OspPath, string? DisplayName = null);
 
 /// <summary>
-/// The project is chosen in the launcher (or O-Studio), never in this app. The launcher starts the app with
+/// The project is chosen in the launcher (or Kivo), never in this app. The launcher starts the app with
 /// <c>OSTUDIO_PROJECT_ID</c> and <c>OSTUDIO_PROJECT_OSP</c>. An app started any other way asks the launcher to start it once a company is
 /// signed in and a project is locked.
 /// </summary>

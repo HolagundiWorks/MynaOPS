@@ -55,13 +55,13 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-        <!-- Suite menu strip — flat like O-Studio (File · Edit · Help). -->
+        <!-- Suite menu strip — flat like Kivo (File · Edit · Help). -->
         <MenuBar x:Name="AppMenuBar" Grid.Row="0" Height="{StaticResource SuiteMenuBarHeight}" VerticalAlignment="Center"
                  Background="{ThemeResource HcwSoftBrush}"
                  Foreground="{ThemeResource HcwInkBrush}"
                  FontSize="{StaticResource SuiteFontBody}"
                  AutomationProperties.Name="Menu bar">
-            <!-- Company first · work · Exit (same File shape as O-Studio). -->
+            <!-- Company first · work · Exit (same File shape as Kivo). -->
             <MenuBarItem Title="File" AccessKey="F">
                 <MenuFlyoutItem Text="Open project…" Click="OpenProject_Click" AccessKey="O">
                     <MenuFlyoutItem.Icon>
@@ -85,7 +85,7 @@
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
-                <MenuFlyoutItem Text="Take-off (O-Draft)…" Click="NavMenu_Click" Tag="takeoff">
+                <MenuFlyoutItem Text="Take-off (Tren)…" Click="NavMenu_Click" Tag="takeoff">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE9F9;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
@@ -192,10 +192,10 @@
                     </Frame.ContentTransitions>
                 </Frame>
 
-                <!-- Floating Ask bar (O-Draft shell): reply card + pill -->
+                <!-- Floating Ask bar (Tren shell): reply card + pill -->
                 <Grid x:Name="AskHost" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
 
-                <!-- Full-bleed status row (O-Draft bottom bar) -->
+                <!-- Full-bleed status row (Tren bottom bar) -->
                 <oui:SuiteBottomStatusBar x:Name="StatusStrip" Grid.Row="4"/>
 
                 <!-- Wired into StatusStrip in code -->
@@ -206,7 +206,7 @@
                     </Button>
                     <StackPanel x:Name="BottomShellRight" Orientation="Horizontal" Spacing="8">
                         <oui:SuiteThemeSwitch x:Name="ThemeSwitch" VerticalAlignment="Center"/>
-                        <!-- The AI assistant, as in O-Draft's bottom bar: the drawn agent mark; click puts the cursor in the Ask bar. -->
+                        <!-- The AI assistant, as in Tren's bottom bar: the drawn agent mark; click puts the cursor in the Ask bar. -->
                         <Button x:Name="AiChip" Width="28" Height="26" MinWidth="0" MinHeight="0" Padding="0" BorderThickness="0"
                                 Background="Transparent" CornerRadius="4" VerticalAlignment="Center"
                                 Click="AiChip_Click" AutomationProperties.Name="AI assistant" ToolTipService.ToolTip="AI assistant: ask about this project">
@@ -215,7 +215,7 @@
                         <Button x:Name="CompanyBadge" Style="{StaticResource HcwGhostButton}" Padding="12,0"
                                 Click="CompanyBadge_Click"
                                 AutomationProperties.Name="Company file"
-                                ToolTipService.ToolTip="The company file shared with O-Studio — open its projects">
+                                ToolTipService.ToolTip="The company file shared with Kivo — open its projects">
                             <TextBlock x:Name="CompanyBadgeText" VerticalAlignment="Center" FontSize="{StaticResource SuiteFontBody}"
                                        Foreground="{ThemeResource HcwInkBrush}" MaxWidth="190" TextTrimming="CharacterEllipsis"
                                        Text="Company · not open"/>

@@ -191,7 +191,7 @@ public sealed class SmartBlockTests
     }
 
     /// <summary>
-    /// <c>Fixtures/rcc_counts.json</c> is written by O-Draft's engine (<c>crates/engine/tests/rcc_parity.rs</c>): how many lines, polylines, dots, circles, arcs,
+    /// <c>Fixtures/rcc_counts.json</c> is written by Tren's engine (<c>crates/engine/tests/rcc_parity.rs</c>): how many lines, polylines, dots, circles, arcs,
     /// texts and hatches each block has for some parameter values. This reader must draw the same, from its copy of the same <c>rcc.json</c>.
     /// </summary>
     [Fact]
@@ -216,7 +216,7 @@ public sealed class SmartBlockTests
         }
     }
 
-    /// <summary><c>Fixtures/details.osp</c> was saved by O-Draft's host (a beam, a column and a slab placed, the beam's bars then changed).</summary>
+    /// <summary><c>Fixtures/details.osp</c> was saved by Tren's host (a beam, a column and a slab placed, the beam's bars then changed).</summary>
     [Fact]
     public void The_details_O_Draft_recorded_are_read_and_drawn()
     {

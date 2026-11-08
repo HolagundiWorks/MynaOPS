@@ -40,7 +40,7 @@ public static class CadImporter
     public static string SourceTag(string drawingId) => "hcwcad:" + drawingId;
 
     /// <summary>
-    /// A wall's thickness. Given: used. Not given (a brick take-off wall from O-Draft carries only its layer): <c>MEASURE-FULLBRICK</c> is a 230 mm wall,
+    /// A wall's thickness. Given: used. Not given (a brick take-off wall from Tren carries only its layer): <c>MEASURE-FULLBRICK</c> is a 230 mm wall,
     /// <c>MEASURE-HALFBRICK</c> a 4.5 in (115 mm) wall, and a <c>material</c> gives its own default; anything else is 230 mm and says it was assumed.
     /// </summary>
     static (double Thickness, string? Note, bool Assumed) WallThickness(JsonObject w, string material)
@@ -79,7 +79,7 @@ public static class CadImporter
         var wallMarkByRef = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var seen = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
-        // a row with no level (O-Draft does not always write one) belongs to the file's floor when the file has only one
+        // a row with no level (Tren does not always write one) belongs to the file's floor when the file has only one
         string LevelName(JsonObject o)
         {
             var n = BridgeFile.Str(o, "level");
@@ -171,7 +171,7 @@ public static class CadImporter
                 f["faces"] = "2";
             if (BridgeFile.Num(w, "paint_external_m2") is { } pext) f["paint_external_m2"] = N(pext);
             if (BridgeFile.Num(w, "paint_internal_m2") is { } pint) f["paint_internal_m2"] = N(pint);
-            // Prefer O-Draft's honesty note (e.g. nominal layer thickness) over silent acceptance of a stated value.
+            // Prefer Tren's honesty note (e.g. nominal layer thickness) over silent acceptance of a stated value.
             var wallNote = BridgeFile.Str(w, "_note");
             var reason = wallNote.Length > 0 ? wallNote
                 : assumed ? thickNote
@@ -473,7 +473,7 @@ public static class CadImporter
     }
 
     /// <summary>
-    /// The estimation and running-bill phase O-Draft put on a row (<c>phase</c>, <c>bill_phase</c>). A row without the
+    /// The estimation and running-bill phase Tren put on a row (<c>phase</c>, <c>bill_phase</c>). A row without the
     /// field says nothing, so a phase typed in AQC is kept; a phase cleared in the drawing is not carried over.
     /// </summary>
     static Dictionary<string, string> PhaseFields(JsonObject? src)

@@ -48,7 +48,7 @@ powershell -File BBSDesktop\installer\sign.ps1 BBSDesktop\artifacts\installer\O-
 
 The OSAS launcher can install this Setup.exe via
 `installer/install-suite.ps1 -ArtifactsDir …` when the file is named
-`Falcon-Setup-*.exe`. Prefer the unified **`O-Suite-Setup-*.exe`** from Kivo
+`Falcon-Setup-*.exe`. Prefer the unified **`Kivo-Suite-Setup-*.exe`** from Kivo
 (`installer/suite/README.md`): one wizard for install and remove of Kivo, Falcon, and Tren.
 
 ## Update channel (check-only)

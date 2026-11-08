@@ -365,7 +365,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         return new ImageIcon { Source = (ImageSource)src, Width = SuiteIconPx, Height = SuiteIconPx };
     }
 
-    /// <summary>Suite icon glyph size (10) and tile hit (36) — matches O.Ui / O-Draft.</summary>
+    /// <summary>Suite icon glyph size (10) and tile hit (36) — matches O.Ui / Tren.</summary>
     private const double SuiteIconPx = 15;
     private const double SuiteTilePx = 36;
 
@@ -1122,7 +1122,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
 
     /// <summary>
     /// The project is chosen and locked in the launcher, so there is no pointer to follow any more; what stays is the poll of the project file's
-    /// revision, which tells when O-Draft recorded a take-off.
+    /// revision, which tells when Tren recorded a take-off.
     /// </summary>
     private void StartActiveProjectWatch()
     {

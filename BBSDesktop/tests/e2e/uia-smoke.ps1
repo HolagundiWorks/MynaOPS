@@ -77,7 +77,7 @@ $items | ForEach-Object { "  $_" }
 try { [System.Windows.Forms.SendKeys]::SendWait("{ESC}") } catch { }
 Start-Sleep -Milliseconds 400
 
-foreach ($step in @("Take-off (O-Draft)", "Import from CAD", "Export for CAD")) {
+foreach ($step in @("Take-off (Tren)", "Import from CAD", "Export for CAD")) {
   "== $step =="
   $ok = Click-MenuItem ($items | Where-Object { $_ -like "*$step*" } | ForEach-Object { ($_ -split ': ', 2)[1] } | Select-Object -First 1)
   if ($ok) {

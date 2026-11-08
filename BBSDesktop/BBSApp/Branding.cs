@@ -4,12 +4,12 @@
 namespace BBSApp;
 
 /// <summary>
-/// Product branding — Falcon, part of Myna (Human Centric Works). Formerly AQC Core and O-CoreOp.
+/// Product branding — Falcon, part of Myna (Human Centric Works). Formerly AQC Core and Falcon.
 /// Keep display strings aligned with suite nomenclature (docs/SUITE.md).
 /// </summary>
 public static class Branding
 {
-    /// <summary>Window · tile · about. Identifiers and the app-data folder stay O-CoreOp.</summary>
+    /// <summary>Window · tile · about. Identifiers and the app-data folder stay Falcon.</summary>
     public const string AppName = "Falcon";
 
     /// <summary>Legacy hyphenated name (files · older docs).</summary>
@@ -40,7 +40,7 @@ public static class Branding
     public const string PreviousAppDataFolder = "AQCCore";
     public const string LegacyAppDataFolder = "BOQCore";
 
-    public const string ProjectFileFilter = "O-Suite project";
+    public const string ProjectFileFilter = "Kivo Suite project";
     public const string ProjectExtension = ".osp";
 
     public static string WindowTitle(string? projectName = null, bool dirty = false)

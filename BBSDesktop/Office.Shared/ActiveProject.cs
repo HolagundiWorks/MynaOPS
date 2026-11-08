@@ -5,12 +5,12 @@ using System.Text.Json;
 
 namespace Office.Shared;
 
-/// <summary>The drawing O-Draft has open and the project file that goes with it.</summary>
+/// <summary>The drawing Tren has open and the project file that goes with it.</summary>
 public sealed record ActiveProjectInfo(string App, string Drawing, string Project, DateTime UpdatedUtc);
 
 /// <summary>
-/// The pointer file O-Draft keeps current under <c>%LOCALAPPDATA%\O-Studio\active-project.json</c>, so O-CoreOp can open the project file of the drawing
-/// on screen. O-Draft writes it when a drawing is opened, saved or closed (closed: the file is deleted or says <c>project: null</c>).
+/// The pointer file Tren keeps current under <c>%LOCALAPPDATA%\O-Studio\active-project.json</c>, so Falcon can open the project file of the drawing
+/// on screen. Tren writes it when a drawing is opened, saved or closed (closed: the file is deleted or says <c>project: null</c>).
 /// <code>{ "format": "studio-active-project", "version": 1, "app": "O-Draft", "drawing": "C:\\p\\house.osp", "project": "C:\\p\\house.osp", "updated_utc": "2026-10-29T09:00:00Z" }</code>
 /// </summary>
 public static class ActiveProject

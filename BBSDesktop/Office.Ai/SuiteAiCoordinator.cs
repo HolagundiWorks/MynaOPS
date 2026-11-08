@@ -7,7 +7,7 @@ namespace Office.Ai;
 
 /// <summary>
 /// One Olmo host per machine on loopback :8742. The suite launcher hosts it for as long as it runs; the apps use <see cref="RemoteLlm"/>.
-/// O-CoreOp alone may still host when the port is free (solo use).
+/// Falcon alone may still host when the port is free (solo use).
 /// </summary>
 public static class SuiteAiCoordinator
 {
@@ -21,7 +21,7 @@ public static class SuiteAiCoordinator
     public static bool PreferHost =>
         string.Equals(Environment.GetEnvironmentVariable(SuiteWire.EnvAiRole), "host", StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>Start listening when this process should own the model (O-Studio workspace, or solo CoreOp).</summary>
+    /// <summary>Start listening when this process should own the model (Kivo workspace, or solo CoreOp).</summary>
     public static AiCoreListener? StartHostIfNeeded(int port = AiCoreListener.DefaultPort)
     {
         if (PreferClient)

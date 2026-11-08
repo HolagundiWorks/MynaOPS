@@ -65,7 +65,7 @@ public static class PdfExport
                             col.Item().Element(c => TakeoffAnnotatedPdf.Draw(c, store, annotatedDrawing));
                         }
 
-                        // annotated drawings O-Draft generated and O-CoreOp stored (quantity lines, measurements, hatches)
+                        // annotated drawings Tren generated and Falcon stored (quantity lines, measurements, hatches)
                         if (storedAnnotated is { Count: > 0 })
                         {
                             col.Item().PageBreak();
@@ -251,7 +251,7 @@ public static class PdfExport
                             col.Item().Element(c => TakeoffAnnotatedPdf.Draw(c, store, annotatedDrawing));
                         }
 
-                        // annotated drawings O-Draft generated and O-CoreOp stored (quantity lines, measurements, hatches)
+                        // annotated drawings Tren generated and Falcon stored (quantity lines, measurements, hatches)
                         if (storedAnnotated is { Count: > 0 })
                         {
                             col.Item().PageBreak();

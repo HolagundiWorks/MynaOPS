@@ -140,7 +140,7 @@ public sealed class SectionDiagram : UserControl
     private DiagramPart _part = DiagramPart.None;
     private DiagramSnapshot _snap = new();
 
-    // Beams, columns, slabs, footings and lintels show the detail O-Draft drew (an RCC block recorded in the project file), read only: O-CoreOp
+    // Beams, columns, slabs, footings and lintels show the detail Tren drew (an RCC block recorded in the project file), read only: Falcon
     // never changes a drawing, so there is nothing to edit or redraw here, only a choice of which recorded detail to look at.
     private IReadOnlyList<OdpDetail> _details = [];
     private readonly ComboBox _detailBox = new() { HorizontalAlignment = HorizontalAlignment.Stretch, FontSize = 11, Margin = new Thickness(0, 0, 0, 2), Visibility = Visibility.Collapsed };
@@ -208,7 +208,7 @@ public sealed class SectionDiagram : UserControl
         Redraw();
     });
 
-    /// <summary>Read the details O-Draft recorded for this kind of element from the open project file and list them.</summary>
+    /// <summary>Read the details Tren recorded for this kind of element from the open project file and list them.</summary>
     private void LoadDetails()
     {
         _details = StructuralDetail.Supports(_kind) ? StructuralDetail.Load(ProjectStore.Current.FilePath, _kind) : [];
@@ -222,7 +222,7 @@ public sealed class SectionDiagram : UserControl
         _fillingDetails = false;
     }
 
-    /// <summary>Draw the selected detail from O-Draft, or say there is none yet.</summary>
+    /// <summary>Draw the selected detail from Tren, or say there is none yet.</summary>
     private void DrawDrawnInDraft()
     {
         var kindName = _kind switch { "beams" => "beam", "columns" => "column", "slabs" => "slab", "footings" => "footing", _ => "lintel" };
@@ -233,8 +233,8 @@ public sealed class SectionDiagram : UserControl
             var note = new TextBlock
             {
                 Text = chosen is null
-                    ? $"No {kindName} has been detailed in O-Draft yet."
-                    : $"The {kindName} detail from O-Draft could not be drawn.",
+                    ? $"No {kindName} has been detailed in Tren yet."
+                    : $"The {kindName} detail from Tren could not be drawn.",
                 TextWrapping = TextWrapping.Wrap,
                 TextAlignment = TextAlignment.Center,
                 Width = 240,
@@ -245,7 +245,7 @@ public sealed class SectionDiagram : UserControl
             Canvas.SetTop(note, 150);
             _canvas.Children.Add(note);
             _caption.Text = $"{char.ToUpperInvariant(kindName[0])}{kindName[1..]} detail";
-            _hint.Text = $"Place an RCC {kindName} in O-Draft and save the project; its detail appears here. Details are drawn in O-Draft and are read only in O-CoreOp.";
+            _hint.Text = $"Place an RCC {kindName} in Tren and save the project; its detail appears here. Details are drawn in Tren and are read only in Falcon.";
             return;
         }
         var ink = new SmartBlockPainter.Ink(
@@ -255,7 +255,7 @@ public sealed class SectionDiagram : UserControl
             dia => new SolidColorBrush(BarColor(dia)));
         var scale = SmartBlockPainter.Paint(_canvas, geometry, ink);
         _caption.Text = chosen.Label;
-        _hint.Text = $"Drawn in O-Draft (layer {chosen.Layer}, object {chosen.Handle}); read only. Change it in O-Draft and save: it updates here. Scale {scale:0.00} px per mm.{(_kind == "slabs" ? " A 1.2 m strip of the span is shown." : "")}";
+        _hint.Text = $"Drawn in Tren (layer {chosen.Layer}, object {chosen.Handle}); read only. Change it in Tren and save: it updates here. Scale {scale:0.00} px per mm.{(_kind == "slabs" ? " A 1.2 m strip of the span is shown." : "")}";
         foreach (var d in geometry.Prims.OfType<DotPrim>().Select(d => (int)Math.Round(d.R * 2)).Distinct().OrderBy(d => d))
         {
             var chip = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 3 };

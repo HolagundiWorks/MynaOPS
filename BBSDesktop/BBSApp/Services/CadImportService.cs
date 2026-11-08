@@ -7,7 +7,7 @@ namespace BBSApp.Services;
 
 /// <summary>
 /// Adapts <see cref="ProjectStore"/> to the CAD importer (AQC.CadImport). Take-off happens in
-/// Reads hcw-aqc-bridge v1 JSON (from O-Draft take-off export or legacy CAD bridge files) and merges into the open project.
+/// Reads hcw-aqc-bridge v1 JSON (from Tren take-off export or legacy CAD bridge files) and merges into the open project.
 /// </summary>
 public static class CadImportService
 {

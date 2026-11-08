@@ -17,7 +17,7 @@ public sealed record RenderedPage(byte[] PngBytes, float WidthPx, float HeightPx
 public sealed record RenderedAnnotatedPdf(StoredAnnotatedDrawing Entry, IReadOnlyList<RenderedPage> Pages, int TotalPages);
 
 /// <summary>
-/// The annotated drawing PDFs O-Draft generated (quantity lines, measurements, hatches) and O-CoreOp stored, as report appendices.
+/// The annotated drawing PDFs Tren generated (quantity lines, measurements, hatches) and Falcon stored, as report appendices.
 /// This replaces the page the removed PDF take-off panel drew. Each stored PDF is rendered page by page (Windows.Data.Pdf) to a PNG
 /// and drawn on its own report page; nothing is redrawn or re-measured here.
 /// </summary>
@@ -87,7 +87,7 @@ public static class StoredAnnotatedPdf
                         c.Spacing(4);
                         c.Item().Text($"Annotated drawing: {entry.Drawing}").SemiBold().FontSize(11);
                         var bits = new List<string> { $"page {i + 1} of {d.TotalPages}" };
-                        if (!string.IsNullOrWhiteSpace(entry.Generated)) bits.Add($"recorded by O-Draft {entry.Generated}");
+                        if (!string.IsNullOrWhiteSpace(entry.Generated)) bits.Add($"recorded by Tren {entry.Generated}");
                         if (!string.IsNullOrWhiteSpace(entry.Revision)) bits.Add($"drawing revision {entry.Revision[..Math.Min(8, entry.Revision.Length)]}");
                         c.Item().Text(string.Join(" · ", bits)).FontSize(7).FontColor(Colors.Grey.Darken1);
                         if (d.TotalPages > d.Pages.Count && i == d.Pages.Count - 1)

@@ -26,9 +26,9 @@ public sealed class EstimateLine
     public double HeightM { get; set; }
     public double AreaM2 { get; set; }
     public double VolumeM3 { get; set; }
-    /// <summary>The estimation phase the measured item was put in, in O-Draft; empty when it has none.</summary>
+    /// <summary>The estimation phase the measured item was put in, in Tren; empty when it has none.</summary>
     public string Phase { get; set; } = "";
-    /// <summary>The running-bill phase the measured item was put in, in O-Draft; empty when it has none.</summary>
+    /// <summary>The running-bill phase the measured item was put in, in Tren; empty when it has none.</summary>
     public string BillPhase { get; set; } = "";
 }
 
@@ -276,7 +276,7 @@ public static class EstimateCalculator
 
     static string PhaseKey(string mark, string level) => mark.Trim().ToUpperInvariant() + "|" + level.Trim();
 
-    /// <summary>The phases the member sheets hold (set in O-Draft), by mark and storey.</summary>
+    /// <summary>The phases the member sheets hold (set in Tren), by mark and storey.</summary>
     static Dictionary<string, (string Phase, string BillPhase)> PhaseIndex(ProjectStore store)
     {
         var index = new Dictionary<string, (string, string)>();
@@ -323,7 +323,7 @@ public static class EstimateCalculator
 
     /// <summary>
     /// Stamps a suite ArtifactRef onto the estimate when the open project is linked to the company file.
-    /// Call after Calculate so O-Studio can name the same estimate once it is saved to the company file.
+    /// Call after Calculate so Kivo can name the same estimate once it is saved to the company file.
     /// </summary>
     public static void AttachCompanyArtifactRef(EstimateResult result, ProjectStore store)
     {
