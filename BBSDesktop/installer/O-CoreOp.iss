@@ -26,6 +26,7 @@ AppSupportURL={#MyAppPublisherUrl}
 DefaultDirName={localappdata}\Programs\O-CoreOp
 DefaultGroupName={#MyAppName}
 UsePreviousAppDir=no
+UsePreviousGroup=no
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
