@@ -116,12 +116,21 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         DispatcherQueue.TryEnqueue(() =>
         {
             O.Ui.SuiteAppearance.Apply(this);
+            // Going through Default first makes every ThemeResource below re-resolve; setting the same theme again does not.
             if (Content is FrameworkElement root)
+            {
+                root.RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Default;
                 root.RequestedTheme = O.Ui.SuiteAppearance.Current;
+            }
+            AppNav.RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Default;
             AppNav.RequestedTheme = O.Ui.SuiteAppearance.Current;
             // The pages sit in the work area: without an explicit theme of its own it kept the colours of the theme it was created in (a black page under a white
             // ribbon after switching to light, found 2026-11-10).
+            WorkArea.RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Default;
             WorkArea.RequestedTheme = O.Ui.SuiteAppearance.Current;
+            // The welcome card paints its own backdrop from a copy of the work area's brush taken when it was made; give it the brush of the new theme.
+            if (_welcome is not null)
+                _welcome.Backdrop = WorkArea.Background;
             // Rebuild the ribbon model so ImageIcon sources pick up the active theme dictionary (light/dark SVG).
             BuildRibbonModel();
             BuildNavigation();
