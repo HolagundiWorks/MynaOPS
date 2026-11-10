@@ -24,11 +24,44 @@ public static class LocalModel
     public static string SharedDirectory => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "HumanCentricWorks", "models");
 
+    /// <summary>
+    /// <c>model-path.txt</c> in <see cref="SharedDirectory"/>: a model file chosen with MynaOps' Edit &gt; Assistant model &gt; Locate, used when it
+    /// is not in the shared folder. One line, the full path.
+    /// </summary>
+    public static string PointerFile => Path.Combine(SharedDirectory, "model-path.txt");
+
+    /// <summary>The path a pointer file names, or null when there is none or it is empty.</summary>
+    public static string? ReadPointer(string pointerFile)
+    {
+        try
+        {
+            if (!File.Exists(pointerFile)) return null;
+            var line = File.ReadLines(pointerFile).FirstOrDefault()?.Trim().Trim('"');
+            return string.IsNullOrWhiteSpace(line) ? null : line;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return null; }
+    }
+
+    /// <summary>Remember a model file somewhere else (null forgets it). The file must look whole (<see cref="Problem"/>).</summary>
+    public static void SetLocated(string? path, string? pointerFile = null)
+    {
+        pointerFile ??= PointerFile;
+        if (path is null)
+        {
+            try { File.Delete(pointerFile); } catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+            return;
+        }
+        if (Problem(path) is { } bad) throw new InvalidOperationException(bad);
+        Directory.CreateDirectory(Path.GetDirectoryName(pointerFile)!);
+        File.WriteAllText(pointerFile, Path.GetFullPath(path));
+    }
+
     public static IReadOnlyList<string> Candidates()
     {
         var list = new List<string>();
         var env = Environment.GetEnvironmentVariable(Env);
         if (!string.IsNullOrWhiteSpace(env)) list.Add(env);
+        if (ReadPointer(PointerFile) is { } located) list.Add(located);
         list.Add(Path.Combine(SharedDirectory, FileName));
         list.Add(Path.Combine(AppContext.BaseDirectory, "models", FileName));
         return list;

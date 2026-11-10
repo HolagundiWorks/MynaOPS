@@ -96,6 +96,12 @@
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Project database…" Click="NavMenu_Click" Tag="projectdb">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE1D3;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
                 <MenuFlyoutItem Text="Exit" Click="Exit_Click" AccessKey="X">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE711;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
@@ -116,6 +122,11 @@
                 <MenuFlyoutItem Text="Cost percentages…" Click="NavMenu_Click" Tag="settings_cost">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE1D0;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Assistant model…" Click="NavMenu_Click" Tag="settings_assistant">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE99A;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                             </MenuBarItem>

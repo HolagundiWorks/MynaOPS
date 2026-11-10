@@ -22,7 +22,9 @@
 #define MyAppPublisherUrl "https://humancentic.works"
 #define MyAppExeName "O-CoreOp.exe"
 #define MyAppId "{{A8F3C2E1-9B4D-4E6A-8C1F-2D7E5A9B0C3D}"
-; The assistant model: Olmo-3-7B-Instruct Q4_K_M from unsloth/Olmo-3-7B-Instruct-GGUF (Apache-2.0), pinned revision, shared with MynaCAD.
+; The assistant model: Olmo-3-7B-Instruct Q4_K_M from unsloth/Olmo-3-7B-Instruct-GGUF (Apache-2.0), pinned revision. MynaOps hosts the AI agent
+; (llama-server from runtime\ beside O-CoreOp.exe) for itself and MynaCAD; MynaCAD starts "O-CoreOp.exe --ai-host" (no window) when no host answers.
+; MynaOps can also download or locate the model later (Edit > Assistant model).
 #define ModelFile "Olmo-3-7B-Instruct-Q4_K_M.gguf"
 #define ModelSha256 "0de0bc63fae8a73a48e167be48f149c9544bd4af61d223cd3f331c6ea664c5c4"
 #define ModelUrl "https://huggingface.co/unsloth/Olmo-3-7B-Instruct-GGUF/resolve/a2a9ae53f5a95087616b3f45ca96e9d2631344ee/" + ModelFile
@@ -62,7 +64,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "model"; Description: "Download the assistant model (Olmo 3 7B, 4.5 GB, runs on this computer only; MynaCAD uses it too)"; GroupDescription: "Assistant:"
+Name: "model"; Description: "Download the assistant model (Olmo 3 7B, 4.5 GB, runs on this computer only; MynaOps hosts it for MynaOps and MynaCAD)"; GroupDescription: "Assistant:"
 
 [Files]
 Source: "..\artifacts\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -78,7 +80,7 @@ Root: HKCU; Subkey: "Software\Classes\OSAS.Project"; ValueType: string; ValueNam
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop"; ValueType: string; ValueName: ""; ValueData: "Open in MynaOps"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-CoreOp\{#MyAppExeName}"" ""%1"""
 #ifdef WithCad
-; Double-click opens the project in MynaCAD; MynaOps keeps the right-click verb. Neither starts Myna.
+; Double-click opens the project in MynaCAD; MynaOps keeps the right-click verb. Neither starts the other app.
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open"; ValueType: string; ValueName: ""; ValueData: "Open in MynaCAD"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-Draft\ODraft.WinUi.exe"" ""%1"""
 #endif
@@ -130,6 +132,30 @@ var
 function ModelPath: String;
 begin
   Result := ExpandConstant('{localappdata}\HumanCentricWorks\models\{#ModelFile}');
+end;
+
+{ MynaOps may be running without a window as the AI host (O-CoreOp.exe --ai-host, started by MynaCAD). It holds the program files open, so it is
+  stopped before files are replaced or removed. A MynaOps window is left to Setup's usual "close the applications" step. }
+procedure StopHeadlessAiHost;
+var
+  Code: Integer;
+begin
+  if not Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'),
+    '-NoProfile -NonInteractive -Command "Get-CimInstance Win32_Process | Where-Object { $_.Name -eq ''O-CoreOp.exe'' -and $_.CommandLine -like ''*--ai-host*'' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"',
+    '', SW_HIDE, ewWaitUntilTerminated, Code) then
+    Log('Could not run PowerShell to stop a headless MynaOps AI host.');
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  StopHeadlessAiHost;
+  Result := '';
+end;
+
+function InitializeUninstall(): Boolean;
+begin
+  StopHeadlessAiHost;
+  Result := True;
 end;
 
 procedure InitializeWizard;

@@ -84,8 +84,10 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             else
                 Office.Ai.LocalLlmHost.Shutdown();
         };
+        // MynaOps hosts the AI agent (for itself and MynaCAD) when no other MynaOps serves it yet; otherwise it is a client of that host.
         if (!Office.Ai.SuiteAiCoordinator.PreferClient)
-            _aiCore = Office.Ai.SuiteAiCoordinator.StartHostIfNeeded();
+            _aiCore = Office.Ai.SuiteAiCoordinator.StartHostIfNeeded(mode: "window");
+        StartAiStatus();
         ServedProject.Changed += () => DispatcherQueue.TryEnqueue(() => AppNotify.Info("Take-off", "MynaCAD updated the take-off. Open Take-off to review and import it."));
         StartActiveProjectWatch();
         if (Content is FrameworkElement root)
@@ -96,6 +98,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
     {
         _askBar = new O.Ui.Controls.SuiteAskBar("Ask about this project…") { OwnerWindow = WinRT.Interop.WindowNative.GetWindowHandle(this) };
         _askBar.Send.Click += AiSend_Click;
+        _aiStatus.Click += (_, _) => Navigate("settings_assistant");
         _askBar.Input.KeyDown += AiInput_KeyDown;
         AskHost.Children.Add(_askBar);
 
@@ -103,6 +106,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         // detected"), which ended the app at start. Take each control out of BottomShellParts before it goes into the status strip.
         BottomShellParts.Children.Remove(NavCalcBtn);
         StatusStrip.Left.Children.Add(NavCalcBtn);
+        StatusStrip.Right.Children.Add(_aiStatus);
         foreach (var child in BottomShellRight.Children.ToList())
         {
             BottomShellRight.Children.Remove(child);
@@ -197,6 +201,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             Cmd("dashboard", "Dashboard", Glyph("\uE80F")),
             Cmd("levels", "Levels", Glyph("\uF158")),
             Cmd("takeoff", "Take-off (MynaCAD)", Glyph("\uE8A5")),
+            Cmd("projectdb", "Project database", Glyph("\uE1D3")),
         }));
         _tabs.Add(new RibbonTab("rcc", "RCC steel", new[]
         {
@@ -266,7 +271,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         foreach (var cmd in _tabs.SelectMany(t => t.Commands))
             _navTags.Add(cmd.Tag);
         // Edit menu + sync actions (not duplicated in Outputs strip).
-        foreach (var tag in new[] { "settings_project", "settings_engineering", "settings_cost" })
+        foreach (var tag in new[] { "settings_project", "settings_engineering", "settings_cost", "settings_assistant" })
             _navTags.Add(tag);
     }
 
@@ -576,6 +581,8 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             "settings" or "settings_project" => new SettingsPage(SettingsPage.SettingsTab.Project),
             "settings_engineering" => new SettingsPage(SettingsPage.SettingsTab.Engineering),
             "settings_cost" => new SettingsPage(SettingsPage.SettingsTab.CostPercent),
+            "settings_assistant" => new AssistantModelPage(),
+            "projectdb" => new ProjectDatabasePage(),
             _ => new DashboardPage()
         };
 
@@ -1132,7 +1139,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
     }
 
     /// <summary>
-    /// The project is chosen and locked in the launcher, so there is no pointer to follow any more; what stays is the poll of the project file's
+    /// MynaOps opens the project file itself (File > Open project, or a file given on the command line); what stays is the poll of the project file's
     /// revision, which tells when MynaCAD recorded a take-off.
     /// </summary>
     private void StartActiveProjectWatch()

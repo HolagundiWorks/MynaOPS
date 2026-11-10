@@ -41,7 +41,8 @@ public sealed class AssistantService
     public static string? LastProblem { get; private set; }
 
     /// <summary>
-    /// Create the assistant. Olmo 3 7B is used through MynaHub's AI Core when it is running, or in-process when this app hosts solo.
+    /// Create the assistant. Olmo 3 7B is used in-process when this MynaOps window hosts the AI agent, or through the MynaOps that hosts it
+    /// (another window, or MynaOps without a window started for MynaCAD).
     /// Without the model, a stored Anthropic key is the fallback.
     /// </summary>
     public static async Task<AssistantService?> TryCreateAsync(IAppCommandBus bus, IAssistantConfirm confirm, DispatcherQueue ui)

@@ -13,7 +13,8 @@ namespace Office.Ai;
 /// <summary>
 /// Lets MynaCAD and MynaOps use the model the host app carries. It answers the suite's local contract on 127.0.0.1 only:
 /// <c>GET /v1/health</c>, <c>POST /v1/chat</c>, and <c>POST /v1/completion</c> (Olmo prompt for MynaOps's Ask bar), behind the bearer
-/// token in <c>%LOCALAPPDATA%\O-Studio\ai\auth.token</c>. The model loads on the first request. MynaHub keeps this open while a workspace is signed in.
+/// token in <c>%LOCALAPPDATA%\O-Studio\ai\auth.token</c>. The model loads on the first request. MynaOps hosts it (its window, or headless with
+/// <c>--ai-host</c>); <see cref="LastRequestUtc"/> tells the headless host when it was last used.
 /// </summary>
 public sealed class AiCoreListener : IDisposable
 {
@@ -27,7 +28,26 @@ public sealed class AiCoreListener : IDisposable
 
     AiCoreListener(string token) { _token = token; }
 
-    public static string TokenPath => SuiteWire.LocalPath(Path.Combine("ai", "auth.token"));
+    /// <summary>
+    /// The folder of the agent's local state (token, host record, host log): <c>%LOCALAPPDATA%\O-Studio\ai</c>. <c>OSTUDIO_AI_DIR</c> moves it
+    /// (tests, or a second agent beside the real one); MynaCAD's client honours it too.
+    /// </summary>
+    public static string StateDirectory =>
+        Environment.GetEnvironmentVariable("OSTUDIO_AI_DIR") is { Length: > 0 } dir ? dir : SuiteWire.LocalPath("ai");
+
+    public static string TokenPath => Path.Combine(StateDirectory, "auth.token");
+
+    static long _lastRequestTicks;
+
+    /// <summary>When an authorised request (a health check counts) last reached a listener in this process; MinValue before the first.</summary>
+    public static DateTime LastRequestUtc
+    {
+        get
+        {
+            long t = Interlocked.Read(ref _lastRequestTicks);
+            return t == 0 ? DateTime.MinValue : new DateTime(t, DateTimeKind.Utc);
+        }
+    }
 
     /// <summary>Start listening, or return null when the port is taken (another AI Core is already serving) or cannot be opened.</summary>
     public static AiCoreListener? TryStart(int port = DefaultPort)
@@ -74,11 +94,13 @@ public sealed class AiCoreListener : IDisposable
         try
         {
             if (!Authorised(ctx.Request.Headers["Authorization"])) { await Reply(ctx, 401, Error("unauthorised")); return; }
+            Interlocked.Exchange(ref _lastRequestTicks, DateTime.UtcNow.Ticks);
             string path = ctx.Request.Url?.AbsolutePath ?? "";
             if (ctx.Request.HttpMethod == "GET" && path == "/v1/health")
             {
                 bool ready = LocalLlmHost.Installed;
-                await Reply(ctx, 200, JsonSerializer.Serialize(new { status = ready ? "ready" : "not_installed", model_ready = ready, model = LocalModel.FileName }));
+                // host and pid are additive: older clients ignore them.
+                await Reply(ctx, 200, JsonSerializer.Serialize(new { status = ready ? "ready" : "not_installed", model_ready = ready, model = LocalModel.FileName, host = "MynaOps", pid = Environment.ProcessId }));
             }
             else if (ctx.Request.HttpMethod == "POST" && path == "/v1/chat")
             {

@@ -15,5 +15,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Office.Shared\Office.Shared.csproj" />
+    <ProjectReference Include="..\Office.Ai\Office.Ai.csproj" />
   </ItemGroup>
 </Project>

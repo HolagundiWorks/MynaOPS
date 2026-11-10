@@ -10,7 +10,8 @@ using Office.Shared;
 namespace Office.Ai;
 
 /// <summary>
-/// Uses the suite AI Core on loopback (the launcher hosts Olmo; MynaOps and MynaCAD connect here). Does not load weights in-process.
+/// Uses the AI agent on loopback that a MynaOps process hosts (its window, or headless with <c>--ai-host</c>); MynaCAD's Rust client speaks the
+/// same contract. Does not load weights in-process.
 /// </summary>
 public sealed class RemoteLlm : IDisposable
 {
