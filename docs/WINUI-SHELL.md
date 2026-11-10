@@ -26,8 +26,8 @@ Notice row and calculator row — docked above the status strip, they push the p
 
 | Region | Role |
 | --- | --- |
-| **File** | New · Open · Open company from MynaHub · Company projects · Close company · Save · Save as · Save to company file · **Take-off (MynaCAD)** · Import / Export CAD · Undo last CAD import · Exit |
-| **Edit** | Project / Engineering / Cost settings |
+| **File** | Open project · Save · **Take-off (MynaCAD)** · Import from CAD · Export for CAD · Undo last CAD import · **Project database** · Exit (no company sign-in: MynaOps is independent of MynaHub) |
+| **Edit** | Project / Engineering / Cost settings · **Assistant model** (model location, who hosts the AI agent, Download, Locate) |
 | **Help** | About |
 | **Main ribbon** | One text tab per section (Project, RCC steel, Civil BOQ, Schedule, Contracts, Stores, Outputs; Office, Accounts and HR are in MynaHub). Ctrl+1 to Ctrl+7 jump to a section's first page. The open tab is the colour of the sub ribbon, so it joins it |
 | **Sub ribbon** | One text tab per page of the open section. The open tab is the colour of the work area, so it joins the page without a line. No icons |

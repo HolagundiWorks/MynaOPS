@@ -46,10 +46,13 @@ powershell -File BBSDesktop\installer\sign.ps1 BBSDesktop\artifacts\installer\O-
 
 ## Suite glue
 
-The OSAS launcher can install this Setup.exe via
-`installer/install-suite.ps1 -ArtifactsDir …` when the file is named
-`O-CoreOp-Setup-*.exe`. Prefer the unified **`Myna-Setup-*.exe`** from MynaHub
-(`installer/suite/README.md`): one wizard for install and remove of MynaHub, MynaOps, and MynaCAD.
+The suite ships two installers, built by MynaHub's `installer/suite/build-all.ps1` (`installer/suite/README.md` there):
+`MynaHub-Setup-<v>.exe` (MynaHub) and **`MynaOpsCAD-Setup-<v>.exe`**, this repo's `O-CoreOp.iss` in its combined mode
+(`build-installer.ps1 -CadStage <folder>`), which installs MynaOps and MynaCAD together. It bundles the llama.cpp runtime in
+`runtime\` and offers the task "Download the assistant model". MynaOps hosts the AI agent for itself and MynaCAD (the Myna
+launcher that hosted it was removed on 2026-11-11). Setup and the uninstaller stop a MynaOps that runs without a window as the
+AI host (`O-CoreOp.exe --ai-host`, matched by its command line) before they replace or remove files; a MynaOps window is left
+to Setup's usual close-applications step.
 
 ## Update channel (check-only)
 

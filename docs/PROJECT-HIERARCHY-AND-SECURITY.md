@@ -49,7 +49,7 @@ Neon (optional)                   ← MynaHub only: .osp snapshots + Postgres re
 | MynaHub → sibling apps | One-time **suite ticket** (120 s, single use, SHA-256 stored); `OSTUDIO_COMPANY` + `OSTUDIO_TICKET`; audited |
 | MynaOps ↔ MynaCAD | Same `.osp`, `meta.revision`; no network |
 | Desktop ↔ Neon | **MynaHub only**; apps hold no cloud keys |
-| Assistant (Olmo) | Myna hosts; read-only `agent_*` tools; bank/UPI omitted from `company.details` |
+| Assistant (Olmo) | MynaOps hosts (since 2026-11-11; MynaHub has no AI); loopback only, bearer token |
 
 ## 4. Role-based access (company file)
 
