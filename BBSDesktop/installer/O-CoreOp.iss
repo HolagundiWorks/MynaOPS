@@ -1,11 +1,23 @@
 ; MynaOps — Inno Setup script (per-user, no admin)
 ; Build via: powershell -File build-installer.ps1
+; With /DWithCad /DCadStage=<folder holding app\ODraft.WinUi.exe> it builds the combined Setup, MynaOpsCAD-Setup, which installs MynaOps and MynaCAD
+; together (they depend on each other and share the project file). build-all.ps1 in the MynaHub repository does that.
 
 #ifndef AppVersion
   #define AppVersion "1.0.0"
 #endif
 
 #define MyAppName "MynaOps"
+#ifdef WithCad
+  #ifndef CadStage
+    #error WithCad needs /DCadStage=<folder that holds app\ODraft.WinUi.exe>
+  #endif
+  #define MyBundleName "MynaOps and MynaCAD"
+  #define MyOutName "MynaOpsCAD-Setup-" + AppVersion
+#else
+  #define MyBundleName "MynaOps"
+  #define MyOutName "O-CoreOp-Setup-" + AppVersion
+#endif
 #define MyAppPublisher "Human Centric Works"
 #define MyAppPublisherUrl "https://humancentic.works"
 #define MyAppExeName "O-CoreOp.exe"
@@ -17,14 +29,14 @@
 
 [Setup]
 AppId={#MyAppId}
-AppName={#MyAppName}
+AppName={#MyBundleName}
 AppVersion={#AppVersion}
-AppVerName={#MyAppName} {#AppVersion}
+AppVerName={#MyBundleName} {#AppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppPublisherUrl}
 AppSupportURL={#MyAppPublisherUrl}
 DefaultDirName={localappdata}\Programs\O-CoreOp
-DefaultGroupName={#MyAppName}
+DefaultGroupName={#MyBundleName}
 UsePreviousAppDir=no
 UsePreviousGroup=no
 DisableProgramGroupPage=yes
@@ -32,7 +44,7 @@ PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\artifacts\installer
-OutputBaseFilename=O-CoreOp-Setup-{#AppVersion}
+OutputBaseFilename={#MyOutName}
 SetupIconFile=..\BBSApp\Assets\app.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2
@@ -40,7 +52,7 @@ SolidCompression=yes
 WizardStyle=modern
 VersionInfoVersion={#AppVersion}.0
 VersionInfoCompany={#MyAppPublisher}
-VersionInfoProductName={#MyAppName}
+VersionInfoProductName={#MyBundleName}
 VersionInfoCopyright=Copyright © {#MyAppPublisher}, Hospet
 LicenseFile=..\..\LICENSE
 ChangesAssociations=yes
@@ -54,6 +66,10 @@ Name: "model"; Description: "Download the assistant model (Olmo 3 7B, 4.5 GB, ru
 
 [Files]
 Source: "..\artifacts\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+#ifdef WithCad
+; MynaCAD: the portable layout. The folder keeps the old name O-Draft on purpose (an identifier), so an earlier install is replaced in place.
+Source: "{#CadStage}\app\*"; DestDir: "{localappdata}\Programs\O-Draft"; Flags: ignoreversion recursesubdirs createallsubdirs
+#endif
 
 [Registry]
 ; The Myna Suite project file (.osp): a right-click "Open in MynaOps". Whichever app registered first stays the default (MynaCAD, when installed with the suite).
@@ -61,11 +77,20 @@ Root: HKCU; Subkey: "Software\Classes\.osp"; ValueType: string; ValueName: ""; V
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project"; ValueType: string; ValueName: ""; ValueData: "Myna Suite project"; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop"; ValueType: string; ValueName: ""; ValueData: "Open in MynaOps"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-CoreOp\{#MyAppExeName}"" ""%1"""
+#ifdef WithCad
+; Double-click opens the project in MynaCAD; MynaOps keeps the right-click verb. Neither starts Myna.
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open"; ValueType: string; ValueName: ""; ValueData: "Open in MynaCAD"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-Draft\ODraft.WinUi.exe"" ""%1"""
+#endif
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; Tasks: desktopicon
+#ifdef WithCad
+Name: "{group}\MynaCAD"; Filename: "{localappdata}\Programs\O-Draft\ODraft.WinUi.exe"; WorkingDir: "{localappdata}\Programs\O-Draft"
+Name: "{autodesktop}\MynaCAD"; Filename: "{localappdata}\Programs\O-Draft\ODraft.WinUi.exe"; WorkingDir: "{localappdata}\Programs\O-Draft"; Tasks: desktopicon
+#endif
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent
@@ -83,6 +108,20 @@ Type: files; Name: "{userdesktop}\Falcon.lnk"
 ; MynaOps no longer reads the company file, so versions up to 1.6.1 left an office.dll behind that nothing uses.
 Type: files; Name: "{app}\office.dll"
 Type: files; Name: "{app}\AQCCore.*"
+#ifdef WithCad
+; The two apps used to be installed separately: remove their old Start menu folders and shortcuts (names MynaOps, MynaCAD, Tren, O-Draft).
+Type: filesandordirs; Name: "{userprograms}\MynaOps"
+Type: filesandordirs; Name: "{userprograms}\MynaCAD"
+Type: files; Name: "{userprograms}\MynaCAD.lnk"
+Type: files; Name: "{userprograms}\Tren.lnk"
+Type: files; Name: "{userprograms}\O-Draft.lnk"
+Type: files; Name: "{userdesktop}\Tren.lnk"
+#endif
+
+#ifdef WithCad
+[UninstallDelete]
+Type: filesandordirs; Name: "{localappdata}\Programs\O-Draft"
+#endif
 
 [Code]
 var

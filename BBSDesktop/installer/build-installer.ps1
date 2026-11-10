@@ -13,7 +13,9 @@
 param(
     [string] $AppVersion = "",
     [switch] $SkipEngineBuild,
-    [switch] $SkipPublish
+    [switch] $SkipPublish,
+    # Folder that holds app\ODraft.WinUi.exe (MynaCAD's portable layout): builds the combined MynaOpsCAD-Setup instead of the MynaOps-only Setup
+    [string] $CadStage = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -166,10 +168,13 @@ Install from https://jrsoftware.org/isdl.php then re-run this script.
 Write-Host "Compiling installer with $iscc ..." -ForegroundColor Yellow
 New-Item -ItemType Directory -Path $InstallerOutDir -Force | Out-Null
 
-& $iscc "/DAppVersion=$AppVersion" $IssPath
+$isccArgs = @("/DAppVersion=$AppVersion")
+if ($CadStage) { $isccArgs += @("/DWithCad", "/DCadStage=$CadStage") }
+& $iscc @isccArgs $IssPath
 if ($LASTEXITCODE -ne 0) { throw "ISCC failed ($LASTEXITCODE)" }
 
-$setup = Join-Path $InstallerOutDir "O-CoreOp-Setup-$AppVersion.exe"
+$setupName = if ($CadStage) { "MynaOpsCAD-Setup-$AppVersion.exe" } else { "O-CoreOp-Setup-$AppVersion.exe" }
+$setup = Join-Path $InstallerOutDir $setupName
 if (-not (Test-Path -LiteralPath $setup)) {
     throw "Expected installer not found: $setup"
 }
