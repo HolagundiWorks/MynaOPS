@@ -46,21 +46,11 @@ jobs:
         shell: pwsh
         run: |
           choco install innosetup ninja -y --no-progress
-      - name: Build office.dll (O-Studio office-ffi)
-        working-directory: o-studio
-        shell: pwsh
-        run: |
-          cargo build --release --manifest-path office-ffi/Cargo.toml
-          $dll = Get-ChildItem -Path . -Recurse -Filter office.dll -ErrorAction SilentlyContinue |
-            Where-Object { $_.FullName -match '\\release\\' } | Select-Object -First 1
-          if (-not $dll) { throw "office.dll not found after office-ffi build" }
-          Write-Host "office.dll at $($dll.FullName)"
-          "OFFICE_DLL_DIR=$($dll.Directory.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Build and optionally sign Setup.exe
         working-directory: aqc
         shell: pwsh
         run: |
-          $args = @("-OfficeDllDir", $env:OFFICE_DLL_DIR)
+          $args = @()
           if ("${{ github.event.inputs.version }}") {
             $args += @("-AppVersion", "${{ github.event.inputs.version }}")
           } elseif ($env:GITHUB_REF_NAME -like 'v*') {

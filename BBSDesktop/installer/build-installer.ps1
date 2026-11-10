@@ -13,8 +13,7 @@
 param(
     [string] $AppVersion = "",
     [switch] $SkipEngineBuild,
-    [switch] $SkipPublish,
-    [string] $OfficeDllDir = ""
+    [switch] $SkipPublish
 )
 
 $ErrorActionPreference = "Stop"
@@ -111,7 +110,6 @@ if (-not $SkipPublish) {
         -p:PublishSingleFile=false `
         -p:GenerateAppxPackageOnBuild=false `
         -p:AppxPackageSigningEnabled=false `
-        "-p:OfficeDllDir=$OfficeDllDir" `
         -o $PublishDir
 
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed ($LASTEXITCODE)" }
@@ -128,12 +126,7 @@ if (-not (Test-Path -LiteralPath $pubEngine)) {
     Copy-Item -LiteralPath $EngineDll -Destination $pubEngine -Force
 }
 
-# office.dll (the shared company-file engine) comes from the O-STUDIO build; without it the installed app cannot open a company file.
-if (-not (Test-Path -LiteralPath (Join-Path $PublishDir "office.dll"))) {
-    throw "office.dll is missing from the publish folder. Build office-ffi in the O-STUDIO repository (release) and pass -OfficeDllDir <folder with office.dll>."
-}
-
-Write-Host "Publish : O-CoreOp.exe + bbs_engine.dll + office.dll ready"
+Write-Host "Publish : O-CoreOp.exe + bbs_engine.dll ready"
 
 # --- llama.cpp runtime for the local assistant model (llama-server, Vulkan build, MIT) ---
 # Pinned release and SHA-256 as in Office.Ai\LocalModel.cs. LLAMA_RUNTIME_ZIP may name an already downloaded copy.

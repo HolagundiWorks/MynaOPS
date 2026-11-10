@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Office.Shared</RootNamespace>
     <AssemblyName>Office.Shared</AssemblyName>
-    <Description>Opens the office company file that O-Studio and O-CoreOp share, through the office C interface (office.dll).</Description>
+    <Description>Shared Falcon code: quantities, catalogs, phases, smart blocks, the CSV export and the AI client.</Description>
     <Company>Human Centric Works</Company>
     <Version>0.1.0</Version>
   </PropertyGroup>
