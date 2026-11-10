@@ -167,7 +167,7 @@ public sealed partial class AccountsPage : Page
         LockBar.IsOpen = locked;
     }
 
-    /// <summary>The running-bill phases to pick from (the defaults and any chosen in Tren), with this bill's own value kept.</summary>
+    /// <summary>The running-bill phases to pick from (the defaults and any chosen in MynaCAD), with this bill's own value kept.</summary>
     private void FillBillPhases(string current)
     {
         var names = ProjectStore.Current.PhaseNames(billing: true);
@@ -267,8 +267,8 @@ public sealed partial class AccountsPage : Page
         var dlg = new ContentDialog
         {
             Title = "Certify RA bill locally",
-            Content = $"Assign local number {_book.PreviewBillNumber(_current, Company)} and lock this bill in Falcon only? "
-                      + $"Suite approval is in Kivo (Practice → Approvals). Net payable ₹ {_current.Net:N2}.",
+            Content = $"Assign local number {_book.PreviewBillNumber(_current, Company)} and lock this bill in MynaOps only? "
+                      + $"Suite approval is in MynaHub (Practice → Approvals). Net payable ₹ {_current.Net:N2}.",
             PrimaryButtonText = "Certify locally",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Primary,

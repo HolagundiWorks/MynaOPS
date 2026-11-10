@@ -1,12 +1,12 @@
-# Falcon
+# MynaOps
 
-**Falcon** is the quantities, estimates and billing app in the **Kivo suite**. The project file extension `.bbsproj` keeps its name because saved projects use it. Earlier versions installed as `AQCCore.exe`; the installer replaces them and the app copies the settings from `%LocalAppData%\AQCCore` on first run.
+**MynaOps** is the quantities, estimates and billing app in the **MynaHub suite**. The project file extension `.bbsproj` keeps its name because saved projects use it. Earlier versions installed as `AQCCore.exe`; the installer replaces them and the app copies the settings from `%LocalAppData%\AQCCore` on first run.
 
 > **The suite:** names, roles, file formats, toolbars of every app and how they link in real time are in [docs/SUITE.md](docs/SUITE.md).
 
-Falcon does quantity take-off and costing. By **Human Centric Works, Hospet**.
+MynaOps does quantity take-off and costing. By **Human Centric Works, Hospet**.
 
-RCC bar bending schedules, civil BOQ, take-off read in from Tren (through the shared project file, `.osp`), rate books, DSR-style estimates (with electrical / plumbing / escalation / consulting %), and purchase orders — plus back-office modules for project scheduling, contracts, running-account billing, stores and HR.
+RCC bar bending schedules, civil BOQ, take-off read in from MynaCAD (through the shared project file, `.osp`), rate books, DSR-style estimates (with electrical / plumbing / escalation / consulting %), and purchase orders — plus back-office modules for project scheduling, contracts, running-account billing, stores and HR.
 
 One project can be operated as either a **Project Manager / PMC** or a **Contractor**: each persona has its own letterhead and numbering series, and every letter, bill and order is branded and numbered accordingly.
 
@@ -18,19 +18,19 @@ Quantities follow IS 456 / IS 1200–derived conventions — always cross-check 
 
 ## The interface
 
-![Falcon before a project is loaded: module tabs, sub-tabs, and a card that sends you to Myna](docs/images/coreop-start.png)
+![MynaOps before a project is loaded: module tabs, sub-tabs, and a card that sends you to Myna](docs/images/coreop-start.png)
 
-Falcon works on **one project at a time, chosen in Myna**. Started without one it shows the card above; **Open Myna** takes you there, and once a project is locked Falcon opens on it with the company's details read from Kivo.
+MynaOps works on **one project at a time, chosen in Myna**. Started without one it shows the card above; **Open Myna** takes you there, and once a project is locked MynaOps opens on it with the company's details read from MynaHub.
 
 | Area | What it is |
 |---|---|
 | Menu bar | **File**, **Edit**, **Help**. |
 | Module tabs | **Project**, **RCC steel**, **Civil BOQ**, **Schedule**, **Contracts**, **Stores** and **Outputs**. Each opens its own row of sub-tabs below. |
-| Project | **Dashboard**, **Levels** and **Take-off (Tren)**: the quantities Tren recorded in the project file (`.osp`), read as they are. |
-| RCC steel | One sub-tab per member: **Columns**, **Beams**, **Pedestals**, **Lintels**, **Slabs**, **Footings**, **Retaining walls** and **Stairs**. The Beams, Columns, Slabs, Footings and Lintels pages also show the **structural details drawn in Tren** (read only; see below). |
+| Project | **Dashboard**, **Levels** and **Take-off (MynaCAD)**: the quantities MynaCAD recorded in the project file (`.osp`), read as they are. |
+| RCC steel | One sub-tab per member: **Columns**, **Beams**, **Pedestals**, **Lintels**, **Slabs**, **Footings**, **Retaining walls** and **Stairs**. The Beams, Columns, Slabs, Footings and Lintels pages also show the **structural details drawn in MynaCAD** (read only; see below). |
 | Status bar | A calculator, the light/dark theme, the AI assistant, and the open company (here "Company: not open"). |
 
-**Details from Tren.** When Tren saves a drawing into the project file it records every reinforced concrete block it contains, with the parameters it was drawn with. The element pages list those details, draw the chosen one in the same style as the drawing (bars by diameter, ties, dimensions, bar notation) and say so when there is none. Falcon never edits a drawing: a detail changes in Tren only.
+**Details from MynaCAD.** When MynaCAD saves a drawing into the project file it records every reinforced concrete block it contains, with the parameters it was drawn with. The element pages list those details, draw the chosen one in the same style as the drawing (bars by diameter, ties, dimensions, bar notation) and say so when there is none. MynaOps never edits a drawing: a detail changes in MynaCAD only.
 
 ## Stack
 
@@ -103,12 +103,12 @@ Output: `BBSDesktop\artifacts\msix\*.msix`
 | RCC | Columns (incl. pedestal), beams, slabs, footings, walls, stairs — BBS + section sketches |
 | Civil BOQ | Masonry, plaster, PCC, earthwork, SSM, shuttering, flooring, paint, doors/windows, etc. |
 | Openings | Doors/windows **On wall** mark → deduct from that masonry wall (IS 1200 ignore-small) |
-| Take-off | Measured in Tren and recorded in the project file (`.osp`); read here, previewed, then imported. **Project > Take-off (Tren)** lists the drawings recorded in the open project (refreshes every 2 s), reads one into the import preview, and fetches and stores the annotated drawing PDF Tren generated; several drawings per project, with a warning when two measure the same floor |
+| Take-off | Measured in MynaCAD and recorded in the project file (`.osp`); read here, previewed, then imported. **Project > Take-off (MynaCAD)** lists the drawings recorded in the open project (refreshes every 2 s), reads one into the import preview, and fetches and stores the annotated drawing PDF MynaCAD generated; several drawings per project, with a warning when two measure the same floor |
 | CAD import / export | **File > Import from CAD** reads an `hcw-aqc-bridge` file (the offline path); **Export for CAD** writes levels, project details and beam depths back. Idempotent (`source = hcwcad:<drawing id>`), preview first, one undo step, `Lvl0` never touched. Contracts: `docs/bridge/`, `docs/PROJECT-FILE.md` |
 | Item links | Data-driven linked-item derivation (plaster from masonry, painting from plaster, skirting from flooring) — editable rules, chained preview, Apply-to-sheets into the BOQ/estimate |
 | Rate book | App-level versioned rates (`%LocalAppData%\O-CoreOp\`) |
 | Estimate | DSR abstract (L/B/H, area, volume) + % markups → grand total; PDF sketches appendix |
-| PO / report | Steel & materials PO; project PDF with BOQ tables + sketches, plus the annotated drawings Tren generated (one report page per PDF page) |
+| PO / report | Steel & materials PO; project PDF with BOQ tables + sketches, plus the annotated drawings MynaCAD generated (one report page per PDF page) |
 | Personas | One project operated as **PM / PMC** or **Contractor** — declared in **File → Project settings**; each has its own letterhead + numbering series (`PMC/…` vs `CON/…`) |
 | Schedule | CPM / PERT scheduling with activity network + Gantt |
 | Contracts | Item-rate / lump-sum work orders & tenders, schedule of rates, standard-terms library, retention |
@@ -126,17 +126,17 @@ Output: `BBSDesktop\artifacts\msix\*.msix`
 | AI assistant API key | `%LocalAppData%\O-CoreOp\` — encrypted with Windows DPAPI (per-user); or the `ANTHROPIC_API_KEY` env var |
 | Project | User-chosen `.bbsproj` (also holds the take-off file path and the stored annotated drawings) |
 | Annotated drawings | `<project name>.assets\annotated\` beside the saved project, or `%LocalAppData%\O-CoreOp\annotated\` until it is saved |
-| Project file | `<project>.osp` (one SQLite file: drawing, take-off and project; Tren and Falcon both open it). See [docs/PROJECT-FILE.md](docs/PROJECT-FILE.md) |
+| Project file | `<project>.osp` (one SQLite file: drawing, take-off and project; MynaCAD and MynaOps both open it). See [docs/PROJECT-FILE.md](docs/PROJECT-FILE.md) |
 
 ## Branding
 
-- Product: **Falcon**, part of the Kivo suite  
+- Product: **MynaOps**, part of the MynaHub suite  
 - Developer: **Human Centric Works, Hospet**  
 - Logo: `BBSDesktop/BBSApp/Assets/logo.png`
 
 ## Licensing
 
-Falcon is **open source** and **dual-licensed** (Developed by Human Centric Works):
+MynaOps is **open source** and **dual-licensed** (Developed by Human Centric Works):
 
 - **Community Edition** — [GNU AGPL v3](LICENSE). Free and open source for individuals,
   hobbyists, research, and internal business use. Note the AGPL's network clause: hosting

@@ -1,6 +1,6 @@
-# Case study: the CPWD Delhi Schedule of Rates (DSR), its specifications, and how Falcon follows them
+# Case study: the CPWD Delhi Schedule of Rates (DSR), its specifications, and how MynaOps follows them
 
-This page records what was learned about how the CPWD DSR describes, specifies, measures and prices building work, and what Falcon does with it. It is a working note for the data model, not a copy of the DSR.
+This page records what was learned about how the CPWD DSR describes, specifies, measures and prices building work, and what MynaOps does with it. It is a working note for the data model, not a copy of the DSR.
 
 ## What was and was not verified
 
@@ -10,7 +10,7 @@ The official DSR 2023 and CPWD Specifications volumes were not available to read
 - A CPWD-based training deck numbers the *Specifications* as 2.0 Earth Work, 3.0 Mortars, 4.0 Concrete Work in Volume 1 and 13.0 Finishing, 14.0 Repairs, 15.0 Dismantling, 16.0 Road Work, 17.0 Sanitary, 18.0 Water Supply, 19.0 Drainage, 20.0 Pile Work, 21.0 Aluminium Work, 22.0 Water Proofing, 23.0 Horticulture in Volume 2 ([slides](https://www.slideshare.net/slideshow/water-proofing-treatement/40417602)).
 - The Railway Board adopted the CPWD DSR 2023 and CPWD Specifications for building and road works in 2025 and names the DSR as Volumes I and II plus the Analysis of Rates volumes ([letter, 03.07.2025](https://indianrailways.gov.in/railwayboard/uploads/directorate/civil_engg/2025/2025_07_03%20Adoption%20of%20CPWD%20Delhi%20Schedule%20of%20Rates-2023%20(2).pdf)); a further instruction deals with the material specifications of DSR items ([letter, 27.11.2024](https://indianrailways.gov.in/railwayboard/uploads/directorate/civil_engg/2024/2024_11_27%20Instructions%20regarding%20the%20Specifications%20of%20materials%20of%20CPWD-DSR%20items%20realted%20to%20Building%20work%2C%20Road%20works%20%20Horticulture%20works.pdf)).
 
-So Falcon **keeps sub-head names but no chapter or item numbers**: those belong to the user's own copy of the DSR, which the rate book (below) carries. Nothing in the app quotes a DSR rate.
+So MynaOps **keeps sub-head names but no chapter or item numbers**: those belong to the user's own copy of the DSR, which the rate book (below) carries. Nothing in the app quotes a DSR rate.
 
 ## How the DSR is built
 
@@ -24,9 +24,9 @@ So Falcon **keeps sub-head names but no chapter or item numbers**: those belong 
 
 Habits of DSR wording that matter for estimating: RCC items are for **concrete only**, with centering and shuttering and reinforcement paid as separate items (by m² and by weight); masonry above half a brick is by volume and a half-brick wall by area; finishing items are by area; skirting, DPC along a wall, coping and parapet by running length.
 
-## How Falcon follows it
+## How MynaOps follows it
 
-| DSR idea | In Falcon |
+| DSR idea | In MynaOps |
 |---|---|
 | Sub-head | `Office.Shared.DsrCatalog.SubHeads` (names only) |
 | Item wording, unit, measurement rule | `DsrCatalog.All` per component |

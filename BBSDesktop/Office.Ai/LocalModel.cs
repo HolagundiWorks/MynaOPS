@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 namespace Office.Ai;
 
 /// <summary>
-/// Where the shared model file lives and whether it is whole. Falcon and Tren read the same file, so it sits in one
+/// Where the shared model file lives and whether it is whole. MynaOps and MynaCAD read the same file, so it sits in one
 /// per-user folder that neither app owns.
 /// </summary>
 public static class LocalModel

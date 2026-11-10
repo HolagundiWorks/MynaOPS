@@ -128,7 +128,7 @@ public sealed class PartyBook
     public Party Counterparty(PartyRole role) => role == PartyRole.Contractor ? Pm : Contractor;
 
     /// <summary>
-    /// The company name on documents comes from Kivo's company file, so the PM party takes its name, address, contacts
+    /// The company name on documents comes from MynaHub's company file, so the PM party takes its name, address, contacts
     /// and registrations from there each time they are read, instead of keeping the copy made the first time. The signatory stays as set.
     /// </summary>
     public void FollowCompanyFile(ProjectInfo info)

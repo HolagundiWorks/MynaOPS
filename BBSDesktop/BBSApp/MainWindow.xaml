@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:oui="using:O.Ui.Controls"
     xmlns:ouiroot="using:O.Ui"
-    Title="Falcon">
+    Title="MynaOps">
 
     <!--
       Shell, the same structure as AOS:
@@ -27,7 +27,7 @@
                 <Border Width="18" Height="18" CornerRadius="2"
                         Background="{ThemeResource HcwSoftBrush}">
                     <Image Stretch="Uniform" Margin="1"
-                           AutomationProperties.Name="Falcon"
+                           AutomationProperties.Name="MynaOps"
                            AutomationProperties.AccessibilityView="Raw">
                         <Image.Source>
                             <SvgImageSource UriSource="ms-appx:///Assets/mark.svg"/>
@@ -55,13 +55,13 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-        <!-- Suite menu strip — flat like Kivo (File · Edit · Help). -->
+        <!-- Suite menu strip — flat like MynaHub (File · Edit · Help). -->
         <MenuBar x:Name="AppMenuBar" Grid.Row="0" Height="{StaticResource SuiteMenuBarHeight}" VerticalAlignment="Center"
                  Background="{ThemeResource HcwSoftBrush}"
                  Foreground="{ThemeResource HcwInkBrush}"
                  FontSize="{StaticResource SuiteFontBody}"
                  AutomationProperties.Name="Menu bar">
-            <!-- Company first · work · Exit (same File shape as Kivo). -->
+            <!-- Company first · work · Exit (same File shape as MynaHub). -->
             <MenuBarItem Title="File" AccessKey="F">
                 <MenuFlyoutItem Text="Open project…" Click="OpenProject_Click" AccessKey="O">
                     <MenuFlyoutItem.Icon>
@@ -75,7 +75,7 @@
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
-                <MenuFlyoutItem Text="Take-off (Tren)…" Click="NavMenu_Click" Tag="takeoff">
+                <MenuFlyoutItem Text="Take-off (MynaCAD)…" Click="NavMenu_Click" Tag="takeoff">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE9F9;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
                     </MenuFlyoutItem.Icon>
@@ -182,10 +182,10 @@
                     </Frame.ContentTransitions>
                 </Frame>
 
-                <!-- Floating Ask bar (Tren shell): reply card + pill -->
+                <!-- Floating Ask bar (MynaCAD shell): reply card + pill -->
                 <Grid x:Name="AskHost" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
 
-                <!-- Full-bleed status row (Tren bottom bar) -->
+                <!-- Full-bleed status row (MynaCAD bottom bar) -->
                 <oui:SuiteBottomStatusBar x:Name="StatusStrip" Grid.Row="4"/>
 
                 <!-- Wired into StatusStrip in code -->
@@ -196,7 +196,7 @@
                     </Button>
                     <StackPanel x:Name="BottomShellRight" Orientation="Horizontal" Spacing="8">
                         <oui:SuiteThemeSwitch x:Name="ThemeSwitch" VerticalAlignment="Center"/>
-                        <!-- The AI assistant, as in Tren's bottom bar: the drawn agent mark; click puts the cursor in the Ask bar. -->
+                        <!-- The AI assistant, as in MynaCAD's bottom bar: the drawn agent mark; click puts the cursor in the Ask bar. -->
                         <Button x:Name="AiChip" Width="28" Height="26" MinWidth="0" MinHeight="0" Padding="0" BorderThickness="0"
                                 Background="Transparent" CornerRadius="4" VerticalAlignment="Center"
                                 Click="AiChip_Click" AutomationProperties.Name="AI assistant" ToolTipService.ToolTip="AI assistant: ask about this project">

@@ -204,7 +204,7 @@ public sealed partial class EstimatePage : Page
             ? "all item codes priced"
             : $"{result.MissingCodes.Count} missing rate(s): {string.Join(", ", result.MissingCodes.Take(8))}"
               + (result.MissingCodes.Count > 8 ? "…" : "");
-        var link = "export the CSV for Kivo when it is ready";
+        var link = "export the CSV for MynaHub when it is ready";
         Info.Message = $"{result.RateBookVersionName} · grand total ₹ {result.GrandTotal:N2} · {miss} · {link}";
         Info.Severity = result.MissingCodes.Count > 0 ? InfoBarSeverity.Warning : InfoBarSeverity.Success;
         Info.IsOpen = true;
@@ -290,12 +290,12 @@ public sealed partial class EstimatePage : Page
         Info.IsOpen = true;
     }
 
-    /// <summary>The CSV Kivo imports (contract <c>osas-falcon-csv/1</c>): estimate, measured-to-date, and the take-off from the project's .osp. Nothing is written when it is refused.</summary>
+    /// <summary>The CSV MynaHub imports (contract <c>osas-falcon-csv/1</c>): estimate, measured-to-date, and the take-off from the project's .osp. Nothing is written when it is refused.</summary>
     private async void ExportKivoCsv_Click(object sender, RoutedEventArgs e)
     {
         void Show(string message, InfoBarSeverity severity)
         {
-            Info.Title = "Export for Kivo";
+            Info.Title = "Export for MynaHub";
             Info.Message = message;
             Info.Severity = severity;
             Info.IsOpen = true;
@@ -326,7 +326,7 @@ public sealed partial class EstimatePage : Page
             var file = await picker.PickSaveFileAsync();
             if (file is null) return;
             await System.IO.File.WriteAllBytesAsync(file.Path, bytes);
-            Show($"Saved {file.Path} ({lines.Count} estimate lines, {measured.Count} measured, {rows.Count} take-off rows). Import it in Kivo.", InfoBarSeverity.Success);
+            Show($"Saved {file.Path} ({lines.Count} estimate lines, {measured.Count} measured, {rows.Count} take-off rows). Import it in MynaHub.", InfoBarSeverity.Success);
         }
         catch (FalconCsvException ex)
         {

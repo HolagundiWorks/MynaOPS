@@ -4,7 +4,7 @@ using Xunit;
 
 namespace AQC.CadImport.Tests;
 
-/// <summary>The estimation and running-bill phase Tren puts on a row (<c>phase</c>, <c>bill_phase</c>) reaches the tables.</summary>
+/// <summary>The estimation and running-bill phase MynaCAD puts on a row (<c>phase</c>, <c>bill_phase</c>) reaches the tables.</summary>
 public class PhaseImportTests
 {
     static string Fixture(string n) => File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "fixtures", n));

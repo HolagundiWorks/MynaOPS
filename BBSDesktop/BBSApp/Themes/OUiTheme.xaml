@@ -127,7 +127,7 @@
         </Setter>
     </Style>
 
-    <!-- Primary / commit: Dusk (the Falcon colour) with white text; 44 dock / override to 35 on ribbon -->
+    <!-- Primary / commit: Dusk (the MynaOps colour) with white text; 44 dock / override to 35 on ribbon -->
     <Style x:Key="HcwPrimaryButton" TargetType="Button">
         <Setter Property="Background" Value="{ThemeResource HcwAccentBrush}"/>
         <Setter Property="Foreground" Value="{ThemeResource HcwOnAccentBrush}"/>

@@ -124,7 +124,7 @@ public static class MaterialsCalculator
     [ThreadStatic] private static string? _phaseScope;
 
     /// <summary>
-    /// Runs <paramref name="build"/> with only the rows whose <c>phase</c> (set in Tren) is <paramref name="phase"/>.
+    /// Runs <paramref name="build"/> with only the rows whose <c>phase</c> (set in MynaCAD) is <paramref name="phase"/>.
     /// A null or empty phase means every row. Every quantity calculator takes its rows through
     /// <see cref="FilterByLevels"/>, so one scope narrows them all; rows with no phase (including the derived finishes)
     /// are left out of a single phase.

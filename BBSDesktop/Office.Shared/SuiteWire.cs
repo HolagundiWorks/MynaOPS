@@ -1,6 +1,6 @@
 namespace Office.Shared;
 
-/// <summary>Suite launch and shared local state (Kivo hub). Used by Falcon, Kivo, and Tren.</summary>
+/// <summary>Suite launch and shared local state (MynaHub hub). Used by MynaOps, MynaHub, and MynaCAD.</summary>
 public static class SuiteWire
 {
     public const string LocalAppFolder = "O-Studio";

@@ -44,7 +44,7 @@ public sealed record DimItem(SmartNum? When, SmartNum[] From, SmartNum[] To, Sma
 public sealed record LeaderItem(SmartNum? When, SmartNum[] From, SmartNum[] To, SmartNum Height, string Text) : SmartItem(When);
 public sealed record RepeatItem(SmartNum? When, string Var, SmartNum Count, IReadOnlyList<SmartItem> Items) : SmartItem(When);
 
-/// <summary>A parametric block: parameters, derived values and the items that draw it (format <c>osas-smartblocks</c> version 1, as Tren reads it).</summary>
+/// <summary>A parametric block: parameters, derived values and the items that draw it (format <c>osas-smartblocks</c> version 1, as MynaCAD reads it).</summary>
 public sealed record SmartBlockDef(string Id, string Title, string Layer, IReadOnlyList<SmartParam> Params, IReadOnlyList<SmartVar> Vars, IReadOnlyList<SmartItem> Items, IReadOnlyList<SmartLayer>? Layers = null)
 {
     private static readonly string[] Shapes = ["line", "rect", "crect", "poly", "circle", "dot", "arc", "text", "hatch", "ring", "dim", "leader", "repeat"];
@@ -551,7 +551,7 @@ public sealed record SmartGeometry(string Id, IReadOnlyDictionary<string, double
         .ToDictionary(g => g.Key, g => g.Count());
 }
 
-/// <summary>The built-in reinforced concrete blocks (a copy of Tren's <c>assets/smartblocks/rcc.json</c>), read once.</summary>
+/// <summary>The built-in reinforced concrete blocks (a copy of MynaCAD's <c>assets/smartblocks/rcc.json</c>), read once.</summary>
 public static class SmartBlockLibrary
 {
     private static readonly Lazy<IReadOnlyList<SmartBlockDef>> Rcc = new(() =>

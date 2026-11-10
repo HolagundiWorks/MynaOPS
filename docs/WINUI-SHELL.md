@@ -1,19 +1,19 @@
-# Falcon WinUI shell (Kivo suite)
+# MynaOps WinUI shell (MynaHub suite)
 
 **Status:** compact density from O-UI · text-tab ribbons · **Updated:** 2026-11-06  
-**App:** `BBSDesktop/BBSApp` (assembly `Falcon` · display **Falcon**)  
+**App:** `BBSDesktop/BBSApp` (assembly `MynaOps` · display **MynaOps**)  
 **Canon:** esti [`DESKTOP-WINUI-UX.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/DESKTOP-WINUI-UX.md) · [`o-ui-UX-PRINCIPLES.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/o-ui-UX-PRINCIPLES.md)
 
 ## Branding
 
 | Field | Value |
 | --- | --- |
-| App name | **Falcon** |
+| App name | **MynaOps** |
 | For | Quantities, estimates and billing |
-| Suite | Kivo suite (company hub in Kivo) |
+| Suite | MynaHub suite (company hub in MynaHub) |
 | Operator | Human Centric Works · Hospet (HCW) |
 
-## Structure (the same as Kivo)
+## Structure (the same as MynaHub)
 
 ```text
 Caption — document title only (OS drag)
@@ -26,20 +26,20 @@ Notice row and calculator row — docked above the status strip, they push the p
 
 | Region | Role |
 | --- | --- |
-| **File** | New · Open · Open company from Kivo · Company projects · Close company · Save · Save as · Save to company file · **Take-off (Tren)** · Import / Export CAD · Undo last CAD import · Exit |
+| **File** | New · Open · Open company from MynaHub · Company projects · Close company · Save · Save as · Save to company file · **Take-off (MynaCAD)** · Import / Export CAD · Undo last CAD import · Exit |
 | **Edit** | Project / Engineering / Cost settings |
 | **Help** | About |
-| **Main ribbon** | One text tab per section (Project, RCC steel, Civil BOQ, Schedule, Contracts, Stores, Outputs; Office, Accounts and HR are in Kivo). Ctrl+1 to Ctrl+7 jump to a section's first page. The open tab is the colour of the sub ribbon, so it joins it |
+| **Main ribbon** | One text tab per section (Project, RCC steel, Civil BOQ, Schedule, Contracts, Stores, Outputs; Office, Accounts and HR are in MynaHub). Ctrl+1 to Ctrl+7 jump to a section's first page. The open tab is the colour of the sub ribbon, so it joins it |
 | **Sub ribbon** | One text tab per page of the open section. The open tab is the colour of the work area, so it joins the page without a line. No icons |
 | **Data model page** | Outputs > Data model: the work items and link rules as a graph, with an icon ribbon, a right-click *Add component* menu and a component and link inspector. See [DATA-MODEL-COMPONENTS.md](DATA-MODEL-COMPONENTS.md) |
 | **Page tabs** | A page whose pivot tabs are the sub ribbon's own pages hides its pivot header (`Controls/PivotTabs.cs`) so each page is named once |
-| **Take-off page bar** | A flat text-only bar (Source, Read and Annotated groups with dividers), the same look as Tren's take-off bar (Draw, Compute, Sync, Phases). No icons |
+| **Take-off page bar** | A flat text-only bar (Source, Read and Annotated groups with dividers), the same look as MynaCAD's take-off bar (Draw, Compute, Sync, Phases). No icons |
 | **Layout page** | Outputs > Layout. Left: project map and layouts. Right: print blocks read from the open project file. Insert, Update nameplate, Export PDF. The PDF is the sheet record; the model stays in the project file. The page was built; it was not opened in a window |
 | **Status strip** | Calculator · theme switch · company chip |
 | **UI scale** | 1×. The shell follows the system text size and display scale (`UiScale` in `MainWindow.xaml.cs`) |
 | **Narrow windows** | Both ribbons scroll sideways when the window is narrower than their tabs. Page headers and toolbars wrap (`O.Ui` `FlexBar`); the element page's section sketch gives its column back under 700 px. Page titles are level 2 headings and section headers level 3, under the level 1 page line |
 
-Kivo (the office app) has the same structure: a menu bar, a left pane grouped by job, and the page (Falcon now uses two ribbons of text tabs instead of the left pane; the two apps are no longer the same here). Keep the two in step when either changes. The earlier ribbon, command strip, action dock and bottom taskbar were removed; New and Save are in the File menu.
+MynaHub (the office app) has the same structure: a menu bar, a left pane grouped by job, and the page (MynaOps now uses two ribbons of text tabs instead of the left pane; the two apps are no longer the same here). Keep the two in step when either changes. The earlier ribbon, command strip, action dock and bottom taskbar were removed; New and Save are in the File menu.
 
 Themes: `OUiTheme.xaml` · `OUiFluentBridge.xaml` · `FluentTokens.xaml`, over the suite scale in O-UI. **Sizes, type and corners follow the compact density in [UI-SIZING.md](UI-SIZING.md)** (26 controls, 28 tabs, 24 menu bar, 22 status strip, 12 / 13 / 18 type, 4 corners).
 

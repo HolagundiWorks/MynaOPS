@@ -1,6 +1,6 @@
 # The local assistant model (Olmo 3 7B Instruct)
 
-The Ask bar runs on a language model that lives on this computer. Nothing about a project is sent anywhere. **Kivo** hosts Olmo and serves it to Falcon and Tren on loopback.
+The Ask bar runs on a language model that lives on this computer. Nothing about a project is sent anywhere. **MynaHub** hosts Olmo and serves it to MynaOps and MynaCAD on loopback.
 
 ## What is installed, and where
 
@@ -13,9 +13,9 @@ Overrides: `OSTUDIO_MODEL` names a model file, `OSTUDIO_LLAMA_SERVER` names `lla
 
 ## How it runs
 
-**Host:** When you sign in to Kivo, it starts `AiCoreListener` on `127.0.0.1:8742` and loads the model on the first question (`SuiteAiCoordinator` in `Office.Ai`). Closing the workspace or Kivo stops the listener and unloads the model.
+**Host:** When you sign in to MynaHub, it starts `AiCoreListener` on `127.0.0.1:8742` and loads the model on the first question (`SuiteAiCoordinator` in `Office.Ai`). Closing the workspace or MynaHub stops the listener and unloads the model.
 
-**Clients:** Falcon and Tren set `OSTUDIO_AI_ROLE=client` when launched from Kivo. They call the host over HTTP (`RemoteLlm`, `POST /v1/completion` for Falcon's tool loop, `POST /v1/chat` for Tren and Kivo's assistant). Falcon opened alone still hosts on `:8742` when the port is free (solo use).
+**Clients:** MynaOps and MynaCAD set `OSTUDIO_AI_ROLE=client` when launched from MynaHub. They call the host over HTTP (`RemoteLlm`, `POST /v1/completion` for MynaOps's tool loop, `POST /v1/chat` for MynaCAD and MynaHub's assistant). MynaOps opened alone still hosts on `:8742` when the port is free (solo use).
 
 `Office.Ai` starts `llama-server` as a hidden child process the first time the host answers, on a free port of 127.0.0.1, behind a random key, 16384 tokens of context, one slot. A Windows job object ends it with the host app. The GPU is used as far as its memory allows; the rest runs on the CPU.
 
@@ -25,26 +25,26 @@ The in-process .NET binding (LLamaSharp 0.27/0.30) was tried first and dropped: 
 
 `Office.Shared.OlmoChat` builds the Olmo 3 prompt exactly as the model's own template does: tool signatures in `<functions>` in the system turn, tool results in `environment` turns, and the model's calls read back from `<function_calls>name(arg=json, …)</function_calls>`. Text that came from a project or a tool result has its `<|im_` tokens broken up so it cannot forge a turn. A block that cannot be read gives no call. The tool set and its confirmation dialogs are unchanged: the model only proposes, the app asks the user before any change.
 
-## How Tren and Falcon use it
+## How MynaCAD and MynaOps use it
 
-While **Kivo** is signed in (or Falcon runs alone with the port free), the suite AI Core on `127.0.0.1:8742` (`AiCoreListener`) answers:
+While **MynaHub** is signed in (or MynaOps runs alone with the port free), the suite AI Core on `127.0.0.1:8742` (`AiCoreListener`) answers:
 
 - `GET /v1/health` — `ready` when the model and runtime are installed.
-- `POST /v1/chat` — `{messages:[{role,content}], max_tokens}` for Tren and Kivo's assistant.
-- `POST /v1/completion` — `{prompt, max_tokens}` for Falcon's Olmo tool loop.
+- `POST /v1/chat` — `{messages:[{role,content}], max_tokens}` for MynaCAD and MynaHub's assistant.
+- `POST /v1/completion` — `{prompt, max_tokens}` for MynaOps's Olmo tool loop.
 - `Authorization: Bearer <token>` — token in `%LOCALAPPDATA%\O-Studio\ai\auth.token` (or `OSTUDIO_AI_TOKEN`).
 
 Apps launched from Studio get `OSTUDIO_AI_ROLE=client` so they never load weights in-process.
 
 ## Installer
 
-`BBSDesktop/installer/build-installer.ps1` downloads the pinned llama.cpp release (SHA-256 checked, cached under `artifacts\cache`, or `LLAMA_RUNTIME_ZIP`) and bundles it in `runtime\` beside the app. The model is not in Setup (4.5 GB): the wizard has a task "Download the assistant model", on by default, that fetches it from the pinned Hugging Face revision with its SHA-256 checked and puts it in `%LOCALAPPDATA%\HumanCentricWorks\models`, where Tren also looks. An existing file is kept, a failed download does not stop the install (the Ask bar says where the file goes), and uninstalling leaves the model for Tren. Run for real on 2026-10-29: `build-installer.ps1` (inside the MSVC environment, with `-OfficeDllDir`) built a 73 MB Setup; a silent install with the model moved aside downloaded the 4 471 602 048 bytes, the hash matched, the app and the 53 runtime files were installed, and the installed Falcon answered through the AI Core service. The installed app used the runtime in the shared folder, not the copy beside it (the beside-the-app copy was not exercised). Note: Windows PowerShell 5.1 read the build script wrongly without a BOM (an em dash became a quote), so it is saved with one.
+`BBSDesktop/installer/build-installer.ps1` downloads the pinned llama.cpp release (SHA-256 checked, cached under `artifacts\cache`, or `LLAMA_RUNTIME_ZIP`) and bundles it in `runtime\` beside the app. The model is not in Setup (4.5 GB): the wizard has a task "Download the assistant model", on by default, that fetches it from the pinned Hugging Face revision with its SHA-256 checked and puts it in `%LOCALAPPDATA%\HumanCentricWorks\models`, where MynaCAD also looks. An existing file is kept, a failed download does not stop the install (the Ask bar says where the file goes), and uninstalling leaves the model for MynaCAD. Run for real on 2026-10-29: `build-installer.ps1` (inside the MSVC environment, with `-OfficeDllDir`) built a 73 MB Setup; a silent install with the model moved aside downloaded the 4 471 602 048 bytes, the hash matched, the app and the 53 runtime files were installed, and the installed MynaOps answered through the AI Core service. The installed app used the runtime in the shared folder, not the copy beside it (the beside-the-app copy was not exercised). Note: Windows PowerShell 5.1 read the build script wrongly without a BOM (an em dash became a quote), so it is saved with one.
 
-## Tren's assistant
+## MynaCAD's assistant
 
-Tren's agent reads Olmo's `<tool_call>` JSON form (what its prompt asks for) and, since 2026-10-29, Olmo's own `<function_calls>name(arg=json)</function_calls>` form. Against Tren's real 16 KB tool prompt through this facade the model chose `audit_drawing`, `get_drawing_summary` and `purge_unused` correctly after the hint in `osas_ai.rs` was added (without it, "remove unused layers" was refused and a greeting triggered a tool call). The facade cuts a reply after the tool call, as the model otherwise invents the result. Run end to end on 2026-10-29 in Tren's window with this app serving the model: "remove unused layers and blocks" gave `get_drawing_summary`, then `purge_unused`, then the Allow/Decline bar; after Allow the model reported the 15 layers removed, and one `undo` ("Purge") restored all 18. Two things had to change for that: the model context went from 8K to 16K tokens (Tren's tool prompt alone is about 5K, so the second turn was refused as too long), and the hint now says to follow the schema exactly, never to ask permission in chat, and to call the tool after a result. Without the last sentence the model asked "shall I proceed?" instead of calling the tool.
+MynaCAD's agent reads Olmo's `<tool_call>` JSON form (what its prompt asks for) and, since 2026-10-29, Olmo's own `<function_calls>name(arg=json)</function_calls>` form. Against MynaCAD's real 16 KB tool prompt through this facade the model chose `audit_drawing`, `get_drawing_summary` and `purge_unused` correctly after the hint in `osas_ai.rs` was added (without it, "remove unused layers" was refused and a greeting triggered a tool call). The facade cuts a reply after the tool call, as the model otherwise invents the result. Run end to end on 2026-10-29 in MynaCAD's window with this app serving the model: "remove unused layers and blocks" gave `get_drawing_summary`, then `purge_unused`, then the Allow/Decline bar; after Allow the model reported the 15 layers removed, and one `undo` ("Purge") restored all 18. Two things had to change for that: the model context went from 8K to 16K tokens (MynaCAD's tool prompt alone is about 5K, so the second turn was refused as too long), and the hint now says to follow the schema exactly, never to ask permission in chat, and to call the tool after a result. Without the last sentence the model asked "shall I proceed?" instead of calling the tool.
 
 ## Not done
 
 - The CUDA build of llama.cpp (faster on NVIDIA cards, 280 MB) is not used.
-- Tren needs the host running (Kivo signed in, or Falcon solo). Its in-process llama.cpp cannot load Olmo 3.
+- MynaCAD needs the host running (MynaHub signed in, or MynaOps solo). Its in-process llama.cpp cannot load Olmo 3.

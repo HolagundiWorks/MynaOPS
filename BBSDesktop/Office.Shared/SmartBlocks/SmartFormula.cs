@@ -9,7 +9,7 @@ namespace Office.Shared.SmartBlocks;
 public sealed class SmartBlockException(string message) : Exception(message);
 
 /// <summary>
-/// The formula language of the smart block definitions (the same as Tren's <c>aad-param</c> formulas, without units): numbers, the
+/// The formula language of the smart block definitions (the same as MynaCAD's <c>aad-param</c> formulas, without units): numbers, the
 /// parameters and derived values by name, <c>+ - * /</c>, <c>^</c> with a whole-number exponent, parentheses and <c>min</c>, <c>max</c>,
 /// <c>abs</c>, <c>sqrt</c>, <c>round</c>, <c>floor</c>, <c>ceil</c>. A formula is parsed once; evaluation never parses again.
 /// </summary>

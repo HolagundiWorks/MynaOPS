@@ -29,8 +29,8 @@
                         Click="ExportPdf_Click" AutomationProperties.Name="Export estimate PDF"/>
                 <Button Content="CSV" Style="{StaticResource SecondaryButtonStyle}"
                         Click="ExportCsv_Click" AutomationProperties.Name="Export estimate CSV"/>
-                <Button Content="Export for Kivo (CSV)" Style="{StaticResource SecondaryButtonStyle}"
-                        Click="ExportKivoCsv_Click" AutomationProperties.Name="Export estimate and take-off as CSV for Kivo"/>
+                <Button Content="Export for MynaHub (CSV)" Style="{StaticResource SecondaryButtonStyle}"
+                        Click="ExportKivoCsv_Click" AutomationProperties.Name="Export estimate and take-off as CSV for MynaHub"/>
             </StackPanel>
         </Grid>
 
@@ -67,7 +67,7 @@
                               AutomationProperties.Name="Rate book version for estimate"/>
                     <ComboBox x:Name="PhaseCombo" Header="Estimation phase" MinWidth="180"
                               AutomationProperties.Name="Estimation phase to estimate"
-                              ToolTipService.ToolTip="Estimate only the items given this phase in Tren. All phases estimates everything; items without a phase are left out of a single phase."/>
+                              ToolTipService.ToolTip="Estimate only the items given this phase in MynaCAD. All phases estimates everything; items without a phase are left out of a single phase."/>
                 </StackPanel>
                 <TextBlock x:Name="TotalText" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,8"
                            Style="{StaticResource PageTitleStyle}" FontSize="20"/>

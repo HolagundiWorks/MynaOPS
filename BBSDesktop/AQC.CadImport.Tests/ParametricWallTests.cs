@@ -5,7 +5,7 @@ using Xunit;
 namespace AQC.CadImport.Tests;
 
 /// <summary>
-/// The wall rows Tren emits for parametric walls (its hand-off HANDOFF-O-COREOP-PARAMETRIC-TAKEOFF.md, 2026-10-19), next to the brick take-off rows
+/// The wall rows MynaCAD emits for parametric walls (its hand-off HANDOFF-O-COREOP-PARAMETRIC-TAKEOFF.md, 2026-10-19), next to the brick take-off rows
 /// it already wrote. The row shapes below are copied from that document.
 /// </summary>
 public class ParametricWallTests
@@ -78,7 +78,7 @@ public class ParametricWallTests
     [Fact]
     public void A_wall_row_note_from_O_Draft_is_shown_in_the_preview_even_when_thickness_is_stated()
     {
-        // Current Tren brick walls send thickness_mm and an honesty _note; without this, a stated thickness looked "trusted".
+        // Current MynaCAD brick walls send thickness_mm and an honesty _note; without this, a stated thickness looked "trusted".
         var noted = """{"ref":"W9","level":"Ground","length_mm":4000.0,"height_mm":2850.0,"thickness_mm":230.0,"layer":"MEASURE-FULLBRICK","_note":"thickness 230 mm is the nominal value the measure layer implies, not a measured thickness; check it"}""";
         var (plan, m) = Import(Wall(9, noted));
         Assert.Equal("230", m.Sheet("masonry")[0]["thickness"]);
@@ -116,7 +116,7 @@ public class ParametricWallTests
         Assert.Equal("PW-wall-1", (string)file.Openings[0]["wall_ref"]!);
     }
 
-    // ---- the optional fields Tren offered to add (its section 4B): accepted if they arrive, never required ----
+    // ---- the optional fields MynaCAD offered to add (its section 4B): accepted if they arrive, never required ----
 
     [Fact]
     public void Material_when_present_chooses_the_unit_type_and_a_default_thickness()

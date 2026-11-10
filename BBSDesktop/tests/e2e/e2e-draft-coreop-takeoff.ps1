@@ -1,4 +1,4 @@
-﻿# Tren takeoff.record (aad-cli, same engine as WinUI) → shared .osp → Falcon Take-off import UIA.
+﻿# MynaCAD takeoff.record (aad-cli, same engine as WinUI) → shared .osp → MynaOps Take-off import UIA.
 param(
   [string]$OutDir = "$env:TEMP\ocoreop",
   [string]$ODraftRoot,
@@ -47,7 +47,7 @@ if (-not $SkipDraftWinUi) {
     if (-not (Test-Path $DraftOutDir)) { New-Item -ItemType Directory -Path $DraftOutDir -Force | Out-Null }
     dotnet build $draftProj -c Debug -p:Platform=x64 -p:WindowsPackageType=None -o $DraftOutDir | Out-Host
   }
-  if (-not (Test-Path $draftExe)) { throw "Missing $draftExe (build Tren WinUI or pass -SkipDraftWinUi)" }
+  if (-not (Test-Path $draftExe)) { throw "Missing $draftExe (build MynaCAD WinUI or pass -SkipDraftWinUi)" }
   if (-not (Test-Path (Join-Path $DraftOutDir "aad_host.dll"))) {
     throw "Missing aad_host.dll beside ODraft.WinUi.exe — run: cargo build -p aad-host in O-DRAFT-main"
   }

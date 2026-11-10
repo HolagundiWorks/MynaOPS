@@ -13,15 +13,15 @@ public sealed record OdpTakeoffHeader(uint Slot, string State, string Json);
 public sealed record OdpTakeoffRow(uint Slot, int Kind, uint N, string Json);
 
 /// <summary>
-/// A structural detail Tren recorded: one RCC block placed in a drawing and the parameters it was drawn with (<see cref="ParamsJson"/> is an object of
-/// numbers). Falcon only reads these and draws them; the drawing is changed in Tren. <see cref="Kind"/> is the element page: beams, columns, slabs,
+/// A structural detail MynaCAD recorded: one RCC block placed in a drawing and the parameters it was drawn with (<see cref="ParamsJson"/> is an object of
+/// numbers). MynaOps only reads these and draws them; the drawing is changed in MynaCAD. <see cref="Kind"/> is the element page: beams, columns, slabs,
 /// footings or lintels.
 /// </summary>
 public sealed record OdpDetail(string Id, string Drawing, string Handle, string Kind, string Block, string ParamsJson, string Layer, string Label);
 
 /// <summary>
-/// A project file, <c>.osp</c> (format <c>osp</c>, version 1): one SQLite file with the drawing, the take-off Tren recorded, the Falcon project,
-/// attachments and markups. This is the .NET side of <c>aad-odp</c> (Tren's Rust crate); both read and write the same file. Every committed change raises
+/// A project file, <c>.osp</c> (format <c>osp</c>, version 1): one SQLite file with the drawing, the take-off MynaCAD recorded, the MynaOps project,
+/// attachments and markups. This is the .NET side of <c>aad-odp</c> (MynaCAD's Rust crate); both read and write the same file. Every committed change raises
 /// <c>meta.revision</c> by one and leaves <c>change</c> rows (what sync sends). The file is in WAL mode: another program may have it open, one writes while
 /// the other reads, and a second writer waits up to five seconds.
 /// Spec: <c>docs/ODP-PROJECT-FILE-AND-SYNC.md</c> in the OSAS repository.
@@ -125,7 +125,7 @@ CREATE INDEX IF NOT EXISTS change_revision ON change (revision);";
 
     public OdpMeta Meta() => new(MetaValue("project_id") ?? "", MetaValue("name") ?? "", MetaValue("created") ?? "", Revision());
 
-    /// <summary>The revision now. Cheap: poll this to learn that Tren (or another device) changed something.</summary>
+    /// <summary>The revision now. Cheap: poll this to learn that MynaCAD (or another device) changed something.</summary>
     public long Revision() => long.TryParse(MetaValue("revision"), out var r) ? r : 0;
 
     public IReadOnlyList<string> DrawingNames() => Column("SELECT name FROM drawing ORDER BY created, name");
@@ -155,7 +155,7 @@ CREATE INDEX IF NOT EXISTS change_revision ON change (revision);";
         return list;
     }
 
-    /// <summary>The structural details Tren recorded (all of them, or those of one element page), in id order.</summary>
+    /// <summary>The structural details MynaCAD recorded (all of them, or those of one element page), in id order.</summary>
     public IReadOnlyList<OdpDetail> Details(string? kind = null)
     {
         var list = new List<OdpDetail>();
@@ -168,7 +168,7 @@ CREATE INDEX IF NOT EXISTS change_revision ON change (revision);";
         return list;
     }
 
-    /// <summary>The Falcon project document, or null when the file has none yet (Tren made it).</summary>
+    /// <summary>The MynaOps project document, or null when the file has none yet (MynaCAD made it).</summary>
     public string? ProjectDoc()
     {
         using var cmd = Command("SELECT json FROM project_doc WHERE id = 1");

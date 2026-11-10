@@ -14,9 +14,9 @@ using WinRT.Interop;
 namespace BBSApp.Views;
 
 /// <summary>
-/// Take-off. Drawings and PDFs are measured in Tren, which records the take-off in the project file (<c>.osp</c>) that Falcon has open too.
+/// Take-off. Drawings and PDFs are measured in MynaCAD, which records the take-off in the project file (<c>.osp</c>) that MynaOps has open too.
 /// This page lists the drawings recorded there, reads one drawing's take-off into the same import preview as
-/// File > Import from CAD (nothing is written before the user accepts), and fetches the annotated drawing PDF Tren generated.
+/// File > Import from CAD (nothing is written before the user accepts), and fetches the annotated drawing PDF MynaCAD generated.
 /// </summary>
 public sealed class TakeoffPage : Page
 {
@@ -53,8 +53,8 @@ public sealed class TakeoffPage : Page
                     new TextBlock
                     {
                         TextWrapping = TextWrapping.Wrap,
-                        Text = "Drawings and PDFs are measured in Tren with its take-off toolbars, which record the take-off in the project file. "
-                             + "That file is this project's file, so a take-off appears here as soon as Tren has recorded it. Pick a drawing, read it, review what would change, "
+                        Text = "Drawings and PDFs are measured in MynaCAD with its take-off toolbars, which record the take-off in the project file. "
+                             + "That file is this project's file, so a take-off appears here as soon as MynaCAD has recorded it. Pick a drawing, read it, review what would change, "
                              + "then import; rows can be edited here by hand afterwards. "
                              + "Importing again updates the same rows and never duplicates them. Plaster, painting, skirting and shuttering are derived here, not imported.",
                     },
@@ -75,7 +75,7 @@ public sealed class TakeoffPage : Page
         _drawings.SelectionChanged += (_, _) => UpdateButtons();
         _poll.Tick += async (_, _) =>
         {
-            // the file is read again only when it has changed (Tren recorded or updated a take-off)
+            // the file is read again only when it has changed (MynaCAD recorded or updated a take-off)
             var p = ProjectFile;
             DateTime now = p is not null && File.Exists(p) ? File.GetLastWriteTimeUtc(p) : DateTime.MinValue;
             if (_busy || now == _stamp) return;
@@ -93,7 +93,7 @@ public sealed class TakeoffPage : Page
     }
 
     /// <summary>
-    /// The take-off bar: flat text buttons in groups with dividers, drawn the way Tren's take-off bar is (text only, no
+    /// The take-off bar: flat text buttons in groups with dividers, drawn the way MynaCAD's take-off bar is (text only, no
     /// icons). Source (where the take-off is read from), Read (list and import it), Annotated (the stored drawing).
     /// </summary>
     StackPanel BuildToolBar()
@@ -146,7 +146,7 @@ public sealed class TakeoffPage : Page
         Background = Application.Current.Resources.TryGetValue("HcwEdgeBrush", out var edge) && edge is Brush br ? br : new SolidColorBrush(Microsoft.UI.Colors.Gray),
     };
 
-    /// <summary>The take-off is read from the open project file, the one Tren records into.</summary>
+    /// <summary>The take-off is read from the open project file, the one MynaCAD records into.</summary>
     static string? ProjectFile => ProjectFiles.IsOdp(ProjectStore.Current.FilePath) ? ProjectStore.Current.FilePath : null;
 
     TakeoffSource? Source() =>
@@ -154,7 +154,7 @@ public sealed class TakeoffPage : Page
 
     DateTime _stamp = DateTime.MinValue;
 
-    // Tren recorded something in the served file: read the list again now, not at the next poll.
+    // MynaCAD recorded something in the served file: read the list again now, not at the next poll.
     void OnServedChanged() => DispatcherQueue.TryEnqueue(async () => { if (!_busy) { UpdateMode(); await RefreshAsync(quiet: true); } });
 
     TakeoffDrawing? Selected => (_drawings.SelectedItem as ListViewItem)?.Tag as TakeoffDrawing;
@@ -163,8 +163,8 @@ public sealed class TakeoffPage : Page
     {
         var p = ProjectFile;
         _file.Text = p is null
-            ? "No project is open. Use File > Open to open a project file (.osp), or open Tren's project, to read a take-off."
-            : File.Exists(p) ? "Reading the take-off from " + p + ". A take-off Tren records appears here at once. Use Reload list after Tren records again." : p + " does not exist yet: record the take-off in Tren, then Reload list.";
+            ? "No project is open. Use File > Open to open a project file (.osp), or open MynaCAD's project, to read a take-off."
+            : File.Exists(p) ? "Reading the take-off from " + p + ". A take-off MynaCAD records appears here at once. Use Reload list after MynaCAD records again." : p + " does not exist yet: record the take-off in MynaCAD, then Reload list.";
         UpdateButtons();
     }
 
@@ -230,7 +230,7 @@ public sealed class TakeoffPage : Page
     async Task SyncTakeoffAsync()
     {
         var path = ProjectFile;
-        if (path is null || !File.Exists(path)) { _status.Text = "Open a project file (.osp) to sync take-off from Tren."; return; }
+        if (path is null || !File.Exists(path)) { _status.Text = "Open a project file (.osp) to sync take-off from MynaCAD."; return; }
         await ServedProject.PollAsync(path);
         await RefreshAsync(quiet: false, force: true);
     }
@@ -258,7 +258,7 @@ public sealed class TakeoffPage : Page
             else if (!quiet)
             {
                 var text = _list.Count == 0
-                    ? "No take-off has been recorded yet. Record one in Tren."
+                    ? "No take-off has been recorded yet. Record one in MynaCAD."
                     : force
                         ? $"Reloaded: {_list.Count} drawing(s) with a recorded take-off."
                         : $"{_list.Count} drawing(s) with a recorded take-off.";

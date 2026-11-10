@@ -26,9 +26,9 @@ public sealed class EstimateLine
     public double HeightM { get; set; }
     public double AreaM2 { get; set; }
     public double VolumeM3 { get; set; }
-    /// <summary>The estimation phase the measured item was put in, in Tren; empty when it has none.</summary>
+    /// <summary>The estimation phase the measured item was put in, in MynaCAD; empty when it has none.</summary>
     public string Phase { get; set; } = "";
-    /// <summary>The running-bill phase the measured item was put in, in Tren; empty when it has none.</summary>
+    /// <summary>The running-bill phase the measured item was put in, in MynaCAD; empty when it has none.</summary>
     public string BillPhase { get; set; } = "";
 }
 
@@ -276,7 +276,7 @@ public static class EstimateCalculator
 
     static string PhaseKey(string mark, string level) => mark.Trim().ToUpperInvariant() + "|" + level.Trim();
 
-    /// <summary>The phases the member sheets hold (set in Tren), by mark and storey.</summary>
+    /// <summary>The phases the member sheets hold (set in MynaCAD), by mark and storey.</summary>
     static Dictionary<string, (string Phase, string BillPhase)> PhaseIndex(ProjectStore store)
     {
         var index = new Dictionary<string, (string, string)>();

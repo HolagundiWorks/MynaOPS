@@ -10,7 +10,7 @@ public sealed class ProjectInfo
 {
     public string Name { get; set; } = "Untitled Project";
     public string Location { get; set; } = "";
-    /// <summary>Short project description from Kivo (title plates, estimate covers, report headers).</summary>
+    /// <summary>Short project description from MynaHub (title plates, estimate covers, report headers).</summary>
     public string Summary { get; set; } = "";
     public string ClientName { get; set; } = "";
     /// <summary>Engineer, Architect, or PMC.</summary>
@@ -99,7 +99,7 @@ public sealed class ProjectInfo
     }
 
     /// <summary>
-    /// Always false: Falcon no longer reads Kivo's company file, so the company's and the project's details are edited in Settings and kept in
+    /// Always false: MynaOps no longer reads MynaHub's company file, so the company's and the project's details are edited in Settings and kept in
     /// the project file. Kept so the Settings page and the party book keep one code path.
     /// </summary>
     public bool FromCompanyFile => false;

@@ -83,7 +83,7 @@ public static class DsrCatalog
             "Brick work with bricks of the stated class in cement mortar of the stated mix, in the stated storey, including raking out joints and curing.",
             "m³ (m² for a half-brick wall)",
             "Walls thicker than half a brick are measured in m³ and half-brick walls (up to 120 mm) in m² (IS 1200 Part 3). Openings under 0.1 m² are not deducted; larger ones are. "
-            + "Falcon applies exactly this under the rule \"IS1200 masonry\".",
+            + "MynaOps applies exactly this under the rule \"IS1200 masonry\".",
             new[]
             {
                 new MaterialSpec("Bricks (modular)", "IS 1077", "Class designation as the item states; modular size 190 x 90 x 90 mm."),
@@ -108,7 +108,7 @@ public static class DsrCatalog
 
         new("Plaster", Finishing,
             "Cement plaster of the stated mix and thickness on the stated surface, including curing and scaffolding as the item states.",
-            "m²", "Area of the plastered surface; both faces of a wall are two measures. Falcon deducts openings in full under the rule \"IS1200 plaster/paint\" and can add the reveals.",
+            "m²", "Area of the plastered surface; both faces of a wall are two measures. MynaOps deducts openings in full under the rule \"IS1200 plaster/paint\" and can add the reveals.",
             new[] { new MaterialSpec("Cement mortar 1:3 (cement : sand)", "", "Mix as the item states."), Cement, Sand }),
         new("Painting", Finishing,
             "Painting with the stated paint, number of coats and primer on the stated surface.",

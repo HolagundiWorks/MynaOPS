@@ -7,8 +7,8 @@ using System.Text.Json.Nodes;
 namespace BBSApp.Services;
 
 /// <summary>
-/// An annotated drawing PDF Tren generated once a take-off was complete (quantity lines, measurements, hatches) and recorded in
-/// the project file. Falcon keeps a verified copy with the project.
+/// An annotated drawing PDF MynaCAD generated once a take-off was complete (quantity lines, measurements, hatches) and recorded in
+/// the project file. MynaOps keeps a verified copy with the project.
 /// </summary>
 public sealed class StoredAnnotatedDrawing
 {
@@ -18,7 +18,7 @@ public sealed class StoredAnnotatedDrawing
     public string File { get; set; } = "";
     public string Sha256 { get; set; } = "";
     public string Generated { get; set; } = "";
-    /// <summary>The drawing revision (SHA-256) the take-off was measured from, when Tren gave it.</summary>
+    /// <summary>The drawing revision (SHA-256) the take-off was measured from, when MynaCAD gave it.</summary>
     public string Revision { get; set; } = "";
     public string Fetched { get; set; } = "";
 

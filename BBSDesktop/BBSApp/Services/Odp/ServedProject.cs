@@ -6,18 +6,18 @@ using Office.Shared;
 namespace BBSApp.Services.Odp;
 
 /// <summary>
-/// Watches the open project file for writes by another program. Tren (or the viewer) writes take-off into the same file; the revision inside it
+/// Watches the open project file for writes by another program. MynaCAD (or the viewer) writes take-off into the same file; the revision inside it
 /// says whether anyone but this app wrote since the last look.
 /// </summary>
 public static class ServedProject
 {
-    /// <summary>Raised when another program wrote to the project file: Tren recorded, updated or removed take-off rows.</summary>
+    /// <summary>Raised when another program wrote to the project file: MynaCAD recorded, updated or removed take-off rows.</summary>
     public static event Action? Changed;
 
     static long _count = -1;
     static readonly Dictionary<string, long> _ownRevisions = new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>Our own save made revision <paramref name="revision"/> of a project file: it is not "Tren changed something".</summary>
+    /// <summary>Our own save made revision <paramref name="revision"/> of a project file: it is not "MynaCAD changed something".</summary>
     public static void NoteOwnRevision(string path, long revision) => _ownRevisions[Path.GetFullPath(path)] = revision;
 
     /// <summary>Look at the project file once (the main window calls this every two seconds); a revision nobody here wrote raises <see cref="Changed"/>.</summary>

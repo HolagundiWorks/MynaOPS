@@ -12,7 +12,7 @@ public sealed class BridgeFile
 {
     public string DrawingId { get; init; } = "";
     public string Drawing { get; init; } = "";
-    /// <summary>Company uuid from <c>source.project_ref</c> when Tren linked the drawing to a company-file project (same as take-off headers).</summary>
+    /// <summary>Company uuid from <c>source.project_ref</c> when MynaCAD linked the drawing to a company-file project (same as take-off headers).</summary>
     public string? ProjectRefCompany { get; init; }
     /// <summary>Project id from <c>source.project_ref</c> when present and numeric.</summary>
     public long? ProjectRefId { get; init; }

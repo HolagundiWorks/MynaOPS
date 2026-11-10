@@ -21,7 +21,7 @@ public partial class App : Application
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
         Services.RateBookStore.Current.EnsureLoaded();
-        // Falcon opens the shared .osp itself; it needs no launcher, no sign-in and no Kivo.
+        // MynaOps opens the shared .osp itself; it needs no launcher, no sign-in and no MynaHub.
         MainWindow = new MainWindow();
         MainWindow.Activate();
         // A project file given on the command line is opened once the window is up.

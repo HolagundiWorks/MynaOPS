@@ -7,10 +7,10 @@ using System.Text.Json.Nodes;
 
 namespace Office.Shared;
 
-/// <summary>One line of the estimate sheet as the CSV takes it. <see cref="Source"/> is "falcon" for a line typed or priced in Falcon, "tren:&lt;kind&gt;" for one taken from the drawing.</summary>
+/// <summary>One line of the estimate sheet as the CSV takes it. <see cref="Source"/> is "falcon" for a line typed or priced in MynaOps, "tren:&lt;kind&gt;" for one taken from the drawing.</summary>
 public sealed record FalconCsvEstimateLine(string Package, string ItemCode, string Description, string Unit, double Quantity, double Rate, string Source = "falcon");
 
-/// <summary>Quantity measured so far for an item, for a running bill. <c>MeasuredToDate = Previous + ThisPeriod</c>; Previous is 0 when Falcon knows of no earlier bill.</summary>
+/// <summary>Quantity measured so far for an item, for a running bill. <c>MeasuredToDate = Previous + ThisPeriod</c>; Previous is 0 when MynaOps knows of no earlier bill.</summary>
 public sealed record FalconCsvMeasured(string ItemCode, string Description, string Unit, double ThisPeriod, double Previous, string Source = "falcon");
 
 public sealed class FalconCsvException : Exception
@@ -19,7 +19,7 @@ public sealed class FalconCsvException : Exception
 }
 
 /// <summary>
-/// The Falcon CSV for Kivo (contract v1, <c>osas-falcon-csv/1</c>): meta, estimate, measured, takeoff and total rows in one RFC 4180 file.
+/// The MynaOps CSV for MynaHub (contract v1, <c>osas-falcon-csv/1</c>): meta, estimate, measured, takeoff and total rows in one RFC 4180 file.
 /// Pure: it takes the project's estimate lines, bills and the <c>.osp</c> take-off rows and returns the bytes; the page only picks a file.
 /// </summary>
 public static class FalconCsvExport
@@ -49,7 +49,7 @@ public static class FalconCsvExport
         return $"{name}-falcon-{exportedAt.UtcDateTime:yyyyMMdd}-r{drawingRevision.ToString(CultureInfo.InvariantCulture)}.csv";
     }
 
-    /// <summary>Checks everything that makes Kivo refuse the file; returns the problems in plain words (empty when the export may go ahead).</summary>
+    /// <summary>Checks everything that makes MynaHub refuse the file; returns the problems in plain words (empty when the export may go ahead).</summary>
     public static List<string> Problems(OdpMeta meta, IReadOnlyList<FalconCsvEstimateLine> estimate, IReadOnlyList<FalconCsvMeasured> measured)
     {
         var p = new List<string>();
@@ -60,7 +60,7 @@ public static class FalconCsvExport
             p.Add($"{noCode.Count} estimate line(s) have no item code: {string.Join("; ", noCode.Take(5))}{(noCode.Count > 5 ? "…" : "")}.");
         var dup = estimate.Where(l => !string.IsNullOrWhiteSpace(l.ItemCode)).GroupBy(l => l.ItemCode.Trim(), StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1).Select(g => g.Key).ToList();
-        if (dup.Count > 0) p.Add($"Item code(s) used on more than one estimate line (Kivo refuses that): {string.Join(", ", dup.Take(8))}.");
+        if (dup.Count > 0) p.Add($"Item code(s) used on more than one estimate line (MynaHub refuses that): {string.Join(", ", dup.Take(8))}.");
         if (measured.Any(m => string.IsNullOrWhiteSpace(m.ItemCode))) p.Add("A measured line has no item code.");
         return p;
     }
@@ -157,7 +157,7 @@ public static class FalconCsvExport
     public static (OdpMeta Meta, List<OdpTakeoffRow> Rows) ReadOsp(string? ospPath)
     {
         if (string.IsNullOrWhiteSpace(ospPath) || !File.Exists(ospPath))
-            throw new FalconCsvException("This project has no project file (.osp). Open or link the .osp that Tren records into, then export again.");
+            throw new FalconCsvException("This project has no project file (.osp). Open or link the .osp that MynaCAD records into, then export again.");
         try
         {
             using var osp = OdpFile.Open(ospPath);

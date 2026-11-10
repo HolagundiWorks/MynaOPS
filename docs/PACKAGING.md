@@ -1,4 +1,4 @@
-# Falcon packaging and signing
+# MynaOps packaging and signing
 
 ## Installers
 
@@ -48,8 +48,8 @@ powershell -File BBSDesktop\installer\sign.ps1 BBSDesktop\artifacts\installer\O-
 
 The OSAS launcher can install this Setup.exe via
 `installer/install-suite.ps1 -ArtifactsDir …` when the file is named
-`O-CoreOp-Setup-*.exe`. Prefer the unified **`Kivo-Suite-Setup-*.exe`** from Kivo
-(`installer/suite/README.md`): one wizard for install and remove of Kivo, Falcon, and Tren.
+`O-CoreOp-Setup-*.exe`. Prefer the unified **`Myna-Setup-*.exe`** from MynaHub
+(`installer/suite/README.md`): one wizard for install and remove of MynaHub, MynaOps, and MynaCAD.
 
 ## Update channel (check-only)
 

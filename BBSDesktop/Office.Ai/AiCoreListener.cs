@@ -11,9 +11,9 @@ using Office.Shared;
 namespace Office.Ai;
 
 /// <summary>
-/// Lets Tren and Falcon use the model the host app carries. It answers the suite's local contract on 127.0.0.1 only:
-/// <c>GET /v1/health</c>, <c>POST /v1/chat</c>, and <c>POST /v1/completion</c> (Olmo prompt for Falcon's Ask bar), behind the bearer
-/// token in <c>%LOCALAPPDATA%\O-Studio\ai\auth.token</c>. The model loads on the first request. Kivo keeps this open while a workspace is signed in.
+/// Lets MynaCAD and MynaOps use the model the host app carries. It answers the suite's local contract on 127.0.0.1 only:
+/// <c>GET /v1/health</c>, <c>POST /v1/chat</c>, and <c>POST /v1/completion</c> (Olmo prompt for MynaOps's Ask bar), behind the bearer
+/// token in <c>%LOCALAPPDATA%\O-Studio\ai\auth.token</c>. The model loads on the first request. MynaHub keeps this open while a workspace is signed in.
 /// </summary>
 public sealed class AiCoreListener : IDisposable
 {

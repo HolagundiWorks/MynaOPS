@@ -10,7 +10,7 @@ namespace AQC.CadImport.Tests;
 /// <summary>
 /// Quantity-trust checklist: known wall/opening numbers that must survive
 /// bridge / project take-off → CadImport without double-count, broken wall_ref, or thickness regressions.
-/// Fixture mirrors Tren <c>crates/engine/tests/fixtures/quantity-trust-checklist.json</c>.
+/// Fixture mirrors MynaCAD <c>crates/engine/tests/fixtures/quantity-trust-checklist.json</c>.
 /// </summary>
 public class QuantityTrustTests
 {

@@ -9,8 +9,8 @@ using WinRT.Interop;
 namespace BBSApp;
 
 /// <summary>
-/// Falcon and Tren share one project file (<c>.osp</c>) on this PC; it is their database. Falcon needs no sign-in and no Kivo: it opens that file
-/// itself, and what Kivo needs (estimates, running bills) leaves Falcon as an exported CSV.
+/// MynaOps and MynaCAD share one project file (<c>.osp</c>) on this PC; it is their database. MynaOps needs no sign-in and no MynaHub: it opens that file
+/// itself, and what MynaHub needs (estimates, running bills) leaves MynaOps as an exported CSV.
 /// </summary>
 public sealed partial class MainWindow
 {
@@ -22,8 +22,8 @@ public sealed partial class MainWindow
         var lockup = Path.Combine(AppContext.BaseDirectory, "Assets", "lockup.png");
         if (_welcome is not null || !File.Exists(lockup))
             return;
-        _welcome = new O.Ui.Controls.SuiteWelcomeCard("Falcon", lockup,
-            "Falcon and Tren share one project file (.osp) on this PC. Open that file here.");
+        _welcome = new O.Ui.Controls.SuiteWelcomeCard("MynaOps", lockup,
+            "MynaOps and MynaCAD share one project file (.osp) on this PC. Open that file here.");
         var open = new Button { Content = "Open project…" };
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var style) && style is Style accent)
             open.Style = accent;
@@ -46,7 +46,7 @@ public sealed partial class MainWindow
 
     async void OpenProject_Click(object sender, RoutedEventArgs e) => await OpenSharedProjectAsync();
 
-    /// <summary>Open the project file shared with Tren.</summary>
+    /// <summary>Open the project file shared with MynaCAD.</summary>
     async Task OpenSharedProjectAsync()
     {
         var picker = new FileOpenPicker { ViewMode = PickerViewMode.List, SuggestedStartLocation = PickerLocationId.DocumentsLibrary };
@@ -58,7 +58,7 @@ public sealed partial class MainWindow
         OpenProjectFile(file.Path);
     }
 
-    /// <summary>Choose where a project that has no file yet is saved: a new project file (.osp) that Tren can open too.</summary>
+    /// <summary>Choose where a project that has no file yet is saved: a new project file (.osp) that MynaCAD can open too.</summary>
     async Task<string?> ChooseNewProjectFileAsync()
     {
         var picker = new FileSavePicker { SuggestedStartLocation = PickerLocationId.DocumentsLibrary, SuggestedFileName = string.IsNullOrWhiteSpace(Services.ProjectStore.Current.Name) ? "Project" : Services.ProjectStore.Current.Name };

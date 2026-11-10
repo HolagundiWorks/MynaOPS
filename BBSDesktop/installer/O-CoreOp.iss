@@ -1,16 +1,16 @@
-; Falcon — Inno Setup script (per-user, no admin)
+; MynaOps — Inno Setup script (per-user, no admin)
 ; Build via: powershell -File build-installer.ps1
 
 #ifndef AppVersion
   #define AppVersion "1.0.0"
 #endif
 
-#define MyAppName "Falcon"
+#define MyAppName "MynaOps"
 #define MyAppPublisher "Human Centric Works"
 #define MyAppPublisherUrl "https://humancentic.works"
 #define MyAppExeName "O-CoreOp.exe"
 #define MyAppId "{{A8F3C2E1-9B4D-4E6A-8C1F-2D7E5A9B0C3D}"
-; The assistant model: Olmo-3-7B-Instruct Q4_K_M from unsloth/Olmo-3-7B-Instruct-GGUF (Apache-2.0), pinned revision, shared with Tren.
+; The assistant model: Olmo-3-7B-Instruct Q4_K_M from unsloth/Olmo-3-7B-Instruct-GGUF (Apache-2.0), pinned revision, shared with MynaCAD.
 #define ModelFile "Olmo-3-7B-Instruct-Q4_K_M.gguf"
 #define ModelSha256 "0de0bc63fae8a73a48e167be48f149c9544bd4af61d223cd3f331c6ea664c5c4"
 #define ModelUrl "https://huggingface.co/unsloth/Olmo-3-7B-Instruct-GGUF/resolve/a2a9ae53f5a95087616b3f45ca96e9d2631344ee/" + ModelFile
@@ -50,16 +50,16 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "model"; Description: "Download the assistant model (Olmo 3 7B, 4.5 GB, runs on this computer only; Tren uses it too)"; GroupDescription: "Assistant:"
+Name: "model"; Description: "Download the assistant model (Olmo 3 7B, 4.5 GB, runs on this computer only; MynaCAD uses it too)"; GroupDescription: "Assistant:"
 
 [Files]
 Source: "..\artifacts\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Registry]
-; The Kivo Suite project file (.osp): a right-click "Open in Falcon". Whichever app registered first stays the default (Tren, when installed with the suite).
+; The Myna Suite project file (.osp): a right-click "Open in MynaOps". Whichever app registered first stays the default (MynaCAD, when installed with the suite).
 Root: HKCU; Subkey: "Software\Classes\.osp"; ValueType: string; ValueName: ""; ValueData: "OSAS.Project"; Flags: createvalueifdoesntexist
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project"; ValueType: string; ValueName: ""; ValueData: "Kivo Suite project"; Flags: createvalueifdoesntexist
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop"; ValueType: string; ValueName: ""; ValueData: "Open in Falcon"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project"; ValueType: string; ValueName: ""; ValueData: "Myna Suite project"; Flags: createvalueifdoesntexist
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop"; ValueType: string; ValueName: ""; ValueData: "Open in MynaOps"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-CoreOp\{#MyAppExeName}"" ""%1"""
 
 [Icons]
@@ -71,13 +71,16 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDi
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent
 
 [InstallDelete]
-; Earlier versions installed as AQC-Core / AQCCore.exe. Remove that program so an upgrade leaves one Falcon behind.
-; Settings in %LocalAppData%\AQCCore are not touched: the app copies them to Falcon on first run.
+; Earlier versions installed as AQC-Core / AQCCore.exe. Remove that program so an upgrade leaves one MynaOps behind.
+; Settings in %LocalAppData%\AQCCore are not touched: the app copies them to MynaOps on first run.
 Type: filesandordirs; Name: "{localappdata}\Programs\AQC-Core"
 ; Earlier Setups used the old name for the Start menu folder.
 Type: filesandordirs; Name: "{userprograms}\O-CoreOp"
 Type: files; Name: "{userdesktop}\O-CoreOp.lnk"
-; Falcon no longer reads the company file, so versions up to 1.6.1 left an office.dll behind that nothing uses.
+; Setups of 1.6.x used the name Falcon for the Start menu folder and the desktop shortcut.
+Type: filesandordirs; Name: "{userprograms}\Falcon"
+Type: files; Name: "{userdesktop}\Falcon.lnk"
+; MynaOps no longer reads the company file, so versions up to 1.6.1 left an office.dll behind that nothing uses.
 Type: files; Name: "{app}\office.dll"
 Type: files; Name: "{app}\AQCCore.*"
 

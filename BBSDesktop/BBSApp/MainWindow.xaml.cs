@@ -86,7 +86,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         };
         if (!Office.Ai.SuiteAiCoordinator.PreferClient)
             _aiCore = Office.Ai.SuiteAiCoordinator.StartHostIfNeeded();
-        ServedProject.Changed += () => DispatcherQueue.TryEnqueue(() => AppNotify.Info("Take-off", "Tren updated the take-off. Open Take-off to review and import it."));
+        ServedProject.Changed += () => DispatcherQueue.TryEnqueue(() => AppNotify.Info("Take-off", "MynaCAD updated the take-off. Open Take-off to review and import it."));
         StartActiveProjectWatch();
         if (Content is FrameworkElement root)
             root.KeyDown += Window_KeyDown;
@@ -181,7 +181,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         {
             Cmd("dashboard", "Dashboard", Glyph("\uE80F")),
             Cmd("levels", "Levels", Glyph("\uF158")),
-            Cmd("takeoff", "Take-off (Tren)", Glyph("\uE8A5")),
+            Cmd("takeoff", "Take-off (MynaCAD)", Glyph("\uE8A5")),
         }));
         _tabs.Add(new RibbonTab("rcc", "RCC steel", new[]
         {
@@ -363,7 +363,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         return new ImageIcon { Source = (ImageSource)src, Width = SuiteIconPx, Height = SuiteIconPx };
     }
 
-    /// <summary>Suite icon glyph size (10) and tile hit (36) — matches O.Ui / Tren.</summary>
+    /// <summary>Suite icon glyph size (10) and tile hit (36) — matches O.Ui / MynaCAD.</summary>
     private const double SuiteIconPx = 15;
     private const double SuiteTilePx = 36;
 
@@ -1093,7 +1093,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         var picker = new FileSavePicker();
         InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
         picker.SuggestedFileName = ProjectStore.Current.Name.Replace(' ', '_') + ".aqcbridge";
-        picker.FileTypeChoices.Add("Falcon bridge file", new List<string> { ".json" });
+        picker.FileTypeChoices.Add("MynaOps bridge file", new List<string> { ".json" });
         var file = await picker.PickSaveFileAsync();
         if (file is null) return;
         try
@@ -1118,7 +1118,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
 
     /// <summary>
     /// The project is chosen and locked in the launcher, so there is no pointer to follow any more; what stays is the poll of the project file's
-    /// revision, which tells when Tren recorded a take-off.
+    /// revision, which tells when MynaCAD recorded a take-off.
     /// </summary>
     private void StartActiveProjectWatch()
     {
@@ -1155,7 +1155,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
 
     private async void Save_Click(object sender, RoutedEventArgs e)
     {
-        // A project that has no file yet is saved to a new project file that Tren can open too.
+        // A project that has no file yet is saved to a new project file that MynaCAD can open too.
         if (string.IsNullOrEmpty(ProjectStore.Current.FilePath) || !ProjectFiles.IsOdp(ProjectStore.Current.FilePath))
         {
             var chosen = await ChooseNewProjectFileAsync();

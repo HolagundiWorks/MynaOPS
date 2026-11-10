@@ -8,7 +8,7 @@ using System.Text.Json.Nodes;
 namespace Office.Shared;
 
 /// <summary>
-/// Builds suite <c>ProjectRef</c> / <c>ArtifactRef</c> JSON (Kivo <c>docs/contracts/refs.md</c>).
+/// Builds suite <c>ProjectRef</c> / <c>ArtifactRef</c> JSON (MynaHub <c>docs/contracts/refs.md</c>).
 /// The company file is the system of record: identity is <c>company_uuid</c> + <c>project_id</c> only.
 /// </summary>
 public static class ArtifactRefs

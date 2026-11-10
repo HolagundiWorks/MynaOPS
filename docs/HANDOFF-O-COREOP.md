@@ -1,6 +1,6 @@
-# Hand-off: what is left in Falcon
+# Hand-off: what is left in MynaOps
 
-Written 2026-10-19 for whoever picks up Falcon next. Falcon is the quantities, estimates and billing app in the **Kivo suite**. It is this repository (`BBSDesktop/BBSApp`, WinUI 3, with the C++ `bbs_engine.dll`).
+Written 2026-10-19 for whoever picks up MynaOps next. MynaOps is the quantities, estimates and billing app in the **MynaHub suite**. It is this repository (`BBSDesktop/BBSApp`, WinUI 3, with the C++ `bbs_engine.dll`).
 
 Each item says how it is known. **Checked** means it was read in the code or run. **Not tested** means nobody has tried it. Where an item is also on the suite roadmap, the number is from `docs/roadmap.md` in the O-STUDIO repository.
 
@@ -11,15 +11,15 @@ Merged on 2026-10-19 (merge commit `a0aa37d`):
 - The OSAS shell: menu bar, grouped left navigation pane, work area, status strip. The pane is open from 900 px, an icon rail from 560 px, and a menu button below that. See `docs/WINUI-SHELL.md`.
 - The shared `O.Ui` design (blue accent), referenced from a sibling checkout of the public `HolagundiWorks/O-UI` repository (`..\..\..\o-ui` from the app folder). The build fails without it.
 - Accessibility fixes from the WCAG 2.2 AA audit: names on sheet cells and icon buttons, targets of 24 px or more, headings, a polite notice host, 1x scale.
-- The rename to Falcon. The program is now `O-CoreOp.exe` and keeps its settings in `%LocalAppData%\Falcon` (copied from `AQCCore` on first run).
+- The rename to MynaOps. The program is now `O-CoreOp.exe` and keeps its settings in `%LocalAppData%\MynaOps` (copied from `AQCCore` on first run).
 - **AORMS Connect / Bridge removed (2026-10-28):** sign-in, Online projects, Push/Pull, Bind/Flush, sync badges, `Aorms.Connect` / `Aorms.Bridge`, FakeAorms e2e, and Bridge stub hosts are gone. Company-file / OSAS ticket flow, CAD import, and `.osp` take-off remain.
 - CI (`.github/workflows/ci.yml`): CadImport + Office.Shared tests, and a BBSApp build.
 
 Also on `main` since 2026-10-19 (fast-forward to `b67710a`; the branch `feat/company-live-sync` was then deleted):
 
 - The README and `docs/WINUI-SHELL.md` rewrite to the current names.
-- **Shared company file and OSAS hub** (section 5.1): Falcon has no company picker. It opens the company file OSAS chose (`OSAS_COMPANY`), signed in by OSAS's one-time ticket (`OSAS_TICKET`, `OSAS_USER`), and shows a project saved in Kivo within about two seconds, and the reverse. Code: `BBSDesktop/Office.Shared` (`OfficeSession`, `SharedCompany`, 5 tests), `BBSApp/MainWindow.Company.cs`, `Services/Company/CompanyService.cs`, the `Shared` link in `Services/ProjectStore.cs`. The engine is `office.dll`, copied beside the app from the O-STUDIO build (`OfficeDllDir`).
-- Take-off reading from Tren, annotated drawings in reports, and the overlap warning (progress log below).
+- **Shared company file and OSAS hub** (section 5.1): MynaOps has no company picker. It opens the company file OSAS chose (`OSAS_COMPANY`), signed in by OSAS's one-time ticket (`OSAS_TICKET`, `OSAS_USER`), and shows a project saved in MynaHub within about two seconds, and the reverse. Code: `BBSDesktop/Office.Shared` (`OfficeSession`, `SharedCompany`, 5 tests), `BBSApp/MainWindow.Company.cs`, `Services/Company/CompanyService.cs`, the `Shared` link in `Services/ProjectStore.cs`. The engine is `office.dll`, copied beside the app from the O-STUDIO build (`OfficeDllDir`).
+- Take-off reading from MynaCAD, annotated drawings in reports, and the overlap warning (progress log below).
 
 ## 2. Do first: make what exists trustworthy
 
@@ -28,13 +28,13 @@ Also on `main` since 2026-10-19 (fast-forward to `b67710a`; the branch `feat/com
 | 2.1 | ~~Add the repository secret `HCW_UI_TOKEN`~~ done: CI clones the public `HolagundiWorks/O-UI` repo (no token). Confirm the first Windows build job on GitHub succeeds | Checked: workflow clones `HolagundiWorks/O-UI` to `o-ui`; first run after the retarget has not been looked at | `.github/workflows/ci.yml` |
 | 2.2 | ~~AORMS portal sign-in / pull~~ **removed** with Connect/Bridge (2026-10-28) | n/a | — |
 | 2.3 | ~~Portal migration `0113` for AORMS sessions~~ **obsolete** after Connect removal | n/a | — |
-| 2.4 | Click through File > Import from CAD, File > Export for CAD and Take-off (Tren) with a real drawing export | Not tested | `BBSDesktop/AQC.CadImport`, `docs/bridge/`, `docs/PROJECT-FILE.md` |
-| 2.5 | Install on a **clean** machine with the Inno Setup installer and check the Start menu entry reads Falcon. On the development machine (2026-10-19) the installer upgraded an existing copy in place: it still installs to `%LOCALAPPDATA%\Programs\AQC-Core`, not `Falcon`, and the run was silent, so the Start menu text was not looked at | Partly checked | `BBSDesktop/installer/AQCCore.iss`, `build-installer.ps1` |
+| 2.4 | Click through File > Import from CAD, File > Export for CAD and Take-off (MynaCAD) with a real drawing export | Not tested | `BBSDesktop/AQC.CadImport`, `docs/bridge/`, `docs/PROJECT-FILE.md` |
+| 2.5 | Install on a **clean** machine with the Inno Setup installer and check the Start menu entry reads MynaOps. On the development machine (2026-10-19) the installer upgraded an existing copy in place: it still installs to `%LOCALAPPDATA%\Programs\AQC-Core`, not `MynaOps`, and the run was silent, so the Start menu text was not looked at | Partly checked | `BBSDesktop/installer/AQCCore.iss`, `build-installer.ps1` |
 | 2.6 | ~~Rebuild the installer~~ done (1.1.0, built and installed 2026-10-19 from `main`). `build-installer.ps1 -OfficeDllDir <folder with office.dll>` now bundles the company-file engine and fails the build if `office.dll` is missing. Reinstalled 2026-10-19 under the new name: the installer replaced the `AQC-Core` folder with `Programs\O-CoreOp`, and the app opened with the settings copied from `AQCCore` | Checked | `BBSDesktop/installer/build-installer.ps1` |
 
 ## 3. Accessibility (WCAG 2.2 AA)
 
-The full audit is in the O-STUDIO repository, `docs/wcag-audit.md`. For Falcon:
+The full audit is in the O-STUDIO repository, `docs/wcag-audit.md`. For MynaOps:
 
 | # | Item | Evidence |
 |---|---|---|
@@ -57,12 +57,12 @@ Connect/Bridge work from the former `docs/AORMS-CONNECT-HANDOFF.md` is **closed 
 
 | # | Item | Roadmap | Notes |
 |---|---|---|---|
-| 5.1 | ~~Read the shared company file~~ **done 2026-10-19.** Projects are stored in the shared company file (`project_documents`, kind `aqc.project`, revisioned, optimistic `expected_revision`, last 10 revisions kept) and sync live both ways with Kivo. The company, sign-in and users are chosen and managed in OSAS only. **Open:** clients are still not read from the company file inside Falcon; a protected (encrypted) company file stays single-program; switching company in OSAS does not move an open Falcon | 2.2 | Contract in O-STUDIO `docs/office-abi.md`, `docs/shared-company-file.md`, `docs/suite-hub.md` |
+| 5.1 | ~~Read the shared company file~~ **done 2026-10-19.** Projects are stored in the shared company file (`project_documents`, kind `aqc.project`, revisioned, optimistic `expected_revision`, last 10 revisions kept) and sync live both ways with MynaHub. The company, sign-in and users are chosen and managed in OSAS only. **Open:** clients are still not read from the company file inside MynaOps; a protected (encrypted) company file stays single-program; switching company in OSAS does not move an open MynaOps | 2.2 | Contract in O-STUDIO `docs/office-abi.md`, `docs/shared-company-file.md`, `docs/suite-hub.md` |
 | 5.2 | Produce and read `ProjectRef` and `ArtifactRef`: estimate gets an `ArtifactRef` when linked to the company file; project JSON carries `project_ref` | 2.3 | Built: `Office.Shared.ArtifactRefs`, Estimate page + `ProjectStore.ToJson`; BOQ / rate schedule ArtifactRefs and drawing `made_from` still open |
 | 5.3 | Compute and store a SHA-256 for each artifact at each revision | 2.3 | Needed for 5.2 |
-| 5.4 | An MCP server around the calculation engine (`aqc.calculate_boq`, `aqc.compare_estimates`), with the same descriptor shape as Kivo's `office-agent` | 2.5 | Writes are proposals first; today only Kivo has a server. The in-app assistant (`Services/Ai`) is separate and stays opt-in |
-| 5.5 | Estimates and running bills: Kivo reads `project_estimate_summary` + `project_ra_summary`; CoreOp also **shares drafts** into the company file for Studio approve/lock | 2.4 | Fee/RA summary **done** on Studio side. CoreOp draft share **implemented** ([STUDIO-DRAFT-SHARE.md](STUDIO-DRAFT-SHARE.md)). Studio inbox / approve / revise still open. Local Certify is interim only. **Open:** Windows GUI E2E, optional invoice ArtifactRef column, BOQ/`made_from` ArtifactRefs |
-| 5.6 | Tren bridge file: CoreOp parses `source.project_ref` (Import captions Mine/Other/missing); Draft stamps take-off `project_ref` when company-linked | (Tren repo) | Interactive Draft project-picker UI still open; offline bridge export should keep carrying the same ref |
+| 5.4 | An MCP server around the calculation engine (`aqc.calculate_boq`, `aqc.compare_estimates`), with the same descriptor shape as MynaHub's `office-agent` | 2.5 | Writes are proposals first; today only MynaHub has a server. The in-app assistant (`Services/Ai`) is separate and stays opt-in |
+| 5.5 | Estimates and running bills: MynaHub reads `project_estimate_summary` + `project_ra_summary`; CoreOp also **shares drafts** into the company file for Studio approve/lock | 2.4 | Fee/RA summary **done** on Studio side. CoreOp draft share **implemented** ([STUDIO-DRAFT-SHARE.md](STUDIO-DRAFT-SHARE.md)). Studio inbox / approve / revise still open. Local Certify is interim only. **Open:** Windows GUI E2E, optional invoice ArtifactRef column, BOQ/`made_from` ArtifactRefs |
+| 5.6 | MynaCAD bridge file: CoreOp parses `source.project_ref` (Import captions Mine/Other/missing); Draft stamps take-off `project_ref` when company-linked | (MynaCAD repo) | Interactive Draft project-picker UI still open; offline bridge export should keep carrying the same ref |
 
 ## 6. Product work, in rough order
 
@@ -72,7 +72,7 @@ Connect/Bridge work from the former `docs/AORMS-CONNECT-HANDOFF.md` is **closed 
 | 6.2 | Code signing for the installer and an update path (roadmap 3.1) — `sign.ps1` + Help → Check for updates stubs exist; need org cert + hosted channel URL |
 | 6.3 | Automated UI tests with UI Automation for the main flows, run in CI (roadmap 3.2) |
 | 6.4 | Check quantities and purchase-order output against a real project and add the cases it exposes (roadmap 3.3) |
-| 6.5 | ~~Retire the PDF take-off canvas~~ done 2026-10-19: take-off moves to Tren and is read from the project file (`docs/PROJECT-FILE.md`) |
+| 6.5 | ~~Retire the PDF take-off canvas~~ done 2026-10-19: take-off moves to MynaCAD and is read from the project file (`docs/PROJECT-FILE.md`) |
 | 6.6 | Pixel-level take-off pre-fill (deferred; needs reliable scale calibration) |
 | 6.7 | Narrow-width polish: cramped table columns and any page that was not looked at (3.2) |
 
@@ -98,7 +98,7 @@ Close the running app before rebuilding to the same folder; Windows keeps `O-Cor
 1. The licence wording and product name in `LICENSING.md` and `CONTRIBUTING.md` (section 7).
 2. Whether the PDF take-off canvas is retired (6.5).
 3. Company file remains the suite system of record for project identity after AORMS Connect removal (`source.project_ref`). Update any stale portal-id guidance in O-STUDIO `docs/contracts/refs.md` if needed.
-4. ~~Whether Falcon may require the shared company file~~ Answered: the company is chosen in OSAS and Falcon follows it. A local `.bbsproj` still works when no company is chosen; decide if that should stay.
+4. ~~Whether MynaOps may require the shared company file~~ Answered: the company is chosen in OSAS and MynaOps follows it. A local `.bbsproj` still works when no company is chosen; decide if that should stay.
 
 ## 10. Progress log
 
@@ -125,16 +125,16 @@ Close the running app before rebuilding to the same folder; Windows keeps `O-Cor
 - **Checked:** 21 new library tests (`Aorms.Connect.Tests` (removed) 109 passed) that follow the host's loop against a scripted server: one edit sends one row, a delete is sent as a delete, offline edits survive a restart and go on the next run, a catch-up is applied and does not come back as a local edit, a catch-up with unsent edits asks for review and keeps the head. The app builds and starts. **Not checked:** against the real server, the two dialogs, `MintRowIds` (it lives in the WinUI project, which has no tests), the timing on a large project.
 - **Behaviour to know:** a project opened on a computer with no baseline file takes the local file as the baseline and says so in the chip's tooltip; use Pull latest to bring in the online version. If a pull arrives while there are unsent edits to the same rows, the online version wins and the unsent edits to those rows are dropped (the dialog says so). The edit lease is taken automatically; when someone else holds it the project is read-only and the chip says so (editing is not blocked in the UI yet: the rows queue and go when the lease is free).
 
-**2026-10-19 (reading Tren's output):**
+**2026-10-19 (reading MynaCAD's output):**
 
-- Tren implemented `takeoff.record` and `takeoff.annotate` (slots, `recording` to `complete`, chunked PDF) in its repository. Falcon reads the same rows via `OspTakeoff` from the `.osp`.
-- **Read with this reader, and it agrees:** header, ids, slot (two independent `SlotFor` agree), 7 rows, nothing skipped. The **2026-10-19 fixture** still shows older gaps (rooms without level/length/breadth; openings without `wall_ref`; walls without thickness; schedule kind `Ventilator`); Falcon fills those in the preview. Current Tren writes `wall_ref`, `thickness_mm` and room sides when measured — see `AQC.CadImport/OspTakeoff.cs` and `docs/PROJECT-FILE.md`.
+- MynaCAD implemented `takeoff.record` and `takeoff.annotate` (slots, `recording` to `complete`, chunked PDF) in its repository. MynaOps reads the same rows via `OspTakeoff` from the `.osp`.
+- **Read with this reader, and it agrees:** header, ids, slot (two independent `SlotFor` agree), 7 rows, nothing skipped. The **2026-10-19 fixture** still shows older gaps (rooms without level/length/breadth; openings without `wall_ref`; walls without thickness; schedule kind `Ventilator`); MynaOps fills those in the preview. Current MynaCAD writes `wall_ref`, `thickness_mm` and room sides when measured — see `AQC.CadImport/OspTakeoff.cs` and `docs/PROJECT-FILE.md`.
 - Regression fixture `fixtures/odraft-takeoff-records.json` and `ODraftOutputTests` (10 tests); `AQC.CadImport.Tests` is 64 passed.
-- **Not checked:** Tren's real annotated PDF (its tests use a stand-in plotter), two drawings from Tren in one database, a linked project, several floors.
+- **Not checked:** MynaCAD's real annotated PDF (its tests use a stand-in plotter), two drawings from MynaCAD in one database, a linked project, several floors.
 
 **Debug pass 2026-10-19 (tests, review and driving the real app):**
 
-The app was driven through Windows UI Automation for the first time (`BBSDesktop/tests/e2e/`, see its README), against a real shared take-off server (with what Tren really wrote) and a scripted fake AORMS. Sign-in, Online projects, Push online, Pull latest and the Take-off page had never been clicked before. **Bugs found and fixed** (each with a test where the code is testable, and each re-checked in the real app):
+The app was driven through Windows UI Automation for the first time (`BBSDesktop/tests/e2e/`, see its README), against a real shared take-off server (with what MynaCAD really wrote) and a scripted fake AORMS. Sign-in, Online projects, Push online, Pull latest and the Take-off page had never been clicked before. **Bugs found and fixed** (each with a test where the code is testable, and each re-checked in the real app):
 
 | # | Bug | How it showed | Fix |
 |---|---|---|---|
@@ -146,37 +146,37 @@ The app was driven through Windows UI Automation for the first time (`BBSDesktop
 | 6 | **Settings changed on another computer never came in** on a pull | code review | the catch-up returns the server's settings and `ApplyDelta` merges them (local paths kept) |
 | 7 | The catch-up **advanced the head before the rows were applied**, so a failure while applying lost them | code review | the head moves only when there is nothing to apply, or when the caller adopts it after applying |
 | 8 | The change check **ran every second while typing** and rebuilt the whole project each time (0.3 to 0.5 s of UI time on 10 000 rows) | measured | it waits for 1.5 s of quiet; `ToSync` no longer deep-clones every row only to empty it (181 to 59 ms) |
-| 9 | A drawing Tren recorded **without a name** showed an empty title and messages like ": no annotated drawing" | the Take-off page in the real app | `TakeoffDrawing.DisplayName` ("drawing <slot>") |
+| 9 | A drawing MynaCAD recorded **without a name** showed an empty title and messages like ": no annotated drawing" | the Take-off page in the real app | `TakeoffDrawing.DisplayName` ("drawing <slot>") |
 | 10 | A compiler null warning in `ConnectClient` (the guard was a level up; made explicit) | build | none needed beyond `!` |
 
 **Checked in the real app (24 checks, all passing):** sign in (wrong password first, with its message), the chip naming the studio, a take-off imported through the UI, push online (54 rows, no local paths), the chip going to `synced`, a changed take-off reaching AORMS as exactly one row by itself, a catch-up applied (the wall then shows as changed locally) with nothing sent back, sign-out. Also on the Take-off page: the drawing list from the shared server, Read take-off and its preview, Fetch annotated drawing (PDF verified, stored, listed with Open).
 
 **Test totals:** `AQC.CadImport.Tests` 65, `Aorms.Connect.Tests` (removed) 127, `Office.Shared.Tests` 5, engine `bbs_tests` 0 failures (MSVC and clang), all passing. **Timing, 10 000 rows (release build):** a change check costs about 0.14 s, settings 0.06 s, building the JSON 0.06 s; the baseline file is written in under 0.1 s.
 
-**Still not checked:** the real AORMS server (the fake follows the contract as the library understands it); two computers editing at once (lease contention); the Online projects list with a bound project; the home screen (not built); Tren's own annotated PDF.
+**Still not checked:** the real AORMS server (the fake follows the contract as the library understands it); two computers editing at once (lease contention); the Online projects list with a bound project; the home screen (not built); MynaCAD's own annotated PDF.
 
 **2026-10-30 (`.osp` migration):** Take-off is read only from the open **`.osp`** (`OdpTakeoffAdapter`, `OspTakeoff`). Legacy docs removed; see [MIGRATION-OSP.md](MIGRATION-OSP.md). UIA e2e: `BBSDesktop/tests/e2e/uia-osp-takeoff.ps1` and `run-e2e.ps1` (9 checks on `small.osp`).
 
-**2026-10-19 (parametric walls, Tren's second hand-off):**
+**2026-10-19 (parametric walls, MynaCAD's second hand-off):**
 
-- Tren's hand-off `HANDOFF-O-COREOP-PARAMETRIC-TAKEOFF.md` is in `docs/`; answers to its questions are in that file's section 9 and in [PROJECT-FILE.md](PROJECT-FILE.md).
+- MynaCAD's hand-off `HANDOFF-O-COREOP-PARAMETRIC-TAKEOFF.md` is in `docs/`; answers to its questions are in that file's section 9 and in [PROJECT-FILE.md](PROJECT-FILE.md).
 - **Reader:** a wall row with `thickness_mm` (a parametric `PW-` wall) is used as given; a brick take-off wall with none takes its thickness from its layer (`MEASURE-FULLBRICK` 230, `MEASURE-HALFBRICK` 115); optional `material` accepted (`rcc` skipped, `block.concrete` as Cement Block). `ParametricWallTests` 11.
-- **Historical:** Tren once wrote sidecar `.vdb` files; take-off now lives in `.osp`.
+- **Historical:** MynaCAD once wrote sidecar `.vdb` files; take-off now lives in `.osp`.
 - `AQC.CadImport.Tests` — run `dotnet test` for current count (88 at last check).
-- **Not checked:** two parametric walls meeting at a corner (Tren's slice has one wall), `material`/`finish` from a real Tren file (it does not write them yet), and the real annotated PDF.
+- **Not checked:** two parametric walls meeting at a corner (MynaCAD's slice has one wall), `material`/`finish` from a real MynaCAD file (it does not write them yet), and the real annotated PDF.
 
 **2026-10-19 (hub merge and install):**
 
-- `origin/main` (project sync, Tren reading, annotated drawings, debug pass) was merged into the company-live-sync branch with no conflicts, and the result went to `main` as a fast-forward (`b67710a`). After the merge `Office.Shared.Tests` (6) and `AQC.CadImport.Tests` (65) pass and the app builds in Release. `Aorms.Connect.Tests` (removed) was not re-run after the merge.
-- Falcon 1.1.0 was built and installed on the development machine, with `office.dll` copied in by hand (see 2.6).
+- `origin/main` (project sync, MynaCAD reading, annotated drawings, debug pass) was merged into the company-live-sync branch with no conflicts, and the result went to `main` as a fast-forward (`b67710a`). After the merge `Office.Shared.Tests` (6) and `AQC.CadImport.Tests` (65) pass and the app builds in Release. `Aorms.Connect.Tests` (removed) was not re-run after the merge.
+- MynaOps 1.1.0 was built and installed on the development machine, with `office.dll` copied in by hand (see 2.6).
 - **Not done:** a run of the installed app against the company file after the merge (the merged sync host and the shared-company code were not driven together); `uia-sync-e2e.ps1` was not re-run.
 
 **2026-10-19 (documents print from the company file):**
 
-- For a project linked to the company file, `ProjectInfo.ApplyCompanyFile` takes the company's name, address, phone, email, GSTIN and PAN (kept in OSAS) and the project's name, site and client (kept in Kivo) from the engine's `document_context` call, through `SharedCompany.DocumentContext`. It runs when a project is opened, reloaded, and whenever the data version moves. The PM party follows (`PartyBook.FollowCompanyFile`), so reports, estimates and purchase orders print the current firm. Settings fields for these are read-only and name where to change them. 7 `Office.Shared` tests, including this call against the real engine.
-- **Not checked:** the Settings page and a report in the running app; a PDF made after changing the company details in OSAS. The CIN, logo and signatory are still Falcon's own. Projects not linked to a company file are unchanged.
+- For a project linked to the company file, `ProjectInfo.ApplyCompanyFile` takes the company's name, address, phone, email, GSTIN and PAN (kept in OSAS) and the project's name, site and client (kept in MynaHub) from the engine's `document_context` call, through `SharedCompany.DocumentContext`. It runs when a project is opened, reloaded, and whenever the data version moves. The PM party follows (`PartyBook.FollowCompanyFile`), so reports, estimates and purchase orders print the current firm. Settings fields for these are read-only and name where to change them. 7 `Office.Shared` tests, including this call against the real engine.
+- **Not checked:** the Settings page and a report in the running app; a PDF made after changing the company details in OSAS. The CIN, logo and signatory are still MynaOps's own. Projects not linked to a company file are unchanged.
 
 **2026-10-20 (checked in the running app, and the take-off names its project):**
 
-- **Checked in the installed app** with a throw-away company (random password, nothing of the practice's data): OSAS signed in, Falcon opened from its card already signed in as the same person (`Company · Demo Studio`), the Company projects list showed `Mehta residence · Mehta family · Plot 4, Hospet`, and after opening it the title read `Falcon — Mehta residence`, the dashboard showed `Plot 4, Hospet · Client: Mehta family · Demo Studio`, and the report persona read `Project Manager · Demo Studio`. The company and project details therefore reach the app from OSAS and Kivo. Still not looked at: a printed report or PDF, and a change made in OSAS while the project is open.
-- The Take-off page recognises a drawing as this project's when its header names the project by `source.project_ref` (the company file and project id) (`TakeoffDrawing.ProjectRefCompany` / `ProjectRefId`; `AQC.CadImport.Tests`). AORMS `project_office_id` grouping was removed with Connect. Needs Tren with the matching `project_ref` change.
+- **Checked in the installed app** with a throw-away company (random password, nothing of the practice's data): OSAS signed in, MynaOps opened from its card already signed in as the same person (`Company · Demo Studio`), the Company projects list showed `Mehta residence · Mehta family · Plot 4, Hospet`, and after opening it the title read `MynaOps — Mehta residence`, the dashboard showed `Plot 4, Hospet · Client: Mehta family · Demo Studio`, and the report persona read `Project Manager · Demo Studio`. The company and project details therefore reach the app from OSAS and MynaHub. Still not looked at: a printed report or PDF, and a change made in OSAS while the project is open.
+- The Take-off page recognises a drawing as this project's when its header names the project by `source.project_ref` (the company file and project id) (`TakeoffDrawing.ProjectRefCompany` / `ProjectRefId`; `AQC.CadImport.Tests`). AORMS `project_office_id` grouping was removed with Connect. Needs MynaCAD with the matching `project_ref` change.
