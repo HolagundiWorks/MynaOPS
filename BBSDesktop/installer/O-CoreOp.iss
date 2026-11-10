@@ -77,7 +77,7 @@ Type: filesandordirs; Name: "{localappdata}\Programs\AQC-Core"
 ; Earlier Setups used the old name for the Start menu folder.
 Type: filesandordirs; Name: "{userprograms}\O-CoreOp"
 Type: files; Name: "{userdesktop}\O-CoreOp.lnk"
-; Falcon no longer reads the company file, so versions up to 1.6.0 left an office.dll behind that nothing uses.
+; Falcon no longer reads the company file, so versions up to 1.6.1 left an office.dll behind that nothing uses.
 Type: files; Name: "{app}\office.dll"
 Type: files; Name: "{app}\AQCCore.*"
 
