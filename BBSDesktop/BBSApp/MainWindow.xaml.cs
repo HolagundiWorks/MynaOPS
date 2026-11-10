@@ -128,6 +128,9 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             ApplyBrandingChrome();
             _askBar?.Retheme();
             StatusStrip.Retheme();
+            // The pages are built in code and take their brushes when they are made, so the page that is showing is made again in the new theme.
+            if (!string.IsNullOrEmpty(_activeTag))
+                NavigateTo(_activeTag);
         });
     }
 
