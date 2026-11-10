@@ -119,6 +119,9 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             if (Content is FrameworkElement root)
                 root.RequestedTheme = O.Ui.SuiteAppearance.Current;
             AppNav.RequestedTheme = O.Ui.SuiteAppearance.Current;
+            // The pages sit in the work area: without an explicit theme of its own it kept the colours of the theme it was created in (a black page under a white
+            // ribbon after switching to light, found 2026-11-10).
+            WorkArea.RequestedTheme = O.Ui.SuiteAppearance.Current;
             // Rebuild the ribbon model so ImageIcon sources pick up the active theme dictionary (light/dark SVG).
             BuildRibbonModel();
             BuildNavigation();
