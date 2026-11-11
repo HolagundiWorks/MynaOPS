@@ -30,7 +30,7 @@ This page is the living checklist for retiring the old take-off store (ShilpiDB,
 - Take-off reader: `AQC.CadImport/OspTakeoff.cs`, tests `OspTakeoffTests.cs`.
 - Project file I/O: `Office.Shared/OdpFile.cs`, `BBSApp/Services/Odp/*`, `ProjectFiles.cs`, `TakeoffPage.cs`.
 - ShilpiDB connectors, gateway client, and duplicate `Services/Shilpi/` removed (re-delete if they reappear from an old branch).
-- Docs: `PROJECT-FILE.md`, `SUITE.md`, `HANDOFF-O-COREOP-PARAMETRIC-TAKEOFF.md`, `CLAUDE.md`, `CHANGELOG` pointer, `HANDOFF-O-COREOP.md`.
+- Docs: `PROJECT-FILE.md`, `SUITE.md`, `HANDOFF-MynaOps-PARAMETRIC-TAKEOFF.md`, `CLAUDE.md`, `CHANGELOG` pointer, `HANDOFF-MynaOps.md`.
 - **UIA e2e:** `tests/e2e/uia-osp-takeoff.ps1`, `run-e2e.ps1` (9 checks on `Office.Shared.Tests/Fixtures/small.osp`).
 - **Draft → CoreOp on a new `.osp`:** `tests/e2e/seed-fresh-osp.ps1`, `e2e-draft-coreop-takeoff.ps1` (MynaCAD + interactive desktop; `aad-cli` `takeoff.record` + optional MynaCAD WinUI open + CoreOp import preview with rows to add).
 - **`bbs_engine.dll`:** built with VS Build Tools + `cmake` in `BBSDesktop/build` (copy beside `O-CoreOp.exe` for local runs).
@@ -83,7 +83,7 @@ This page is the living checklist for retiring the old take-off store (ShilpiDB,
 | Format + sync roadmap | MynaHub `docs/ODP-PROJECT-FILE-AND-SYNC.md` |
 | MynaCAD project file | MynaCAD `docs/PROJECT-FILE.md` |
 | Bridge / CAD import | `docs/bridge/`, `docs/AADT.md` |
-| Parametric walls hand-off | `docs/HANDOFF-O-COREOP-PARAMETRIC-TAKEOFF.md` |
+| Parametric walls hand-off | `docs/HANDOFF-MynaOps-PARAMETRIC-TAKEOFF.md` |
 | Record layout | `AQC.CadImport/OspTakeoff.cs`, `docs/bridge/`, fixtures `odraft-takeoff-records.json` |
 | Manual UIA e2e | MynaOps `BBSDesktop/tests/e2e/README.md` |
 

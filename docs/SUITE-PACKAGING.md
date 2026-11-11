@@ -10,9 +10,9 @@ MynaOps is installed through **`Myna-Setup-<version>.exe`**, built in the MynaHu
 Build this app’s payload first:
 
 ```powershell
-# From O-STUDIO repo: cargo build --release -p office-ffi  (or office-ffi folder)
+# From MynaHub repo: cargo build --release -p office-ffi  (or office-ffi folder)
 powershell -ExecutionPolicy Bypass -File BBSDesktop\installer\build-installer.ps1 `
-  -OfficeDllDir D:\path\to\O-STUDIO\office-ffi\target\release
+  -OfficeDllDir D:\path\to\MynaHub\office-ffi\target\release
 ```
 
 Output: `BBSDesktop/artifacts/installer/O-CoreOp-Setup-<ver>.exe` (Inno Setup, per user). The suite builder copies it to `installer/suite/stage/` and runs it silently during Myna Suite install.
