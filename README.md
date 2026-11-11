@@ -1,6 +1,6 @@
 # MynaOps
 
-**MynaOps** is the quantities, estimates and billing app in the **MynaHub suite**. The project file extension `.bbsproj` keeps its name because saved projects use it. Earlier versions installed as `AQCCore.exe`; the installer replaces them and the app copies the settings from `%LocalAppData%\AQCCore` on first run.
+**MynaOps** is the quantities, estimates and billing app in the **Myna suite**. The project file extension `.bbsproj` keeps its name because saved projects use it. Earlier versions installed as `AQCCore.exe`; the installer replaces them and the app copies the settings from `%LocalAppData%\AQCCore` on first run.
 
 > **The suite:** names, roles, file formats, toolbars of every app and how they link in real time are in [docs/SUITE.md](docs/SUITE.md).
 
@@ -18,9 +18,9 @@ Quantities follow IS 456 / IS 1200–derived conventions — always cross-check 
 
 ## The interface
 
-![MynaOps before a project is loaded: module tabs, sub-tabs, and a card that sends you to Myna](docs/images/coreop-start.png)
+![MynaOps before a project is loaded: module tabs, sub-tabs, and a card shown when no project is open](docs/images/coreop-start.png)
 
-MynaOps works on **one project at a time, chosen in Myna**. Started without one it shows the card above; **Open Myna** takes you there, and once a project is locked MynaOps opens on it with the company's details read from MynaHub.
+MynaOps works on **one project at a time**, the shared project file (`.osp`) that MynaCAD also opens. Started without a project it shows the card above. MynaOps needs no sign-in and no MynaHub; project data reaches the company database only through the CSV export that MynaHub imports.
 
 | Area | What it is |
 |---|---|
@@ -130,7 +130,7 @@ Output: `BBSDesktop\artifacts\msix\*.msix`
 
 ## Branding
 
-- Product: **MynaOps**, part of the MynaHub suite  
+- Product: **MynaOps**, part of the Myna suite  
 - Developer: **Human Centric Works, Hospet**  
 - Logo: `BBSDesktop/BBSApp/Assets/logo.png`
 
