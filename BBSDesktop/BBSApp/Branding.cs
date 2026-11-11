@@ -33,7 +33,7 @@ public static class Branding
     public const string Copyright = "© Human Centric Works · Hospet";
     public const string LicenseName = "GNU AGPL v3 (Community) or Commercial";
     public const string LicenseUrl = "https://www.gnu.org/licenses/agpl-3.0.html";
-    public const string SuiteUrl = "https://github.com/holagundiworks/o-studio";
+    public const string SuiteUrl = "https://github.com/HolagundiWorks/MynaHub";
 
     /// <summary>%LocalAppData% folder. Earlier versions used AQCCore; the first run copies that folder here and leaves it in place.</summary>
     public const string AppDataFolder = "O-CoreOp";

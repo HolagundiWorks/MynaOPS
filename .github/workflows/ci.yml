@@ -15,7 +15,7 @@ jobs:
           path: aqc
       - uses: actions/checkout@v4
         with:
-          repository: HolagundiWorks/O-UI
+          repository: HolagundiWorks/MynaUI
           path: MynaUI
       # O-UI #3 left WidgetWindow internal and an ambiguous Path in PomodoroWidget;
       # CoreOp needs that tip for SuiteAppearance/SuiteDark. Patch until O-UI ships the fix.

@@ -32,11 +32,11 @@ jobs:
           path: aqc
       - uses: actions/checkout@v4
         with:
-          repository: HolagundiWorks/O-UI
+          repository: HolagundiWorks/MynaUI
           path: MynaUI
       - uses: actions/checkout@v4
         with:
-          repository: HolagundiWorks/O-STUDIO
+          repository: HolagundiWorks/MynaHub
           path: o-studio
       - uses: actions/setup-dotnet@v4
         with:
