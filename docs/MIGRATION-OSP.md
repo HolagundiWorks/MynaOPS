@@ -32,7 +32,7 @@ This page is the living checklist for retiring the old take-off store (ShilpiDB,
 - ShilpiDB connectors, gateway client, and duplicate `Services/Shilpi/` removed (re-delete if they reappear from an old branch).
 - Docs: `PROJECT-FILE.md`, `SUITE.md`, `HANDOFF-O-COREOP-PARAMETRIC-TAKEOFF.md`, `CLAUDE.md`, `CHANGELOG` pointer, `HANDOFF-O-COREOP.md`.
 - **UIA e2e:** `tests/e2e/uia-osp-takeoff.ps1`, `run-e2e.ps1` (9 checks on `Office.Shared.Tests/Fixtures/small.osp`).
-- **Draft → CoreOp on a new `.osp`:** `tests/e2e/seed-fresh-osp.ps1`, `e2e-draft-coreop-takeoff.ps1` (O-DRAFT-main + interactive desktop; `aad-cli` `takeoff.record` + optional MynaCAD WinUI open + CoreOp import preview with rows to add).
+- **Draft → CoreOp on a new `.osp`:** `tests/e2e/seed-fresh-osp.ps1`, `e2e-draft-coreop-takeoff.ps1` (MynaCAD + interactive desktop; `aad-cli` `takeoff.record` + optional MynaCAD WinUI open + CoreOp import preview with rows to add).
 - **`bbs_engine.dll`:** built with VS Build Tools + `cmake` in `BBSDesktop/build` (copy beside `O-CoreOp.exe` for local runs).
 - **`dotnet test`:** `AQC.CadImport.Tests` (88), `Office.Shared.Tests` (91) — run before release.
 

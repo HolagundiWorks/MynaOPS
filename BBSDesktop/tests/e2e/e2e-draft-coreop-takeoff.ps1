@@ -15,16 +15,16 @@ $coreRoot = Resolve-Path (Join-Path $here "..\..")
 function Get-ODraftRoot([string]$Hint) {
   if ($Hint -and (Test-Path (Join-Path $Hint "Cargo.toml"))) { return (Resolve-Path $Hint).Path }
   foreach ($c in @(
-      (Join-Path $here "..\..\..\O-DRAFT-main"),
-      (Join-Path $here "..\..\..\..\O-DRAFT-main"),
-      "D:\Work Development\Repos\O-DRAFT-main"
+      (Join-Path $here "..\..\..\MynaCAD"),
+      (Join-Path $here "..\..\..\..\MynaCAD"),
+      "D:\Work Development\Repos\MynaCAD"
     )) {
     try {
       $p = (Resolve-Path $c -ErrorAction Stop).Path
       if (Test-Path (Join-Path $p "Cargo.toml")) { return $p }
     } catch { }
   }
-  throw "Set -ODraftRoot to O-DRAFT-main."
+  throw "Set -ODraftRoot to MynaCAD."
 }
 
 & (Join-Path $here "seed-fresh-osp.ps1") -OutOsp $Osp -ODraftRoot $ODraftRoot
@@ -49,7 +49,7 @@ if (-not $SkipDraftWinUi) {
   }
   if (-not (Test-Path $draftExe)) { throw "Missing $draftExe (build MynaCAD WinUI or pass -SkipDraftWinUi)" }
   if (-not (Test-Path (Join-Path $DraftOutDir "aad_host.dll"))) {
-    throw "Missing aad_host.dll beside ODraft.WinUi.exe — run: cargo build -p aad-host in O-DRAFT-main"
+    throw "Missing aad_host.dll beside ODraft.WinUi.exe — run: cargo build -p aad-host in MynaCAD"
   }
   & (Join-Path $here "uia-odraft-osp.ps1") -Exe $draftExe -Osp $Osp
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

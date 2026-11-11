@@ -2,7 +2,7 @@
 param(
   [string]$Dwg = "$env:USERPROFILE\OneDrive\Documents\OSAS TEST\DEMO.dwg",
   [string]$Osp = "$env:TEMP\demo-dwg.osp",
-  [string]$ODraftRoot = "D:\Work Development\Repos\O-DRAFT-main",
+  [string]$ODraftRoot = "D:\Work Development\Repos\MynaCAD",
   [switch]$LaunchApps
 )
 $ErrorActionPreference = "Stop"

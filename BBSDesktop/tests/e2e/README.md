@@ -7,7 +7,7 @@ powershell -File BBSDesktop\tests\e2e\run-e2e.ps1
 # Fixture .osp (take-off already in file):
 powershell -File BBSDesktop\tests\e2e\uia-osp-takeoff.ps1 -Exe $exe -Osp (Resolve-Path BBSDesktop\Office.Shared.Tests\Fixtures\small.osp)
 
-# Fresh .osp: MynaCAD engine takeoff.record → MynaOps import (needs O-DRAFT-main beside repo):
+# Fresh .osp: MynaCAD engine takeoff.record → MynaOps import (needs MynaCAD beside repo):
 powershell -File BBSDesktop\tests\e2e\e2e-draft-coreop-takeoff.ps1
 # Engine only (skip MynaCAD WinUI launch): -SkipDraftWinUi
 ```

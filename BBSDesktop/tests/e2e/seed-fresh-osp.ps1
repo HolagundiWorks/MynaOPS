@@ -10,9 +10,9 @@ function Resolve-ODraftRoot {
   param([string]$Hint)
   if ($Hint -and (Test-Path (Join-Path $Hint "Cargo.toml"))) { return (Resolve-Path $Hint).Path }
   $candidates = @(
-    (Join-Path $PSScriptRoot "..\..\..\O-DRAFT-main"),
-    (Join-Path $PSScriptRoot "..\..\..\..\O-DRAFT-main"),
-    "D:\Work Development\Repos\O-DRAFT-main"
+    (Join-Path $PSScriptRoot "..\..\..\MynaCAD"),
+    (Join-Path $PSScriptRoot "..\..\..\..\MynaCAD"),
+    "D:\Work Development\Repos\MynaCAD"
   )
   foreach ($c in $candidates) {
     try {
@@ -20,7 +20,7 @@ function Resolve-ODraftRoot {
       if (Test-Path (Join-Path $p "Cargo.toml")) { return $p }
     } catch { }
   }
-  throw "Set -ODraftRoot to your O-DRAFT-main clone (needs apps/aad-cli and scripts/e2e-house-takeoff.scr)."
+  throw "Set -ODraftRoot to your MynaCAD clone (needs apps/aad-cli and scripts/e2e-house-takeoff.scr)."
 }
 
 $ODraftRoot = Resolve-ODraftRoot $ODraftRoot
