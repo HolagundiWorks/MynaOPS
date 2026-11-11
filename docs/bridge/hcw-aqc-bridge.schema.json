@@ -47,7 +47,9 @@
           "slab_thickness_mm": { "type": "number", "minimum": 0 },
           "beam_depth_mm": { "type": "number", "minimum": 0, "description": "AQC computes the clear column height as height - slab - beam depth." },
           "ceiling_mm": { "type": "number", "minimum": 0 },
-          "lintel_bottom_mm": { "type": "number", "minimum": 0 }
+          "lintel_bottom_mm": { "type": "number", "minimum": 0 },
+          "id": { "type": "integer", "minimum": 0, "description": "Optional. The MynaCAD level's stable id; rows name it in `level_id` (LEVEL-IDS.md)." },
+          "elevation_mm": { "type": "number", "description": "Optional. Floor elevation above the site datum." }
         }
       }
     },
@@ -62,6 +64,7 @@
           "bill_phase": { "type": "string", "description": "Running-bill phase chosen in O-Draft (optional)." },
           "ref": { "type": "string", "minLength": 1, "description": "The plugin's wall id, for example W0001." },
           "level": { "type": "string" },
+          "level_id": { "type": "integer", "minimum": 0, "description": "Optional. The stable id of the MynaCAD level the row was measured on (see LEVEL-IDS.md); `level` stays the name." },
           "length_mm": { "type": "number", "exclusiveMinimum": 0, "description": "Centre-line length." },
           "height_mm": { "type": "number", "exclusiveMinimum": 0 },
           "thickness_mm": { "type": "number", "exclusiveMinimum": 0 },
@@ -82,6 +85,7 @@
           "kind": { "enum": ["Door", "Window"] },
           "mark": { "type": "string", "description": "Standard marks: D1 800, D2 900, D3 1200; W1 600, W2 900, W3 1200, W4 1500, W5 2000; V1 600 (a ventilator is a window)." },
           "level": { "type": "string" },
+          "level_id": { "type": "integer", "minimum": 0, "description": "Optional. The stable id of the MynaCAD level the row was measured on (see LEVEL-IDS.md); `level` stays the name." },
           "width_mm": { "type": "number", "exclusiveMinimum": 0 },
           "height_mm": { "type": "number", "exclusiveMinimum": 0 },
           "sill_mm": { "type": "number", "minimum": 0 },
@@ -117,6 +121,7 @@
           "ref": { "type": "string", "minLength": 1 },
           "mark": { "type": "string" },
           "level": { "type": "string" },
+          "level_id": { "type": "integer", "minimum": 0, "description": "Optional. The stable id of the MynaCAD level the row was measured on (see LEVEL-IDS.md); `level` stays the name." },
           "width_mm": { "type": "number", "exclusiveMinimum": 0 },
           "depth_mm": { "type": "number", "exclusiveMinimum": 0 }
         }
@@ -133,6 +138,7 @@
           "ref": { "type": "string", "minLength": 1 },
           "mark": { "type": "string" },
           "level": { "type": "string" },
+          "level_id": { "type": "integer", "minimum": 0, "description": "Optional. The stable id of the MynaCAD level the row was measured on (see LEVEL-IDS.md); `level` stays the name." },
           "opening_mm": { "type": "number", "exclusiveMinimum": 0 },
           "bearing_mm": { "type": "number", "minimum": 0 },
           "width_mm": { "type": "number", "exclusiveMinimum": 0 },
@@ -149,6 +155,7 @@
           "ref": { "type": "string", "minLength": 1 },
           "name": { "type": "string" },
           "level": { "type": "string" },
+          "level_id": { "type": "integer", "minimum": 0, "description": "Optional. The stable id of the MynaCAD level the row was measured on (see LEVEL-IDS.md); `level` stays the name." },
           "area_m2": { "type": "number", "exclusiveMinimum": 0 },
           "length_mm": { "type": "number", "minimum": 0 },
           "breadth_mm": { "type": "number", "minimum": 0 }
@@ -165,6 +172,7 @@
           "bill_phase": { "type": "string", "description": "Running-bill phase chosen in O-Draft (optional)." },
           "ref": { "type": "string", "minLength": 1 },
           "level": { "type": "string" },
+          "level_id": { "type": "integer", "minimum": 0, "description": "Optional. The stable id of the MynaCAD level the row was measured on (see LEVEL-IDS.md); `level` stays the name." },
           "area_m2": { "type": "number", "exclusiveMinimum": 0 },
           "thickness_mm": { "type": "number", "exclusiveMinimum": 0 },
           "length_mm": { "type": "number", "minimum": 0 },

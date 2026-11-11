@@ -71,7 +71,8 @@ public sealed class BridgeFile
 
         if (root["levels"] is JsonArray la)
             foreach (var o in la.OfType<JsonObject>())
-                f.Levels.Add(new BridgeLevel(Str(o, "name"), Num(o, "height_mm"), Num(o, "slab_thickness_mm"), Num(o, "beam_depth_mm")));
+                f.Levels.Add(new BridgeLevel(Str(o, "name"), Num(o, "height_mm"), Num(o, "slab_thickness_mm"), Num(o, "beam_depth_mm"),
+                    Id: WholeId(Num(o, "id")), ElevationMm: Num(o, "elevation_mm")));
 
         Fill(root, "walls", f.Walls);
         Fill(root, "openings", f.Openings);
@@ -109,6 +110,11 @@ public sealed class BridgeFile
         if (root[key] is JsonArray a) into.AddRange(a.OfType<JsonObject>());
     }
 
+    static int? WholeId(double? d) => d is { } v && v >= 0 && v <= int.MaxValue && v == Math.Floor(v) ? (int)v : null;
+
+    /// <summary>The optional <c>level_id</c> of a row (the MynaCAD level's stable id), or null when the row has none or it is not a whole number.</summary>
+    public static int? LevelIdOf(JsonObject row) => WholeId(Num(row, "level_id"));
+
     internal static string Str(JsonObject o, string key) =>
         o[key] is JsonValue v ? v.ToString() : "";
 
@@ -119,7 +125,8 @@ public sealed class BridgeFile
     }
 }
 
-public sealed record BridgeLevel(string Name, double? HeightMm, double? SlabThicknessMm, double? BeamDepthMm);
+/// <summary>One entry of the file's <c>levels</c>. <c>Id</c> and <c>ElevationMm</c> are the optional named-level fields (docs/bridge/LEVEL-IDS.md); both are null in a file written before they existed.</summary>
+public sealed record BridgeLevel(string Name, double? HeightMm, double? SlabThicknessMm, double? BeamDepthMm, int? Id = null, double? ElevationMm = null);
 
 public sealed class BridgeFormatException : Exception
 {

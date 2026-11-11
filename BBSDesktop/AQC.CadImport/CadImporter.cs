@@ -80,11 +80,8 @@ public static class CadImporter
         var seen = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
         // a row with no level (MynaCAD does not always write one) belongs to the file's floor when the file has only one
-        string LevelName(JsonObject o)
-        {
-            var n = BridgeFile.Str(o, "level");
-            return n.Length == 0 && file.Levels.Count == 1 ? file.Levels[0].Name : n;
-        }
+        // a row's optional level_id (MynaCAD's stable level id) wins over its level name when the file lists that id
+        string LevelName(JsonObject o) => TakeoffLevels.LevelNameOf(file, o);
 
         string? Lvl(JsonObject o, string section, string refId, string mark)
         {
