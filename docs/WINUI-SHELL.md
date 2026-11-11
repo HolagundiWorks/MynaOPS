@@ -1,8 +1,8 @@
 # MynaOps WinUI shell (MynaHub suite)
 
-**Status:** compact density from O-UI · text-tab ribbons · **Updated:** 2026-11-06  
+**Status:** compact density from MynaUI · text-tab ribbons · **Updated:** 2026-11-06  
 **App:** `BBSDesktop/BBSApp` (assembly `MynaOps` · display **MynaOps**)  
-**Canon:** esti [`DESKTOP-WINUI-UX.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/DESKTOP-WINUI-UX.md) · [`o-ui-UX-PRINCIPLES.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/o-ui-UX-PRINCIPLES.md)
+**Canon:** esti [`DESKTOP-WINUI-UX.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/DESKTOP-WINUI-UX.md) · [`MynaUI-UX-PRINCIPLES.md`](https://github.com/HolagundiWorks/aorms/blob/main/docs/esti/MynaUI-UX-PRINCIPLES.md)
 
 ## Branding
 
@@ -41,7 +41,7 @@ Notice row and calculator row — docked above the status strip, they push the p
 
 MynaHub (the office app) has the same structure: a menu bar, a left pane grouped by job, and the page (MynaOps now uses two ribbons of text tabs instead of the left pane; the two apps are no longer the same here). Keep the two in step when either changes. The earlier ribbon, command strip, action dock and bottom taskbar were removed; New and Save are in the File menu.
 
-Themes: `OUiTheme.xaml` · `OUiFluentBridge.xaml` · `FluentTokens.xaml`, over the suite scale in O-UI. **Sizes, type and corners follow the compact density in [UI-SIZING.md](UI-SIZING.md)** (26 controls, 28 tabs, 24 menu bar, 22 status strip, 12 / 13 / 18 type, 4 corners).
+Themes: `OUiTheme.xaml` · `OUiFluentBridge.xaml` · `FluentTokens.xaml`, over the suite scale in MynaUI. **Sizes, type and corners follow the compact density in [UI-SIZING.md](UI-SIZING.md)** (26 controls, 28 tabs, 24 menu bar, 22 status strip, 12 / 13 / 18 type, 4 corners).
 
 ## Build / run (unpackaged)
 

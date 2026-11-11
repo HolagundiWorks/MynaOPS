@@ -94,7 +94,7 @@ AORMS Connect / Bridge (sign-in, Online projects, Push/Pull, Bind/Flush, outbox)
 8. A notice when MynaCAD has re-recorded a drawing since it was imported.
 9. MynaCAD side (not in this repository): `takeoff.record`, stable `refs`, slab spans, `takeoff.annotate`, room/entity level, `wall_ref` on deduct openings, A-WALL face thickness, and take-off honesty notes are built. Still open there: product E2E against live CoreOp on a shared `.osp`, scanned-PDF underlay polish, interactive company-file project picker UI. See [MIGRATION-OSP.md](MIGRATION-OSP.md).
 
-**Suite joins** (O-STUDIO roadmap numbers): shared company file + live sync (2.2); `ProjectRef` / estimate `ArtifactRef` stamped on company-file saves and Estimate page (2.3); MynaHub fee proposals + RA summary via `project_estimate_summary` / `project_ra_summary` (2.4); **share estimate / RA drafts to Studio** via `aqc.estimate.draft` / `aqc.ra.draft.*` ([STUDIO-DRAFT-SHARE.md](STUDIO-DRAFT-SHARE.md)); Studio inbox approve/lock still open; MCP server still open (2.5). Suite-linked CoreOp no longer creates clients/projects (use Studio). Next trust gate: human/Windows GUI E2E.
+**Suite joins** (MynaHub roadmap numbers): shared company file + live sync (2.2); `ProjectRef` / estimate `ArtifactRef` stamped on company-file saves and Estimate page (2.3); MynaHub fee proposals + RA summary via `project_estimate_summary` / `project_ra_summary` (2.4); **share estimate / RA drafts to Studio** via `aqc.estimate.draft` / `aqc.ra.draft.*` ([STUDIO-DRAFT-SHARE.md](STUDIO-DRAFT-SHARE.md)); Studio inbox approve/lock still open; MCP server still open (2.5). Suite-linked CoreOp no longer creates clients/projects (use Studio). Next trust gate: human/Windows GUI E2E.
 
 **Product**
 

@@ -89,4 +89,4 @@ Existing project quantities document remains `aqc.project` (unchanged).
 
 ## 7. CI note
 
-CoreOp CI applies a temporary post-checkout patch for O-UI widget accessibility (`WidgetWindow` public; Pomodoro `Path` qualified) until O-UI lands the same fix.
+CoreOp CI applies a temporary post-checkout patch for MynaUI widget accessibility (`WidgetWindow` public; Pomodoro `Path` qualified) until MynaUI lands the same fix.

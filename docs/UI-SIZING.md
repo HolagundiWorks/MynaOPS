@@ -1,12 +1,12 @@
 # UI sizing
 
-MynaOps follows the suite's compact density, set in the shared UI library **O-UI** (`O.Ui`, `Themes/SuiteStyles.xaml` and `SuiteScale`) and taken from MynaCAD's shell. MynaHub, MynaCAD and MynaOps use the same numbers. This page lists them and says where MynaOps reads them from. When the library changes, change these lists to match; do not set a size in a page when a token exists.
+MynaOps follows the suite's compact density, set in the shared UI library **MynaUI** (`O.Ui`, `Themes/SuiteStyles.xaml` and `SuiteScale`) and taken from MynaCAD's shell. MynaHub, MynaCAD and MynaOps use the same numbers. This page lists them and says where MynaOps reads them from. When the library changes, change these lists to match; do not set a size in a page when a token exists.
 
 ## The scale
 
 All values are DIPs.
 
-| Token (O-UI) | Value | Used for |
+| Token (MynaUI) | Value | Used for |
 |---|---|---|
 | `SuiteControlMinHeight` / `SuiteToolTile` | 26 | Buttons, text boxes, combo boxes, number boxes, text tools |
 | `SuiteControlHeightCompact` | 22 | Menu and list rows, dense toolbar buttons, port rows on the data-model canvas |

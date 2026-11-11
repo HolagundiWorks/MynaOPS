@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-test:
-    # Public shared design library (assembly O.Ui), checked out beside this repo as o-ui.
+    # Public shared design library (assembly O.Ui), checked out beside this repo as MynaUI.
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,11 +16,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: HolagundiWorks/O-UI
-          path: o-ui
+          path: MynaUI
       # O-UI #3 left WidgetWindow internal and an ambiguous Path in PomodoroWidget;
       # CoreOp needs that tip for SuiteAppearance/SuiteDark. Patch until O-UI ships the fix.
       - name: Patch O-UI widget build break
-        working-directory: o-ui
+        working-directory: MynaUI
         shell: pwsh
         run: |
           $ww = 'O.Ui/Widgets/WidgetWindow.cs'
