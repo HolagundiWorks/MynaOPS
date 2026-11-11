@@ -1,4 +1,4 @@
-# AQC: notes for any Claude agent in this repo
+# MynaOps: notes for any Claude agent in this repo
 
 **Quantity take-off from drawings and PDFs is done in MynaCAD** (repository `HolagundiWorks/MynaCAD`, earlier AADT), **not in MynaOps. MynaCAD writes the take-off** (`takeoff.record` / `takeoff.annotate`) **into the shared project file (`.osp`)** that both apps open; MynaCAD also generates the annotated drawing PDF, which MynaOps stores. **MynaOps reads it from there** (Project > Take-off (MynaCAD); row layout matches `hcw-aqc-bridge` v1 — see [docs/bridge/](docs/bridge/) and [docs/PROJECT-FILE.md](docs/PROJECT-FILE.md)). The MynaOps PDF take-off panel was removed on 2026-10-19. The bridge file (`hcw-aqc-bridge` v1, millimetres, [docs/bridge/](docs/bridge/)) stays as the offline path and as the format of each take-off row. Remaining trust work is product E2E (Windows GUI) and PDF underlay polish. The AutoCAD plugin hcwCAD-KIT is dropped. MynaOps imports the measured facts and does everything after: derived quantities, rates, estimates, bar bending schedules.
 
