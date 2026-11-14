@@ -96,7 +96,7 @@ public static class TakeoffLevels
         return new BridgeFile
         {
             DrawingId = file.DrawingId, Drawing = file.Drawing, ProjectRefCompany = file.ProjectRefCompany, ProjectRefId = file.ProjectRefId,
-            Project = file.Project, IsLevelFiltered = true,
+            Project = file.Project, WholeFileLevels = file.WholeFileLevels ?? file.Levels,
             Levels = file.Levels.Where(l => keep.Contains(l.Name)).ToList(),
             Walls = Pick(file.Walls), Openings = Pick(file.Openings), OpeningSchedule = Pick(file.OpeningSchedule),
             Columns = Pick(file.Columns), Lintels = Pick(file.Lintels), Rooms = Pick(file.Rooms), Slabs = Pick(file.Slabs),

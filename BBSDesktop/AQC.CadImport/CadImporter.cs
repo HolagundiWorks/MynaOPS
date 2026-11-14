@@ -427,6 +427,17 @@ public static class CadImporter
 
     // ---- levels and project ----
 
+    /// <summary>The AQC level at the level's position in the whole file, unless it is taken or named after another floor of the whole file.</summary>
+    static LevelRec? PositionMatch(BridgeFile file, ImportModel model, HashSet<LevelRec> used, BridgeLevel fl, int i)
+    {
+        var whole = file.WholeFileLevels ?? file.Levels;
+        var at = whole.ToList().FindIndex(l => l.Name.Equals(fl.Name, StringComparison.OrdinalIgnoreCase));
+        var pos = (at >= 0 ? at : i) + 1;
+        if (model.Levels.Count <= pos || used.Contains(model.Levels[pos])) return null;
+        var cand = model.Levels[pos];
+        return whole.Any(l => !l.Name.Equals(fl.Name, StringComparison.OrdinalIgnoreCase) && l.Name.Equals(cand.Name, StringComparison.OrdinalIgnoreCase)) ? null : cand;
+    }
+
     internal static Dictionary<string, string> PlanLevels(BridgeFile file, ImportModel model, ImportPlan plan)
     {
         var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -437,7 +448,7 @@ public static class CadImporter
             var fl = file.Levels[i];
             // Lvl0 is AQC's plinth and is never matched
             var match = model.Levels.Skip(1).FirstOrDefault(l => !used.Contains(l) && l.Name.Equals(fl.Name, StringComparison.OrdinalIgnoreCase))
-                        ?? (!file.IsLevelFiltered && model.Levels.Count > i + 1 && !used.Contains(model.Levels[i + 1]) ? model.Levels[i + 1] : null);
+                        ?? PositionMatch(file, model, used, fl, i);
             if (match is not null)
             {
                 used.Add(match); map[fl.Name] = match.Id;

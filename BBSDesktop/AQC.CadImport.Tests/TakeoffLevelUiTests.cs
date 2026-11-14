@@ -163,16 +163,29 @@ public class TakeoffLevelUiTests
     }
 
     [Fact]
-    public void A_chosen_level_is_matched_by_name_only_never_by_position()
+    public void A_chosen_level_keeps_the_position_it_has_in_the_whole_file()
     {
         var file = BridgeFile.Parse(TwoStoreys().ToJsonString());
-        // The whole file matches Ground to the AQC level at its position when the names differ; a chosen level must not
+        // The whole file matches Ground to the AQC level at its position when the names differ; leaving First out must not change that
         var m = NewModel(("Lvl1", "Ground floor"));
         Assert.Equal("Lvl1", TakeoffLevels.AqcLevels(file, m)["Ground"].Id);
+        Assert.Equal("Lvl1", TakeoffLevels.AqcLevels(TakeoffLevels.Filter(file, new[] { "Ground" }), m)["Ground"].Id);
+        // First alone is the second floor of the file, so it does not take the AQC level at position 1
         var chosen = TakeoffLevels.Filter(file, new[] { "First" });
-        Assert.True(chosen.IsLevelFiltered);
-        Assert.Equal("Lvl2", TakeoffLevels.AqcLevels(chosen, m)["First"].Id);   // a new level, not the one at position 0
-        Assert.False(file.IsLevelFiltered);
+        Assert.Equal("Lvl2", TakeoffLevels.AqcLevels(chosen, m)["First"].Id);
+        Assert.Equal(new[] { "Ground", "First" }, chosen.WholeFileLevels!.Select(l => l.Name));
+        Assert.Null(file.WholeFileLevels);
+    }
+
+    [Fact]
+    public void Importing_one_floor_at_a_time_never_puts_the_second_on_the_first_ones_level()
+    {
+        var file = BridgeFile.Parse(TwoStoreys().ToJsonString());
+        var m = NewModel();
+        CadImporter.Apply(CadImporter.Plan(TakeoffLevels.Filter(file, new[] { "First" }), m), m);
+        Assert.Equal("First", m.Levels[1].Name);
+        var ground = TakeoffLevels.AqcLevels(TakeoffLevels.Filter(file, new[] { "Ground" }), m)["Ground"];
+        Assert.Equal(("Lvl2", true), (ground.Id, ground.IsNew));   // not Lvl1, which is the First floor now
     }
 
     [Fact]
