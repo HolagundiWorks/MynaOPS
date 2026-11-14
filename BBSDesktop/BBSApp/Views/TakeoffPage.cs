@@ -27,6 +27,8 @@ public sealed class TakeoffPage : Page
     readonly Button _read = new() { Content = "Read take-off…" };
     readonly Button _annotated = new() { Content = "Fetch annotated drawing" };
     readonly StackPanel _stored = new() { Spacing = 6 };
+    readonly StackPanel _levels = new() { Spacing = 4 };
+    int _levelsToken;
     readonly TextBlock _status = new() { TextWrapping = TextWrapping.Wrap, Opacity = 0.8 };
     readonly DispatcherTimer _poll = new() { Interval = TimeSpan.FromSeconds(5) };
     List<TakeoffDrawing> _list = new();
@@ -61,6 +63,8 @@ public sealed class TakeoffPage : Page
                     _file,
                     new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Children = { new TextBlock { Text = "Drawings", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center } } },
                     _drawings,
+                    new TextBlock { Text = "Levels in the selected drawing", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Margin = new Thickness(0, 10, 0, 0) },
+                    new ScrollViewer { HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Disabled, Content = _levels },
                     new TextBlock { Text = "Annotated drawings stored with this project", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Margin = new Thickness(0, 10, 0, 0) },
                     _stored,
                     _status,
@@ -72,7 +76,9 @@ public sealed class TakeoffPage : Page
         _refresh.Click += async (_, _) => await RefreshAsync(force: true);
         _read.Click += async (_, _) => await ReadAsync();
         _annotated.Click += async (_, _) => await FetchAnnotatedAsync();
-        _drawings.SelectionChanged += (_, _) => UpdateButtons();
+        _drawings.SelectionChanged += (_, _) => { UpdateButtons(); _ = ShowLevelsAsync(); };
+        AutomationProperties.SetAutomationId(_levels, "TakeoffLevelSummary");
+        AutomationProperties.SetName(_levels, "Levels in the selected drawing");
         _poll.Tick += async (_, _) =>
         {
             // the file is read again only when it has changed (MynaCAD recorded or updated a take-off)
@@ -251,6 +257,7 @@ public sealed class TakeoffPage : Page
             foreach (var d in _list.Where(d => d.IsComplete)) _complete.Add(d.Slot);
             _seenList = true;
             FillList();
+            _ = ShowLevelsAsync();
             if (newly.Count > 0)
                 _status.Text = newly.Count == 1
                     ? $"{newly[0]} take-off is complete and can be read."
@@ -272,6 +279,66 @@ public sealed class TakeoffPage : Page
             else _status.Text = ex.Message;
         }
         finally { _busy = false; UpdateButtons(); }
+    }
+
+    static TextBlock Cell(string text, int col, int row, bool header = false, bool right = false)
+    {
+        var t = new TextBlock
+        {
+            Text = text, Margin = new Thickness(0, 2, 14, 2), FontWeight = header ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal,
+            HorizontalAlignment = right ? HorizontalAlignment.Right : HorizontalAlignment.Left, IsTextSelectionEnabled = true,
+        };
+        Grid.SetColumn(t, col); Grid.SetRow(t, row);
+        return t;
+    }
+
+    /// <summary>The per-level summary of the selected drawing: counts, wall length and area, room and slab area, the AQC level each lands on, and whether MynaCAD recorded it (and whether it changed since).</summary>
+    async Task ShowLevelsAsync()
+    {
+        var token = ++_levelsToken;
+        var src = Source(); var d = Selected;
+        _levels.Children.Clear();
+        if (src is null || d is not { IsComplete: true })
+        {
+            _levels.Children.Add(new TextBlock { Text = "Select a complete take-off to see its levels.", Opacity = 0.7 });
+            return;
+        }
+        _levels.Children.Add(new TextBlock { Text = "Reading levels…", Opacity = 0.7 });
+        try
+        {
+            var result = await OdpTakeoffService.ReadDrawingAsync(src, d.Slot);
+            if (token != _levelsToken) return;
+            var lines = TakeoffLevels.Lines(result.File, d.LevelStatus, CadImportService.AqcLevels(result.File));
+            _levels.Children.Clear();
+            if (lines.Count == 0) { _levels.Children.Add(new TextBlock { Text = "This take-off has no levels and no rows.", Opacity = 0.7 }); return; }
+            var heads = new[] { "Level", "AQC level", "Elevation", "Walls", "Wall length (m)", "Wall area (m²)", "Rooms", "Room area (m²)", "Slab area (m²)", "Recording" };
+            var grid = new Grid();
+            foreach (var _ in heads) grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            for (int r = 0; r <= lines.Count; r++) grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            for (int c = 0; c < heads.Length; c++) grid.Children.Add(Cell(heads[c], c, 0, header: true, right: c is >= 3 and <= 8));
+            for (int i = 0; i < lines.Count; i++)
+            {
+                var l = lines[i];
+                var cells = new[] { l.Level, l.Aqc, l.Elevation, l.Walls, l.WallLength, l.WallArea, l.Rooms, l.RoomArea, l.SlabArea, l.Status };
+                for (int c = 0; c < cells.Length; c++) grid.Children.Add(Cell(cells[c], c, i + 1, right: c is >= 3 and <= 8));
+            }
+            _levels.Children.Add(grid);
+            var st = d.LevelStatus;
+            _levels.Children.Add(new TextBlock
+            {
+                Opacity = 0.7, TextWrapping = TextWrapping.Wrap,
+                Text = st is null
+                    ? "This take-off does not say which levels were recorded (recorded by an older MynaCAD, or a drawing without named levels)."
+                    : $"MynaCAD recorded {(st.Mode == "all" ? "all levels" : st.Mode == "list" ? "the chosen levels" : "the active level")}"
+                      + (st.RecordedAt is null ? "." : $" at {st.RecordedAt}.") + " \"Changed\" means the level was edited in MynaCAD after that; record again there.",
+            });
+        }
+        catch (Exception ex)
+        {
+            if (token != _levelsToken) return;
+            _levels.Children.Clear();
+            _levels.Children.Add(new TextBlock { Text = "The levels could not be read: " + ex.Message, TextWrapping = TextWrapping.Wrap });
+        }
     }
 
     async Task ReadAsync()

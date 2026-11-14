@@ -16,12 +16,24 @@ public sealed record TakeoffRecord(ulong Id, double MinX, double MinY, double Ma
 /// <summary>One drawing's take-off in a project file: what its header says, without reading its rows.</summary>
 public sealed record TakeoffDrawing(
     uint Slot, string DrawingId, string Drawing, string? ProjectOfficeId, string State, string? Exported, string? RevisionSha256,
-    IReadOnlyDictionary<byte, int> Counts, AnnotatedPdfInfo? Annotated, string? Problem, string? ProjectRefCompany = null, long? ProjectRefId = null)
+    IReadOnlyDictionary<byte, int> Counts, AnnotatedPdfInfo? Annotated, string? Problem, string? ProjectRefCompany = null, long? ProjectRefId = null,
+    LevelStatusInfo? LevelStatus = null)
 {
     public bool IsComplete => State == "complete";
     /// <summary>The drawing's name, or "drawing &lt;slot&gt;" when MynaCAD recorded an unsaved drawing that has no name.</summary>
     public string DisplayName => string.IsNullOrWhiteSpace(Drawing) ? $"drawing {Slot}" : Drawing;
     public int Rows => Counts.Where(kv => kv.Key != OspTakeoff.KindHeader && kv.Key != OspTakeoff.KindAnnotatedChunk).Sum(kv => kv.Value);
+}
+
+/// <summary>One level in a header's optional <c>level_status</c>: whether the recording covered it, how many rows it has, and whether it changed in MynaCAD since.</summary>
+public sealed record LevelRecording(int? Id, string Name, bool Recorded, int Rows, bool Stale);
+
+/// <summary>A header's optional <c>level_status</c> (docs/bridge/LEVEL-IDS.md): which levels one <c>takeoff.record</c> run covered. <c>Mode</c> is "all", "list" or "active".</summary>
+public sealed record LevelStatusInfo(string Mode, string? RecordedAt, IReadOnlyList<LevelRecording> Levels)
+{
+    /// <summary>The entry for a level: by id when both have one, else by name (case-insensitive).</summary>
+    public LevelRecording? For(int? id, string name) =>
+        (id is { } i ? Levels.FirstOrDefault(l => l.Id == i) : null) ?? Levels.FirstOrDefault(l => l.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 }
 
 /// <summary>The annotated drawing MynaCAD generated once the take-off was complete: a PDF stored as numbered chunks in the project file.</summary>
@@ -101,7 +113,8 @@ public static class OspTakeoff
                 list.Add(new TakeoffDrawing(slot, Str(src, "drawing_id"), Str(src, "drawing"), NullIfEmpty(Str(src, "project_office_id")),
                     NullIfEmpty(Str(o, "state")) ?? "complete", NullIfEmpty(Str(src, "exported")), NullIfEmpty(Str(src, "revision_sha256")), c,
                     ann is null ? null : new AnnotatedPdfInfo(Str(ann, "sha256"), Num(ann, "bytes"), (int)Num(ann, "chunks"), (int)Num(ann, "pages"), NullIfEmpty(Str(ann, "generated"))),
-                    null, NullIfEmpty(Str(src?["project_ref"] as JsonObject, "company_uuid")), (src?["project_ref"] as JsonObject)?["project_id"] is JsonValue pid && pid.TryGetValue<long>(out var pidValue) ? pidValue : null));
+                    null, NullIfEmpty(Str(src?["project_ref"] as JsonObject, "company_uuid")), (src?["project_ref"] as JsonObject)?["project_id"] is JsonValue pid && pid.TryGetValue<long>(out var pidValue) ? pidValue : null,
+                    ParseLevelStatus(o["level_status"])));
             }
             catch (BridgeFormatException e)
             {
@@ -110,6 +123,24 @@ public static class OspTakeoff
         }
         return list;
     }
+
+    /// <summary>Reads a header's <c>level_status</c>. Anything that is not the documented shape gives null or skips the entry; it never throws.</summary>
+    public static LevelStatusInfo? ParseLevelStatus(JsonNode? node)
+    {
+        if (node is not JsonObject o || o["levels"] is not JsonArray a) return null;
+        var list = new List<LevelRecording>();
+        foreach (var e in a.Take(256).OfType<JsonObject>())
+        {
+            var name = Str(e, "name");
+            if (name.Length == 0) continue;
+            int? id = e["id"] is JsonValue iv && iv.TryGetValue<double>(out var d) && d >= 0 && d <= int.MaxValue && d == Math.Floor(d) ? (int)d : null;
+            int rows = e["rows"] is JsonValue rv && rv.TryGetValue<double>(out var r) && r >= 0 && r <= int.MaxValue ? (int)r : 0;
+            list.Add(new LevelRecording(id, name, Flag(e, "recorded"), rows, Flag(e, "stale")));
+        }
+        return new LevelStatusInfo(NullIfEmpty(Str(o, "mode")) ?? "active", NullIfEmpty(Str(o, "recorded_at")), list);
+    }
+
+    static bool Flag(JsonObject o, string key) => o[key] is JsonValue v && v.TryGetValue<bool>(out var b) && b;
 
     /// <summary>Reads the one drawing in these records. Throws when there are none or several (use <see cref="ListDrawings"/> and pass a slot).</summary>
     public static Result Read(IEnumerable<TakeoffRecord> records)

@@ -1069,45 +1069,93 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         await ShowCadImportPreviewAsync(prep, "Import from CAD");
     }
 
-    /// <summary>The preview dialog for "Import from CAD". Nothing is written before Import.</summary>
+    /// <summary>
+    /// The preview dialog for "Import from CAD". Nothing is written before Import. A take-off with two or more levels shows a level picker: the preview and
+    /// the import then cover only the ticked levels (<see cref="TakeoffLevels.Filter"/>); with every level ticked the file is imported whole.
+    /// </summary>
     internal async Task ShowCadImportPreviewAsync(CadImportService.Prepared prep, string title)
     {
-        var plan = prep.Plan;
-        var lines = plan.Items
-            .Where(i => i.Action != Aqc.CadImport.PlanAction.Unchanged)
-            .Select(i => $"{i.Action,-17} {i.Section,-17} {(i.Mark.Length > 0 ? i.Mark : i.Ref)}{(i.Reason.Length > 0 ? "  - " + i.Reason : "")}")
-            .ToList();
-        var projectRefLine = prep.File.ProjectRefCaption(null, null);
-        var other = "\n" + projectRefLine + "\n";
-        if (plan.OtherDrawingId is not null)
-            other += "\nThis project already holds rows from a different drawing; importing adds this drawing's rows alongside them.\n";
-        if (plan.Warnings.Count > 0)
-            other += "\nCheck before importing:\n - " + string.Join("\n - ", plan.Warnings) + "\n";
+        var original = prep;
+        var current = prep;
+        var levels = Aqc.CadImport.TakeoffLevels.Summarise(original.File);
+        var text = new TextBlock
+        {
+            FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Consolas"),
+            TextWrapping = TextWrapping.Wrap,
+            IsTextSelectionEnabled = true,
+        };
+        string Describe(CadImportService.Prepared p)
+        {
+            var plan = p.Plan;
+            var lines = plan.Items
+                .Where(i => i.Action != Aqc.CadImport.PlanAction.Unchanged)
+                .Select(i => $"{i.Action,-17} {i.Section,-17} {(i.Mark.Length > 0 ? i.Mark : i.Ref)}{(i.Reason.Length > 0 ? "  - " + i.Reason : "")}")
+                .ToList();
+            var other = "\n" + p.File.ProjectRefCaption(null, null) + "\n";
+            if (plan.OtherDrawingId is not null)
+                other += "\nThis project already holds rows from a different drawing; importing adds this drawing's rows alongside them.\n";
+            if (plan.Warnings.Count > 0)
+                other += "\nCheck before importing:\n - " + string.Join("\n - ", plan.Warnings) + "\n";
+            return plan.Summary + other + "\n" + string.Join("\n", lines);
+        }
+        text.Text = Describe(current);
+
+        var panel = new StackPanel { Spacing = 8 };
+        var boxes = new List<CheckBox>();
         var dlg = new ContentDialog
         {
             Title = title,
-            Content = new ScrollViewer
-            {
-                MaxHeight = 420,
-                Content = new TextBlock
-                {
-                    Text = plan.Summary + other + "\n" + string.Join("\n", lines),
-                    FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Consolas"),
-                    TextWrapping = TextWrapping.Wrap,
-                    IsTextSelectionEnabled = true,
-                },
-            },
             PrimaryButtonText = "Import",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close,
-            IsPrimaryButtonEnabled = plan.HasChanges,
+            IsPrimaryButtonEnabled = current.Plan.HasChanges,
             XamlRoot = Content.XamlRoot,
         };
+        if (levels.Count >= 2)
+        {
+            var picker = new StackPanel { Spacing = 2 };
+            AutomationProperties.SetAutomationId(picker, "ImportLevelPicker");
+            AutomationProperties.SetName(picker, "Levels to import");
+            picker.Children.Add(new TextBlock { Text = "Levels to import", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+            void Reselect()
+            {
+                var chosen = boxes.Where(c => c.IsChecked == true).Select(c => (string)c.Tag).ToList();
+                if (chosen.Count == 0)
+                {
+                    text.Text = "No level is ticked: nothing would be imported.";
+                    dlg.IsPrimaryButtonEnabled = false;
+                    return;
+                }
+                try
+                {
+                    current = CadImportService.Prepare(chosen.Count == levels.Count ? original.File : Aqc.CadImport.TakeoffLevels.Filter(original.File, chosen));
+                    text.Text = Describe(current);
+                    dlg.IsPrimaryButtonEnabled = current.Plan.HasChanges;
+                }
+                catch (Exception ex) { text.Text = ex.Message; dlg.IsPrimaryButtonEnabled = false; }
+            }
+            foreach (var q in levels)
+            {
+                var box = new CheckBox
+                {
+                    IsChecked = true, Tag = q.Name, MinHeight = 28,
+                    Content = $"{q.Name}  ({q.Walls} walls, {q.Columns} columns, {q.Rooms} rooms, {q.Slabs} slabs)",
+                };
+                AutomationProperties.SetName(box, "Import level " + q.Name);
+                box.Checked += (_, _) => Reselect();
+                box.Unchecked += (_, _) => Reselect();
+                boxes.Add(box);
+                picker.Children.Add(box);
+            }
+            panel.Children.Add(picker);
+        }
+        panel.Children.Add(new ScrollViewer { MaxHeight = 420, Content = text });
+        dlg.Content = panel;
         if (await dlg.ShowAsync() != ContentDialogResult.Primary) return;
 
-        CadImportService.Apply(prep);
+        CadImportService.Apply(current);
         RefreshWindowTitle();
-        AppNotify.Success("Import from CAD", plan.Summary);
+        AppNotify.Success("Import from CAD", current.Plan.Summary);
     }
 
     private async void ExportCad_Click(object sender, RoutedEventArgs e)

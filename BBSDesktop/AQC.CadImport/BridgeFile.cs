@@ -16,6 +16,11 @@ public sealed class BridgeFile
     public string? ProjectRefCompany { get; init; }
     /// <summary>Project id from <c>source.project_ref</c> when present and numeric.</summary>
     public long? ProjectRefId { get; init; }
+    /// <summary>
+    /// True for a file <see cref="TakeoffLevels.Filter"/> cut down to chosen levels. The importer then matches levels by name only: a position match
+    /// would put a floor on whichever AQC level happens to sit at the same position, and a partial import cannot know the floor's position.
+    /// </summary>
+    public bool IsLevelFiltered { get; init; }
     public Dictionary<string, string> Project { get; init; } = new();
     public List<BridgeLevel> Levels { get; init; } = new();
     public List<JsonObject> Walls { get; init; } = new();

@@ -96,12 +96,51 @@ public static class TakeoffLevels
         return new BridgeFile
         {
             DrawingId = file.DrawingId, Drawing = file.Drawing, ProjectRefCompany = file.ProjectRefCompany, ProjectRefId = file.ProjectRefId,
-            Project = file.Project,
+            Project = file.Project, IsLevelFiltered = true,
             Levels = file.Levels.Where(l => keep.Contains(l.Name)).ToList(),
             Walls = Pick(file.Walls), Openings = Pick(file.Openings), OpeningSchedule = Pick(file.OpeningSchedule),
             Columns = Pick(file.Columns), Lintels = Pick(file.Lintels), Rooms = Pick(file.Rooms), Slabs = Pick(file.Slabs),
             Electrical = Pick(file.Electrical), ElectricalCircuits = Pick(file.ElectricalCircuits),
             Plumbing = Pick(file.Plumbing), PlumbingFixtures = Pick(file.PlumbingFixtures),
         };
+    }
+
+    /// <summary>Where one CAD level lands in AQC: the AQC level id (<c>Lvl1</c>...) and whether an import would create that level.</summary>
+    public sealed record AqcLevel(string Id, bool IsNew);
+
+    /// <summary>
+    /// The AQC level each of the file's levels would be imported into, by the importer's own level mapping (name, then position; <c>Lvl0</c> never).
+    /// Nothing is changed. Imported rows sit on these AQC levels, so the BOQ's level filter shows each CAD level's quantities under the level named here.
+    /// </summary>
+    public static IReadOnlyDictionary<string, AqcLevel> AqcLevels(BridgeFile file, ImportModel model)
+    {
+        var plan = new ImportPlan();
+        var map = CadImporter.PlanLevels(file, model, plan);
+        var added = plan.Items.Where(i => i.Section == "level" && i.Action == PlanAction.Add).Select(i => i.Mark).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return file.Levels.Where(l => map.ContainsKey(l.Name)).GroupBy(l => l.Name, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => new AqcLevel(map[g.Key], added.Contains(map[g.Key])), StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>One line of the Take-off page's per-level summary, formatted for display.</summary>
+    public sealed record SummaryLine(string Level, string Aqc, string Elevation, string Walls, string WallLength, string WallArea, string Rooms, string RoomArea, string SlabArea, string Status);
+
+    /// <summary>
+    /// The per-level summary as display text: counts, wall length (m) and gross wall area (m2), room and slab area (m2), the AQC level the CAD level maps
+    /// to, and the recording status from the header's <c>level_status</c> when there is one ("recorded", "changed in MynaCAD since recorded", "not recorded").
+    /// </summary>
+    public static IReadOnlyList<SummaryLine> Lines(BridgeFile file, LevelStatusInfo? status = null, IReadOnlyDictionary<string, AqcLevel>? aqc = null)
+    {
+        var ci = System.Globalization.CultureInfo.InvariantCulture;
+        var lines = new List<SummaryLine>();
+        foreach (var q in Summarise(file))
+        {
+            var rec = status?.For(q.Id, q.Name);
+            var st = status is null ? "" : rec is null ? "not in the recording" : !rec.Recorded ? "not recorded" : rec.Stale ? "changed in MynaCAD since recorded" : "recorded";
+            var a = aqc is not null && aqc.TryGetValue(q.Name, out var m) ? m.Id + (m.IsNew ? " (new)" : "") : "";
+            lines.Add(new SummaryLine(q.Name, a, q.ElevationMm is { } e ? (e / 1000).ToString("0.###", ci) + " m" : "",
+                q.Walls.ToString(ci), (q.WallLengthMm / 1000).ToString("0.##", ci), q.WallAreaM2.ToString("0.##", ci),
+                q.Rooms.ToString(ci), q.RoomAreaM2.ToString("0.##", ci), q.SlabAreaM2.ToString("0.##", ci), st));
+        }
+        return lines;
     }
 }
