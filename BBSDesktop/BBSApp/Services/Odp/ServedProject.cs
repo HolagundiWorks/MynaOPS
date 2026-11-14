@@ -18,7 +18,11 @@ public static class ServedProject
     static readonly Dictionary<string, long> _ownRevisions = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Our own save made revision <paramref name="revision"/> of a project file: it is not "MynaCAD changed something".</summary>
-    public static void NoteOwnRevision(string path, long revision) => _ownRevisions[Path.GetFullPath(path)] = revision;
+    public static void NoteOwnRevision(string path, long revision)
+    {
+        _ownRevisions[Path.GetFullPath(path)] = revision;
+        SyncStatusService.NoteOwnWrite(path, revision);
+    }
 
     /// <summary>Look at the project file once (the main window calls this every two seconds); a revision nobody here wrote raises <see cref="Changed"/>.</summary>
     public static async Task PollAsync(string? projectPath)
@@ -33,5 +37,6 @@ public static class ServedProject
         bool outside = n >= 0 && _count >= 0 && n != _count && n != own;
         _count = n;
         if (outside) Changed?.Invoke();
+        await SyncStatusService.RefreshAsync(projectPath).ConfigureAwait(true);   // read only; the same poll, no second timer
     }
 }

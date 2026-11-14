@@ -1192,8 +1192,30 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
     /// </summary>
     private void StartActiveProjectWatch()
     {
+        // The status text of the shared project file (docs/live-sync.md in MynaCAD): Synced / Updated by MynaCAD at hh:mm / Take-off out of date / Locked ...
+        var sync = new TextBlock { Visibility = Visibility.Collapsed, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 8, 0) };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sync, "Project sync status");
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(sync, "ProjectSyncStatus");
+        StatusStrip.Left.Children.Add(sync);
+        SyncStatusService.Changed += s => DispatcherQueue.TryEnqueue(() =>
+        {
+            sync.Text = s.Text;
+            sync.Visibility = s.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+            ToolTipService.SetToolTip(sync, s.State switch
+            {
+                SyncState.Updated => "The project file was changed by another program. Open the Take-off page to read it.",
+                SyncState.OutOfDate => "The drawing was saved after this take-off was recorded. Record it again in MynaCAD.",
+                SyncState.Locked => "Another program holds the project file right now. It is checked again every two seconds.",
+                SyncState.Replaced => "The project file was replaced by another copy. Reopen the project.",
+                SyncState.Unreadable => "The project file cannot be read: " + s.Reason,
+                SyncState.Missing => "The project file is not where it was.",
+                _ => null,
+            });
+        });
+        // A file watcher only brings the next poll forward (about 0.3 s after a write instead of up to 2 s); the poll below stays the fallback.
+        var watcher = new ProjectFileWatcher(p => { DispatcherQueue.TryEnqueue(() => _ = ServedProject.PollAsync(p)); return Task.CompletedTask; });
         var t = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-        t.Tick += (_, _) => _ = ServedProject.PollAsync(ProjectStore.Current.FilePath);
+        t.Tick += (_, _) => { watcher.Watch(ProjectStore.Current.FilePath); _ = ServedProject.PollAsync(ProjectStore.Current.FilePath); };
         t.Start();
         _ = ServedProject.PollAsync(ProjectStore.Current.FilePath);
     }

@@ -170,9 +170,12 @@ public sealed class TakeoffPage : Page
         var p = ProjectFile;
         _file.Text = p is null
             ? "No project is open. Use File > Open to open a project file (.osp), or open MynaCAD's project, to read a take-off."
-            : File.Exists(p) ? "Reading the take-off from " + p + ". A take-off MynaCAD records appears here at once. Use Reload list after MynaCAD records again." : p + " does not exist yet: record the take-off in MynaCAD, then Reload list.";
+            : File.Exists(p) ? SyncNote() + "Reading the take-off from " + p + ". A take-off MynaCAD records appears here at once. Use Reload list after MynaCAD records again." : p + " does not exist yet: record the take-off in MynaCAD, then Reload list.";
         UpdateButtons();
     }
+
+    /// <summary>The live sync status in front of the header, when it is more than "Synced" (a take-off older than its drawing, a locked file).</summary>
+    static string SyncNote() => SyncStatusService.Current is { State: not (SyncState.None or SyncState.Synced) } s ? s.Text + ". " : "";
 
     void UpdateButtons()
     {
@@ -258,6 +261,7 @@ public sealed class TakeoffPage : Page
             _seenList = true;
             FillList();
             _ = ShowLevelsAsync();
+            _ = SyncStatusService.AcceptAsync(ProjectFile);   // the page has read the file as it is now
             if (newly.Count > 0)
                 _status.Text = newly.Count == 1
                     ? $"{newly[0]} take-off is complete and can be read."

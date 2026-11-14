@@ -66,6 +66,9 @@ CREATE INDEX IF NOT EXISTS change_revision ON change (revision);";
     static string ConnectionString(string path, SqliteOpenMode mode) =>
         new SqliteConnectionStringBuilder { DataSource = path, Mode = mode, Pooling = false, DefaultTimeout = 5 }.ToString();
 
+    /// <summary>True when the name ends in <c>.osp</c> (no file is touched).</summary>
+    public static bool LooksLikeOdpPath(string? path) => !string.IsNullOrEmpty(path) && path.EndsWith(Extension, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>True when the file starts like SQLite (cheap check before <see cref="Open"/>).</summary>
     public static bool LooksLikeOdp(string path)
     {
@@ -235,6 +238,9 @@ CREATE INDEX IF NOT EXISTS change_revision ON change (revision);";
             var rev = Revision() + 1;
             body(rev);
             Exec("UPDATE meta SET value = $v WHERE key = 'revision'", ("$v", rev.ToString(CultureInfo.InvariantCulture)));
+            // Who wrote this revision and when, in the same transaction (MynaCAD docs/live-sync.md).
+            var last = System.Text.Json.JsonSerializer.Serialize(new { app = OdpSync.App, revision = rev, time = DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture) });
+            Exec("INSERT INTO meta (key, value) VALUES ('sync.last', $v) ON CONFLICT(key) DO UPDATE SET value = $v", ("$v", last));
             Exec("COMMIT");
             return rev;
         }
