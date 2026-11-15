@@ -1194,7 +1194,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
     {
         // The status text of the shared project file (docs/live-sync.md in MynaCAD): Synced / Updated by MynaCAD at hh:mm / Take-off out of date / Locked ...
         var sync = new TextBlock { Visibility = Visibility.Collapsed, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 8, 0) };
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(sync, "Project sync status");
+        // No explicit Name: the text itself is the accessible name (a screen reader or UI Automation reads "Synced", "Updated by MynaCAD at 14:32").
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(sync, "ProjectSyncStatus");
         StatusStrip.Left.Children.Add(sync);
         SyncStatusService.Changed += s => DispatcherQueue.TryEnqueue(() =>
