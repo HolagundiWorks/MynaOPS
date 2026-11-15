@@ -12,3 +12,6 @@ MynaOps also hosts the suite's **local AI agent** (Olmo 3 7B, loopback `127.0.0.
 - [[The Myna suite|The-Myna-suite]]
 
 Quantities follow IS 456 and IS 1200 derived conventions; always cross-check against drawings.
+
+## Workflow decision (2026-11-15)
+MynaOps will be the entry point: you open or create the project here (project details wizard), MynaOps starts and stops the AI agent and the project database manager, and launches MynaCAD with the current project. MynaCAD will keep only import and export, with project configuration (levels, layer sets, settings) done in MynaOps and applied live in MynaCAD; one project file runs across both apps, with sync on/off and Sync now buttons. This is decided, not built; see `docs/ops-first-workflow.md` when it is merged.
