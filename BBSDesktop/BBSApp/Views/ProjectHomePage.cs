@@ -212,10 +212,20 @@ public sealed class ProjectHomePage : Page
             }
             var (ai, detail, running) = await Task.Run(async () =>
             {
-                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-                var (a, d) = await Office.Ai.AiStatus.CheckAsync(cts.Token);
-                var up = Office.Ai.SuiteAiCoordinator.IsHost || await Office.Ai.RemoteLlm.IsAvailableAsync(cts.Token);
-                return (a, d, up);
+                // Stopped here: nothing is asked of the port (a closed listener can leave a request waiting for its timeout).
+                if (Office.Ai.SuiteAiCoordinator.StoppedByUser && !Office.Ai.SuiteAiCoordinator.IsHost)
+                {
+                    var off = Office.Ai.AiStatus.Describe(new Office.Ai.AiStatus.Snapshot(false, false, false, true, true, null, StoppedByUser: true));
+                    return (off.Short, off.Detail, false);
+                }
+                try
+                {
+                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                    var (a, d) = await Office.Ai.AiStatus.CheckAsync(cts.Token);
+                    var up = Office.Ai.SuiteAiCoordinator.IsHost || await Office.Ai.RemoteLlm.IsAvailableAsync(cts.Token);
+                    return (a, d, up);
+                }
+                catch (OperationCanceledException) { return ("AI: checking…", "The AI agent did not answer within three seconds.", false); }
             }).ConfigureAwait(true);
             _aiState.Text = ai;
             _aiDetail.Text = detail;
@@ -226,7 +236,11 @@ public sealed class ProjectHomePage : Page
             }
             if (_syncState.Text.Length == 0) _syncState.Text = SyncStatusService.Current.Text.Length > 0 ? SyncStatusService.Current.Text : "Synced";
         }
-        catch (Exception ex) when (ex is OperationCanceledException or HttpRequestException or InvalidOperationException) { }
+        catch (Exception ex)
+        {
+            // a failed look is shown, never swallowed: the page stays usable and the next tick tries again
+            _aiDetail.Text = "Could not read the state: " + ex.Message;
+        }
         finally { _refreshing = false; }
     }
 

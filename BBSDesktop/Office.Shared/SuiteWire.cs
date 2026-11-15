@@ -25,8 +25,11 @@ public static class SuiteWire
     public const string SelectedProjectFormat = "studio-selected-project";
     public const string SelectedProjectFile = "selected-project.json";
 
+    /// <summary><c>OSTUDIO_LOCAL_DIR</c> moves the whole local state folder (tests and hand runs on a scratch folder); otherwise <c>%LOCALAPPDATA%\O-Studio</c>.</summary>
     public static string LocalDirectory =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), LocalAppFolder);
+        Environment.GetEnvironmentVariable("OSTUDIO_LOCAL_DIR") is { Length: > 0 } d
+            ? d
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), LocalAppFolder);
 
     public static string LocalPath(string fileName) =>
         Path.Combine(LocalDirectory, fileName);

@@ -199,6 +199,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         _tabs.Clear();
         _tabs.Add(new RibbonTab("project", "Project", new[]
         {
+            Cmd("home", "Home", Glyph("\uE80F")),
             Cmd("dashboard", "Dashboard", Glyph("\uE80F")),
             Cmd("levels", "Levels", Glyph("\uF158")),
             Cmd("takeoff", "Take-off (MynaCAD)", Glyph("\uE8A5")),

@@ -55,6 +55,7 @@ internal static class OpsUi
         AutomationProperties.SetAutomationId(control, automationId);
         AutomationProperties.SetName(control, label);
         control.Width = width;
+        control.HorizontalAlignment = HorizontalAlignment.Left;
         var s = new StackPanel { Spacing = 2 };
         s.Children.Add(Text(label, "CaptionSecondaryStyle"));
         s.Children.Add(control);
