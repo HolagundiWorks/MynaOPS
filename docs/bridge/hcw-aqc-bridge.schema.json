@@ -49,7 +49,8 @@
           "ceiling_mm": { "type": "number", "minimum": 0 },
           "lintel_bottom_mm": { "type": "number", "minimum": 0 },
           "id": { "type": "integer", "minimum": 0, "description": "Optional. The MynaCAD level's stable id; rows name it in `level_id` (LEVEL-IDS.md)." },
-          "elevation_mm": { "type": "number", "description": "Optional. Floor elevation above the site datum." }
+          "elevation_mm": { "type": "number", "description": "Optional. Floor elevation above the site datum." },
+          "config_id": { "type": "integer", "minimum": 0, "description": "Optional. The project configuration's level id (`config.levels.items[].cid`, MynaOps' own) this level is bound to; written next to `id` when MynaCAD has bound the level (LEVEL-IDS.md)." }
         }
       }
     },
