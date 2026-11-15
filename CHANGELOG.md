@@ -5,6 +5,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added (2026-11-15)
+- **Ops-first, package A (not merged):** Project > Home, File > New project (wizard writes `meta.config.*`), Open MynaCAD (`--managed --project --ops-pid`, second press activates), project lease and session holder, AI Stop/Start, Database online/offline, Adopt window for existing project files (drawing unchanged), Compact/Restore gated by MynaCAD's lease. See `docs/ops-first-workflow.md` section 11.
+
 > **Naming (2026-10-30):** Older bullets below may say ShilpiDB or `.vdb`; the product now uses the **`.osp` project file** only. See [MIGRATION-OSP.md](docs/MIGRATION-OSP.md).
 
 ### Changed (2026-10-29)

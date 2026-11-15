@@ -23,12 +23,25 @@ public sealed partial class MainWindow
         if (_welcome is not null || !File.Exists(lockup))
             return;
         _welcome = new O.Ui.Controls.SuiteWelcomeCard("MynaOps", lockup,
-            "MynaOps and MynaCAD share one project file (.osp) on this PC. Open that file here.");
+            "MynaOps opens or creates the project and starts MynaCAD from it. Open a project file here, or create a new project.");
         var open = new Button { Content = "Open project…" };
         if (Application.Current.Resources.TryGetValue("AccentButtonStyle", out var style) && style is Style accent)
             open.Style = accent;
-        open.Click += async (_, _) => await OpenSharedProjectAsync();
+        open.Click += async (_, _) => await OpenProjectDialogAsync();
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(open, "Welcome.Open");
         _welcome.Actions.Children.Add(open);
+        var create = new Button { Content = "New project…" };
+        create.Click += async (_, _) => await NewProjectAsync();
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(create, "Welcome.New");
+        _welcome.Actions.Children.Add(create);
+        foreach (var recent in Services.OpsProject.Recent.Read().Where(File.Exists).Take(5))
+        {
+            var p = recent;
+            var b = new Button { Content = p, HorizontalContentAlignment = HorizontalAlignment.Left };
+            b.Click += (_, _) => OpenProjectFile(p);
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(b, "Welcome.Recent." + Path.GetFileNameWithoutExtension(p));
+            _welcome.Extra.Children.Add(b);
+        }
         Microsoft.UI.Xaml.Controls.Grid.SetRow(_welcome, 0);
         Microsoft.UI.Xaml.Controls.Grid.SetRowSpan(_welcome, 3);
         _welcome.Backdrop = WorkArea.Background;
@@ -44,19 +57,7 @@ public sealed partial class MainWindow
         _welcome = null;
     }
 
-    async void OpenProject_Click(object sender, RoutedEventArgs e) => await OpenSharedProjectAsync();
-
-    /// <summary>Open the project file shared with MynaCAD.</summary>
-    async Task OpenSharedProjectAsync()
-    {
-        var picker = new FileOpenPicker { ViewMode = PickerViewMode.List, SuggestedStartLocation = PickerLocationId.DocumentsLibrary };
-        picker.FileTypeFilter.Add(".osp");
-        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(this));
-        var file = await picker.PickSingleFileAsync();
-        if (file is null)
-            return;
-        OpenProjectFile(file.Path);
-    }
+    async void OpenProject_Click(object sender, RoutedEventArgs e) => await OpenProjectDialogAsync();
 
     /// <summary>Choose where a project that has no file yet is saved: a new project file (.osp) that MynaCAD can open too.</summary>
     async Task<string?> ChooseNewProjectFileAsync()

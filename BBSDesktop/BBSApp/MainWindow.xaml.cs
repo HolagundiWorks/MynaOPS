@@ -32,7 +32,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
     // Canonical navigable tags, matched case-sensitively to NavigateTo's switch arms.
     private readonly HashSet<string> _navTags = new(StringComparer.Ordinal);
     private string _activeTab = "project";
-    private string _activeTag = "dashboard";
+    private string _activeTag = "home";
     private DispatcherTimer? _toastTimer;
     private int _toastGeneration;
     private AssistantService? _assistant;
@@ -68,8 +68,9 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         O.Ui.SuiteLandmarks.ApplyShell(AppNav, ContentFrame, StatusStrip,
             navigationName: "Sections", mainName: "Main content");
         BuildNavigation();
-        NavigateTo("dashboard");
+        NavigateTo("home");
         UpdatePersonaBadge();
+        WireProjectLifetime();
         SetWindowTitle(Branding.WindowTitle(ProjectStore.Current.Name, ProjectStore.Current.IsDirty));
         AppNotify.Raised += OnAppNotify;
         ProjectStore.Current.Changed += OnStoreChanged;
@@ -198,6 +199,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         _tabs.Clear();
         _tabs.Add(new RibbonTab("project", "Project", new[]
         {
+            Cmd("home", "Home", Glyph("\uE80F")),
             Cmd("dashboard", "Dashboard", Glyph("\uE80F")),
             Cmd("levels", "Levels", Glyph("\uF158")),
             Cmd("takeoff", "Take-off (MynaCAD)", Glyph("\uE8A5")),
@@ -531,6 +533,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
 
         ContentFrame.Content = tag switch
         {
+            "home" => new ProjectHomePage(),
             "dashboard" => new DashboardPage(),
             "levels" => new LevelsPage(),
             "columns" => new ElementPage(ElementSpecs.Columns(), ProjectStore.Current.Columns),
@@ -583,7 +586,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             "settings_cost" => new SettingsPage(SettingsPage.SettingsTab.CostPercent),
             "settings_assistant" => new AssistantModelPage(),
             "projectdb" => new ProjectDatabasePage(),
-            _ => new DashboardPage()
+            _ => new ProjectHomePage()
         };
 
         var label = owner?.Commands.FirstOrDefault(c => c.Tag == tag)?.Label ?? tag;
@@ -1215,55 +1218,12 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
         // A file watcher only brings the next poll forward (about 0.3 s after a write instead of up to 2 s); the poll below stays the fallback.
         var watcher = new ProjectFileWatcher(p => { DispatcherQueue.TryEnqueue(() => _ = ServedProject.PollAsync(p)); return Task.CompletedTask; });
         var t = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
-        t.Tick += (_, _) => { watcher.Watch(ProjectStore.Current.FilePath); _ = ServedProject.PollAsync(ProjectStore.Current.FilePath); };
+        // Database offline: the file is left alone (nothing here reads it) until the project is taken online again.
+        t.Tick += (_, _) => { if (OpsProject.HasProject && !OpsProject.Online) return; watcher.Watch(ProjectStore.Current.FilePath); _ = ServedProject.PollAsync(ProjectStore.Current.FilePath); };
         t.Start();
         _ = ServedProject.PollAsync(ProjectStore.Current.FilePath);
     }
 
-    /// <summary>Make the project in a project file the open one.</summary>
-    internal void OpenProjectFile(string path, string? launcherDisplayName = null)
-    {
-        HideWelcome();
-        if (!ProjectFiles.OpenInto(ProjectStore.Current, path, out var err))
-        {
-            AppNotify.Error("Open failed", err ?? "Could not open project.");
-            return;
-        }
-        if (!string.IsNullOrWhiteSpace(launcherDisplayName))
-        {
-            var stem = Path.GetFileNameWithoutExtension(path);
-            if (string.IsNullOrWhiteSpace(ProjectStore.Current.Info.Name)
-                || ProjectStore.Current.Name.Equals(stem, StringComparison.OrdinalIgnoreCase)
-                || ProjectStore.Current.Name == "Untitled Project")
-            {
-                ProjectStore.Current.Name = launcherDisplayName.Trim();
-            }
-        }
-        RefreshWindowTitle();
-        UpdatePersonaBadge();
-        SelectNavTag("dashboard");
-        AppNotify.Success("Project opened", $"{ProjectStore.Current.Name}  ·  {Path.GetFileName(path)}");
-    }
-
-    private async void Save_Click(object sender, RoutedEventArgs e)
-    {
-        // A project that has no file yet is saved to a new project file that MynaCAD can open too.
-        if (string.IsNullOrEmpty(ProjectStore.Current.FilePath) || !ProjectFiles.IsOdp(ProjectStore.Current.FilePath))
-        {
-            var chosen = await ChooseNewProjectFileAsync();
-            if (string.IsNullOrEmpty(chosen))
-                return;
-            ProjectStore.Current.FilePath = chosen;
-            ProjectStore.Current.Info.OspPath = chosen;
-        }
-        if (!ProjectFiles.Save(ProjectStore.Current.FilePath, ProjectStore.Current.ToJson(), out var err))
-            AppNotify.Error("Save failed", err ?? "Could not save.");
-        else
-        {
-            ProjectStore.Current.IsDirty = false;
-            RefreshWindowTitle();
-            AppNotify.Success("Saved", Path.GetFileName(ProjectStore.Current.FilePath));
-        }
-    }
+    private async void Save_Click(object sender, RoutedEventArgs e) => await SaveProjectAsync();
 
 }

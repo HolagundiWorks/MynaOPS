@@ -28,9 +28,22 @@ Code: `Office.Shared/OdpFile.cs` (the format), `BBSApp/Services/ProjectFiles.cs`
 | Back up now | `VACUUM INTO` a temporary name in `<name>.backups\`, renamed to `<name> <UTC yyyyMMddTHHmmssZ> manual.osp`: the folder and names MynaCAD's engine uses (MynaCAD `docs/AUTOSAVE-BACKUP.md`). Safe while MynaCAD has the file open. Nothing is pruned here; MynaCAD prunes to its `BACKUPCOUNT` on its next save, counting these too |
 | Backups | The backups of the file, newest first; other files in the folder are ignored |
 | Restore selected | Only a listed backup; keeps the file as it is as a `before-restore` backup first, copies the backup to a temporary file, checkpoints, renames it over the file, removes `-wal`/`-shm`; MynaOps then reopens the project. Refused while the file is open elsewhere |
-| Open elsewhere | MynaCAD has it open when the active-project pointer names it and MynaCAD (`ODraft.WinUi`) runs; any other program is seen by its handle on the file (an exclusive open fails) |
+| Open elsewhere | MynaCAD has it open when it holds `<hash>.cad.lock` (the lease, below); another MynaOps when it holds `<hash>.ops.lock`; the older marker (the active-project pointer and a running `ODraft.WinUi`) still counts until package E removes it; any other program is seen by its handle on the file (an exclusive open fails). With MynaCAD holding the project, the page asks it to close first (**Close MynaCAD**) before Compact or Restore, and refuses when it stays open |
 
 Nothing on the page changes the format: no table or column is added or altered and the revision does not move (a restore brings back the backup's own revision).
+
+## Lease, session and database online/offline (Ops-first package A)
+
+Code: `Office.Shared/ProjectLease.cs`, `ProjectSession.cs`, `OdpFile.Session.cs`; tests `ProjectLeaseTests.cs`, `ProjectSessionTests.cs` (what was run: `docs/ops-first-workflow.md`, section 11).
+
+| Piece | What it is |
+|---|---|
+| Lease | `%LOCALAPPDATA%\O-Studio\leases\<hash>.ops.lock` (MynaOps) and `.cad.lock` (MynaCAD): a file kept open while the project is open; it goes with the process, a leftover file is not a lease. `<hash>` is the first 16 hex digits of SHA-256 of the lower-case full path. Details of the handle: `ops-first-workflow.md` 2.1 (clarifications) |
+| `session.holder` | A **local** meta key written by MynaOps (no revision, no `change` row, no `sync.last`): `{machine, user, ops_pid, started_utc, heartbeat_utc}`, refreshed every 30 s and cleared on close; a heartbeat under 120 s from another machine or process makes MynaOps ask "Take over" before it opens the project. Only `session.*` keys can be written this way (`OdpFile.PutLocalMeta`) |
+| Database online | MynaOps holds the project: its lease and the holder record |
+| Database offline | MynaCAD was asked to close and has; the write-ahead log is folded into the file (`wal_checkpoint(TRUNCATE)`); the holder record is cleared and the lease released. Compact, Restore and copying the file are then safe. Project > Home has the button |
+| Adoption | A file without `config.schema` goes through the Adopt window; **Adopt** makes a `manual` backup, then writes the `config.*` keys in one revision and nothing else, so every `drawing` row stays byte for byte as it was (`ProjectAdoptionTests`). The proposal comes from MynaCAD's `config.proposal`, the take-off header's levels (`id`, `elevation_mm`, `height_mm`), and the MynaOps project document, in that order; same-named levels are one entry and keep MynaCAD's id as `cid` |
+| Save | The project document is written, then the Settings and Levels page values are merged into `config.*` (`ConfigPublisher`): one more revision, none when nothing differs |
 
 ## Project configuration (`meta.config.*`)
 

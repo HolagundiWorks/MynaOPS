@@ -217,11 +217,13 @@ public static class HeadlessAiHost
 /// <summary>What MynaOps' status bar says about the AI agent, in a few words, from what can be seen without waiting on the model.</summary>
 public static class AiStatus
 {
-    public sealed record Snapshot(bool HostedHere, bool ModelLoaded, bool RemoteAnswers, bool ModelInstalled, bool RuntimeInstalled, string? RemoteMode);
+    public sealed record Snapshot(bool HostedHere, bool ModelLoaded, bool RemoteAnswers, bool ModelInstalled, bool RuntimeInstalled, string? RemoteMode, bool StoppedByUser = false);
 
     /// <summary>Short text for the status bar and a longer one for its tooltip.</summary>
     public static (string Short, string Detail) Describe(Snapshot s)
     {
+        if (s.StoppedByUser && !s.HostedHere)
+            return ("AI: off", "The AI agent was stopped in MynaOps. Project home > AI > Start brings it back; MynaCAD's assistant waits for it.");
         if (s.HostedHere)
         {
             if (!s.ModelInstalled)
@@ -247,6 +249,6 @@ public static class AiStatus
         bool here = SuiteAiCoordinator.IsHost;
         bool remote = !here && await RemoteLlm.IsAvailableAsync(ct).ConfigureAwait(false);
         var record = AiHostRecord.Read();
-        return Describe(new Snapshot(here, LocalLlmHost.Loaded, remote, LocalModel.Find() is not null, LocalModel.FindServer() is not null, record?.Mode));
+        return Describe(new Snapshot(here, LocalLlmHost.Loaded, remote, LocalModel.Find() is not null, LocalModel.FindServer() is not null, record?.Mode, SuiteAiCoordinator.StoppedByUser));
     }
 }

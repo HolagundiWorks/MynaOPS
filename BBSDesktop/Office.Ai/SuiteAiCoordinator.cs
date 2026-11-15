@@ -16,6 +16,37 @@ public static class SuiteAiCoordinator
 
     public static bool IsHost => _host is not null;
 
+    static volatile bool _stoppedByUser;
+
+    /// <summary>
+    /// True after the user pressed <b>Stop</b> for the AI agent in MynaOps (Project home) and until they press <b>Start</b>. While it is true this process
+    /// neither hosts the agent nor starts it for a question (<see cref="StartHostIfNeeded"/> returns null).
+    /// </summary>
+    public static bool StoppedByUser => _stoppedByUser;
+
+    /// <summary>
+    /// <b>Stop</b>: stop serving the agent (the loopback port is closed, the host record removed, the model unloaded) and keep it stopped. A headless
+    /// host that was started for MynaCAD is asked to end too. Returns true when something was stopped.
+    /// </summary>
+    public static bool StopByUser()
+    {
+        _stoppedByUser = true;
+        var was = IsHost;
+        StopHost();
+        var headless = HeadlessAiHost.RequestStop();
+        return was || headless;
+    }
+
+    /// <summary>
+    /// <b>Start</b>: allow the agent again and serve it from this process. Returns the listener, or null when another program already serves the port,
+    /// or when this process is only ever a client (<c>OSTUDIO_AI_ROLE=client</c>); <see cref="StoppedByUser"/> is false afterwards in every case.
+    /// </summary>
+    public static AiCoreListener? StartByUser(int port = AiCoreListener.DefaultPort, string mode = "window")
+    {
+        _stoppedByUser = false;
+        return StartHostIfNeeded(port, mode);
+    }
+
     public static bool PreferClient =>
         string.Equals(Environment.GetEnvironmentVariable(SuiteWire.EnvAiRole), "client", StringComparison.OrdinalIgnoreCase);
 
@@ -28,7 +59,7 @@ public static class SuiteAiCoordinator
     /// </summary>
     public static AiCoreListener? StartHostIfNeeded(int port = AiCoreListener.DefaultPort, string mode = "window")
     {
-        if (PreferClient)
+        if (PreferClient || _stoppedByUser)
             return null;
         if (_host is not null)
             return _host;
@@ -50,6 +81,8 @@ public static class SuiteAiCoordinator
     /// <summary>Local in-process llama when this app hosts; remote when another app already serves :8742.</summary>
     public static async Task<(LocalLlm? local, RemoteLlm? remote, string? problem)> ResolveLlmAsync(CancellationToken ct = default)
     {
+        if (_stoppedByUser)
+            return (null, null, "The AI agent is stopped. Start it in MynaOps (Project home > AI).");
         if (PreferClient || (!PreferHost && await RemoteLlm.IsAvailableAsync(ct).ConfigureAwait(false)))
         {
             var remote = await RemoteLlm.ConnectAsync(ct).ConfigureAwait(false);

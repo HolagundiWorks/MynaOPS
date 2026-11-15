@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- A stand-in for MynaCAD in managed mode, for driving MynaOps by hand (docs/ops-first-workflow.md section 2.1): it records the arguments it was started
+       with, holds <hash>.cad.lock while it runs, answers the activation pipe (activate, close, status, import, sync.*) and, like the real one, a second
+       start for the same project sends "activate" to the first and exits. It draws nothing. Test tool, not shipped. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ODraft.WinUi</AssemblyName>
+    <RootNamespace>CadStub</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Office.Shared\Office.Shared.csproj" />
+  </ItemGroup>
+</Project>

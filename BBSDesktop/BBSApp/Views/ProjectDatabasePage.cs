@@ -32,6 +32,7 @@ public sealed class ProjectDatabasePage : Page
     readonly List<Button> _actions = new();
     Button _compact = null!, _restore = null!;
     bool _openElsewhere;
+    bool _cadOpen;
 
     public ProjectDatabasePage(string? path = null)
     {
@@ -172,10 +173,14 @@ public sealed class ProjectDatabasePage : Page
         {
             var (info, open, backups) = await Task.Run(() =>
                 (ProjectDatabase.Info(path), ProjectDatabase.OpenElsewhere(path), ProjectDatabase.ListBackups(path)));
-            _openElsewhere = open.IsOpen;
-            _openLine.Text = open.IsOpen
-                ? $"Open in {open.Who}. Compact and Restore are not available until it is closed there; a backup can still be made."
-                : "Not open in another program.";
+            _cadOpen = open.IsOpen && open.Who is not null && open.Who.StartsWith("MynaCAD", StringComparison.Ordinal);
+            _openElsewhere = open.IsOpen && !_cadOpen;
+            _openLine.Text = _cadOpen
+                ? "MynaCAD has this project open. Compact and Restore ask it to close first (or take the database offline on the Home page); a backup can be made meanwhile."
+                : open.IsOpen
+                    ? $"Open in {open.Who}. Compact and Restore are not available until it is closed there; a backup can still be made."
+                    : "Not open in another program.";
+            AutomationProperties.SetName(_openLine, _openLine.Text);
             int r = 0;
             Fact(r++, "Project", string.IsNullOrWhiteSpace(info.Name) ? "(no name)" : info.Name);
             Fact(r++, "Format", $"{info.Format}, version {info.Version}");
@@ -265,8 +270,25 @@ public sealed class ProjectDatabasePage : Page
               + string.Join("\n", problems);
     }, refresh: false);
 
+    /// <summary>
+    /// Compact and Restore need MynaCAD to have let go of the project (its lease, docs/ops-first-workflow.md 2.3): when it has it open it is asked to close
+    /// first (it asks about unsaved work), and nothing is changed when it stays open.
+    /// </summary>
+    async Task<bool> CloseCadFirstAsync(string action)
+    {
+        if (_path is null || !ProjectLease.IsHeld(_path, ProjectLease.AppCad)) return true;
+        if (!await Confirm("MynaCAD has this project open",
+                $"{action} needs the project closed in MynaCAD. MynaCAD is asked to close (it asks about unsaved work), then this continues.", "Close MynaCAD"))
+            return false;
+        _result.Text = "Waiting for MynaCAD to close…";
+        if (await OpsProject.CloseCadAsync(_path, TimeSpan.FromSeconds(120))) return true;
+        _result.Text = $"MynaCAD is still open for this project, so nothing was changed ({action.ToLowerInvariant()} is refused while MynaCAD holds the project).";
+        return false;
+    }
+
     async Task CompactAsync()
     {
+        if (!await CloseCadFirstAsync("Compact")) return;
         if (!await Confirm("Compact the project file?",
                 "The file is rewritten without its free space. Its contents and revision stay the same. It must not be open in MynaCAD meanwhile.",
                 "Compact"))
@@ -283,6 +305,8 @@ public sealed class ProjectDatabasePage : Page
             _result.Text = "Select a backup in the list first.";
             return;
         }
+        var reopenCad = _path is not null && ProjectLease.IsHeld(_path, ProjectLease.AppCad);
+        if (!await CloseCadFirstAsync("Restore")) return;
         bool ours = ActiveProject.SamePath(ProjectStore.Current.FilePath, _path);
         var lose = ours && ProjectStore.Current.IsDirty ? " Unsaved changes in MynaOps are discarded." : "";
         if (!await Confirm("Restore this backup?",
@@ -302,6 +326,12 @@ public sealed class ProjectDatabasePage : Page
         {
             ProjectStore.Current.IsDirty = false;
             window.OpenProjectFile(path);
+        }
+        // MynaCAD was closed for the restore: open it again on the restored project (it applies the restored configuration)
+        if (restored && reopenCad && OpsProject.Session is { Online: true })
+        {
+            var r = await OpsProject.Launcher.OpenAsync(path);
+            AppNotify.Info("MynaCAD", r.Message);
         }
     }
 
