@@ -110,6 +110,13 @@ MynaOps writes nothing about a MynaCAD it started except what the lease and stat
 6. *Test and hand-run hooks (not user features).* `OSTUDIO_LOCAL_DIR` moves the whole `O-Studio` local folder, `OSTUDIO_LEASE_DIR` only its `leases` folder. A stand-in for MynaCAD that follows 2.1 and these clarifications is `BBSDesktop/tests/e2e/CadStub` (MynaOps repo).
 7. *`session.holder`* is a **local** meta key (no revision, no `change` row, no `sync.last`): `{machine, user, ops_pid, started_utc, heartbeat_utc}`, refreshed every 30 s; a heartbeat younger than 120 s from another machine or process warns. MynaCAD never writes it.
 
+**Clarifications made by package B (2026-11-15; reconciled by the owner).** Pipe requests use the `cmd` shape above.
+
+1. *Reading the lock.* MynaCAD holds `.cad.lock` with **no sharing**, so MynaOps cannot read its body: "cannot open" means held, and details come from the pipe `status` request. MynaOps' code never reads the `.cad.lock` body (it reads only the `.ops.lock` body, for a message).
+2. *First configuration poll.* The first configuration poll in a MynaCAD run always applies the configuration, whatever `config.applied.cad` says (a run that reported applied but closed without saving left the drawing without the levels).
+3. *Levels only through MynaOps.* The MynaCAD host also refuses `level.moveto` with `create` and `level.import` without `sheetSet`, so levels cannot be added through those routes (only MynaOps adds or deletes levels).
+4. *Path hash test vectors* (checked against the MynaOps code, `ProjectLeaseTests.Path_hash_matches_the_shared_test_vectors`): `C:\Work\House.osp` and `c:\work\house.osp` give `a8f10e8331d28c52`; `C:\Users\Ana\Documents\My House\Plan.osp` gives `0df4c7568e96ec70`.
+
 ### 2.2 Who owns which tables and meta keys
 
 Extends the live-sync table (live-sync.md, "Who owns what"). A program writes only what it owns; the rule from live-sync stays: a program that would have to write a table it does not own refuses.

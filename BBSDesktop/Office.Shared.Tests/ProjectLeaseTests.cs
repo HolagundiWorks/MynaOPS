@@ -84,6 +84,13 @@ public sealed class ProjectLeaseTests : OpsFirstTestBase
         Assert.Equal(expected, a);
     }
 
+    /// <summary>Test vectors shared with MynaCAD's side (package B uses the same ones).</summary>
+    [Theory]
+    [InlineData(@"C:\Work\House.osp", "a8f10e8331d28c52")]
+    [InlineData(@"c:\work\house.osp", "a8f10e8331d28c52")]
+    [InlineData(@"C:\Users\Ana\Documents\My House\Plan.osp", "0df4c7568e96ec70")]
+    public void Path_hash_matches_the_shared_test_vectors(string path, string expected) => Assert.Equal(expected, ProjectLease.PathHash(path));
+
     [Fact]
     public void A_lease_is_exclusive_and_goes_when_released()
     {
