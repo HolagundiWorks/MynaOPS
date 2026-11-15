@@ -16,6 +16,12 @@ public sealed class BridgeFile
     public string? ProjectRefCompany { get; init; }
     /// <summary>Project id from <c>source.project_ref</c> when present and numeric.</summary>
     public long? ProjectRefId { get; init; }
+    /// <summary>
+    /// For a file <see cref="TakeoffLevels.Filter"/> cut down to chosen levels: the levels of the whole file, in order (null otherwise). The importer keeps
+    /// the position each level has in the whole file when it falls back to matching by position, and never puts a level on an AQC level that is named
+    /// after another floor of the whole file (importing one floor at a time would otherwise land the second on the first's level).
+    /// </summary>
+    public IReadOnlyList<BridgeLevel>? WholeFileLevels { get; init; }
     public Dictionary<string, string> Project { get; init; } = new();
     public List<BridgeLevel> Levels { get; init; } = new();
     public List<JsonObject> Walls { get; init; } = new();

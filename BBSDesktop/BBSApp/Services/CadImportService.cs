@@ -38,6 +38,9 @@ public static class CadImportService
         return new Prepared(file, model, CadImporter.Plan(file, model, options));
     }
 
+    /// <summary>Which AQC level each of the take-off's levels would be imported into (the importer's own mapping; nothing is changed).</summary>
+    public static IReadOnlyDictionary<string, TakeoffLevels.AqcLevel> AqcLevels(BridgeFile file) => TakeoffLevels.AqcLevels(file, BuildModel(ProjectStore.Current));
+
     /// <summary>Applies the plan to the open project. One undo step via <see cref="Undo"/>.</summary>
     public static void Apply(Prepared p)
     {

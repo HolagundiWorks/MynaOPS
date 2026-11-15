@@ -73,6 +73,10 @@ public static class CadImporter
 
         var levelMap = PlanLevels(file, model, plan);
         PlanProject(file, model, plan, options);
+        // the floor elevation (mm above the site datum) of the CAD level each AQC level receives, when the file states it: stored on the rows it adds
+        var elevationOf = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var fl in file.Levels)
+            if (fl.ElevationMm is { } el && double.IsFinite(el) && levelMap.TryGetValue(fl.Name, out var aqcId)) elevationOf.TryAdd(aqcId, N(el));
 
         // marks assigned during planning, so NextMark sees rows already planned
         var pending = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
@@ -106,6 +110,7 @@ public static class CadImporter
                 if (!row.ContainsKey("mark") || string.IsNullOrEmpty(row["mark"]))
                     row["mark"] = NextMark(section, level, sheet, pending);
                 row["level"] = level;
+                if (elevationOf.TryGetValue(level, out var elev)) row[ElevationKey] = elev;
                 row["source"] = tag;
                 row["source_ref"] = refId;
                 row["source_hash"] = Hash(row, geo);
@@ -331,9 +336,24 @@ public static class CadImporter
         return plan;
     }
 
+    /// <summary>The CAD level's floor elevation in millimetres, stored on a row the importer adds when the file stated it.</summary>
+    const string ElevationKey = "source_elevation_mm";
+
+    static double? ElevationOf(Dictionary<string, string> row) =>
+        row.TryGetValue(ElevationKey, out var t) && double.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) && double.IsFinite(d) ? d : null;
+
+    /// <summary>
+    /// Whether an existing row is on the same floor as an incoming one. A MynaCAD level id belongs to one drawing (two drawings may both have a level 1, and a
+    /// copied drawing keeps the ids), so across drawings the id cannot say. The floor elevation can: when both rows carry one, equal elevations (within 1 mm)
+    /// are the same floor whatever the levels are called. Otherwise the AQC level the two were imported into decides, as before.
+    /// </summary>
+    static bool SameFloor(Dictionary<string, string> existing, string level, double? incomingElevation) =>
+        incomingElevation is { } a && ElevationOf(existing) is { } b ? Math.Abs(a - b) <= 1.0 : Get(existing, "level") == level;
+
     /// <summary>
     /// Two drawings that both measure the same trade on the same floor would be imported twice. The importer cannot know whether they overlap
     /// (a plan and a detail sheet of the same wall) or are separate parts, so it says so, once per drawing and floor, and leaves the choice to the user.
+    /// The floors are compared by elevation when both rows have one (see <see cref="SameFloor"/>), else by AQC level.
     /// </summary>
     static void WarnAboutOverlap(ImportPlan plan, ImportModel model, string tag)
     {
@@ -344,8 +364,9 @@ public static class CadImporter
         var seen = new HashSet<string>();
         foreach (var g in incoming)
         {
+            var elevation = ElevationOf(g.First().Row!);
             foreach (var other in model.Sheet(g.Key.Section)
-                         .Where(r => Get(r, "level") == g.Key.Level && Get(r, "source") is { Length: > 0 } s && s.StartsWith("hcwcad:", StringComparison.Ordinal) && s != tag)
+                         .Where(r => SameFloor(r, g.Key.Level, elevation) && Get(r, "source") is { Length: > 0 } s && s.StartsWith("hcwcad:", StringComparison.Ordinal) && s != tag)
                          .Select(r => Get(r, "source")["hcwcad:".Length..]).Distinct())
             {
                 var floor = levelNames.TryGetValue(g.Key.Level, out var n) && n.Length > 0 ? n : g.Key.Level;
@@ -406,7 +427,18 @@ public static class CadImporter
 
     // ---- levels and project ----
 
-    static Dictionary<string, string> PlanLevels(BridgeFile file, ImportModel model, ImportPlan plan)
+    /// <summary>The AQC level at the level's position in the whole file, unless it is taken or named after another floor of the whole file.</summary>
+    static LevelRec? PositionMatch(BridgeFile file, ImportModel model, HashSet<LevelRec> used, BridgeLevel fl, int i)
+    {
+        var whole = file.WholeFileLevels ?? file.Levels;
+        var at = whole.ToList().FindIndex(l => l.Name.Equals(fl.Name, StringComparison.OrdinalIgnoreCase));
+        var pos = (at >= 0 ? at : i) + 1;
+        if (model.Levels.Count <= pos || used.Contains(model.Levels[pos])) return null;
+        var cand = model.Levels[pos];
+        return whole.Any(l => !l.Name.Equals(fl.Name, StringComparison.OrdinalIgnoreCase) && l.Name.Equals(cand.Name, StringComparison.OrdinalIgnoreCase)) ? null : cand;
+    }
+
+    internal static Dictionary<string, string> PlanLevels(BridgeFile file, ImportModel model, ImportPlan plan)
     {
         var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var used = new HashSet<LevelRec>();
@@ -416,7 +448,7 @@ public static class CadImporter
             var fl = file.Levels[i];
             // Lvl0 is AQC's plinth and is never matched
             var match = model.Levels.Skip(1).FirstOrDefault(l => !used.Contains(l) && l.Name.Equals(fl.Name, StringComparison.OrdinalIgnoreCase))
-                        ?? (model.Levels.Count > i + 1 && !used.Contains(model.Levels[i + 1]) ? model.Levels[i + 1] : null);
+                        ?? PositionMatch(file, model, used, fl, i);
             if (match is not null)
             {
                 used.Add(match); map[fl.Name] = match.Id;
