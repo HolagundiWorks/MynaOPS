@@ -25,6 +25,7 @@ Each entry keeps its existing fields (`name`, `height_mm` = floor to floor, `sla
 |---|---|---|
 | `id` | integer ≥ 0, optional | The level's stable id: the value rows carry in `level_id`. |
 | `elevation_mm` | number, optional | The level's floor elevation above the site datum, in millimetres. |
+| `config_id` | integer ≥ 0, optional | **Added with the project configuration** (Ops-first, package C). The `cid` of the configured level (`meta.config.levels`, MynaOps' own id, never reused) that this MynaCAD level is bound to. Written next to `id` only when the drawing has applied a project configuration and the level is bound (`config.levelmap` in the drawing's project data). For a level adopted from an existing drawing `cid` equals `id`. A reader that wants the configured level uses `config_id`; `id` stays the MynaCAD level. |
 
 A project floor (`floors`) and a level with the same name (case-insensitive) are one entry. A level with no project floor of that name is appended with `name`, `height_mm` (the level's height) , `id` and `elevation_mm` only. A drawing without explicit levels writes the list exactly as before.
 

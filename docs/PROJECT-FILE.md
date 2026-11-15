@@ -32,6 +32,22 @@ Code: `Office.Shared/OdpFile.cs` (the format), `BBSApp/Services/ProjectFiles.cs`
 
 Nothing on the page changes the format: no table or column is added or altered and the revision does not move (a restore brings back the backup's own revision).
 
+## Project configuration (`meta.config.*`)
+
+MynaOps is the only writer of the project configuration; MynaCAD reads it and applies it to the drawing (`docs/ops-first-workflow.md`, sections 4 and 7a; MynaCAD `docs/PROJECT-FILE.md` has the same description). It is additive: new `meta` keys with the prefix `config.`, no table added or changed, `meta.format` and `meta.version` unchanged. Every value is JSON text of at most 256 KiB and carries `"v": 1`; a key with an unknown `v` is left out and reported, unknown fields are ignored, and a part that breaks a rule (more than 64 levels, repeated ids or names, a number that is not finite or out of range, a `..` in a file pattern, a unit that does not exist) rejects the whole configuration with a `ConfigException`.
+
+| Key | Written by | Meaning |
+|---|---|---|
+| `config.schema` | MynaOps | `{v, min_reader}`: present = configured by MynaOps; a reader older than `min_reader` refuses |
+| `config.rev` | MynaOps | `{v, rev, app, time}`: rises by one per configuration change |
+| `config.project`, `config.team`, `config.units`, `config.levels`, `config.layer_sets`, `config.tabs`, `config.sheets`, `config.naming`, `config.titleblock` | MynaOps | The parts (fields: ops-first-workflow.md 4.2; `config.tabs` also has an optional `next_tid`) |
+| `config.applied.cad` | MynaCAD, local (no revision) | What MynaCAD applied: `{v, rev, time, result: ok\|partial\|failed, has_content, items}` |
+| `config.proposal` | MynaCAD, local, once | What a legacy drawing already has, for the Adopt page; written only while the file has no `config.schema` |
+
+`config.plot` is not defined: no project-wide plot setting exists (ops-first-workflow.md, 3.1).
+
+Code: `Office.Shared/ProjectConfig.cs` (types, strict parse and validation, `Read`, the read-only `Probe`, `Write`), `Office.Shared/OdpFile.Config.cs` (`MetaLength`, `MetaText`, `WriteMeta`). **One revision per write:** `ProjectConfig.Write(odp, config)` puts every part that differs from the file and the bumped `config.rev` in one transaction, so `meta.revision` rises once, one `change` row names each key, and `sync.last` names `mynaops`; it writes nothing when no part differs, never deletes a key, and `WriteMeta` refuses the keys that describe the file. The Rust side is `aad_odp::config`; both read the same JSON fixtures (`Office.Shared.Tests/Fixtures/config`, identical in MynaCAD `crates/odp/tests/fixtures/config`) and each reads the other's file (`config-rust.osp`, `config-csharp.osp`). Tests: `Office.Shared.Tests/ProjectConfigTests.cs`.
+
 ## Retired
 
 Legacy `.vdb` sidecars, the shared `shilpid` server, and ShilpiDB project files are **not** used anymore. Projects are **`.osp` only**. There is **no shipped importer** from old `.vdb` take-off files into `.osp`; see [MIGRATION-OSP.md](MIGRATION-OSP.md) for what is done and what remains.

@@ -26,7 +26,7 @@ public sealed record OdpDetail(string Id, string Drawing, string Handle, string 
 /// the other reads, and a second writer waits up to five seconds.
 /// Spec: <c>docs/ODP-PROJECT-FILE-AND-SYNC.md</c> in the OSAS repository.
 /// </summary>
-public sealed class OdpFile : IDisposable
+public sealed partial class OdpFile : IDisposable
 {
     public const string Format = SuiteWire.ProjectFileFormat;
     public const int Version = 1;
