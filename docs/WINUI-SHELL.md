@@ -26,9 +26,11 @@ Notice row and calculator row — docked above the status strip, they push the p
 
 | Region | Role |
 | --- | --- |
-| **File** | Open project · Save · **Take-off (MynaCAD)** · Import from CAD · Export for CAD · Undo last CAD import · **Project database** · Exit (no company sign-in: MynaOps is independent of MynaHub) |
+| **File** | **New project** (the create-project wizard, a window of its own) · Open project · **Open MynaCAD** · Save · **Take-off (MynaCAD)** · Import from CAD · Export for CAD · Undo last CAD import · **Project database** · Exit (no company sign-in: MynaOps is independent of MynaHub) |
 | **Edit** | Project / Engineering / Cost settings · **Assistant model** (model location, who hosts the AI agent, Download, Locate) |
 | **Help** | About |
+| **Project home** | Project > Home (the first page, and the one a project opens on): with no project, Open project, New project and the recent list; with one, cards for Project, Configuration, MynaCAD (state, **Open MynaCAD**), Database (**Take database offline / online**), AI agent (**Stop / Start**) and Sync status. Read-only; it probes the file every two seconds while the database is online. Built in code (`Views/ProjectHomePage.cs`) with the existing card and button styles |
+| **Wizard and Adopt windows** | `NewProjectWindow` (five steps) and `AdoptWindow` are ordinary top-level windows (system caption, resizable), owned by and modal over the main window, themed with `O.Ui` and the compact density; base class `OpsWindow` in `Views/OpsUi.cs`. Every control has an automation id (`NewProject.*`, `Adopt.*`, `Home.*`) for UI Automation. Run by hand with `tests/e2e/uia-ops-first.ps1`; what was seen is in `ops-first-workflow.md` section 11 |
 | **Main ribbon** | One text tab per section (Project, RCC steel, Civil BOQ, Schedule, Contracts, Stores, Outputs; Office, Accounts and HR are in MynaHub). Ctrl+1 to Ctrl+7 jump to a section's first page. The open tab is the colour of the sub ribbon, so it joins it |
 | **Sub ribbon** | One text tab per page of the open section. The open tab is the colour of the work area, so it joins the page without a line. No icons |
 | **Data model page** | Outputs > Data model: the work items and link rules as a graph, with an icon ribbon, a right-click *Add component* menu and a component and link inspector. See [DATA-MODEL-COMPONENTS.md](DATA-MODEL-COMPONENTS.md) |
