@@ -9,3 +9,7 @@ MynaCAD writes the take-off as records in the shared `.osp` (`takeoff.record`: a
 - **Project > Take-off** shows a per-level summary of the selected drawing (counts, wall length and area, room and slab area, the AQC level each lands on, recording status). The **import preview** has a tick box per level and imports only the ticked ones. Details and what was run by hand: `docs/bridge/LEVEL-IDS.md`.
 - The double-count warning compares floors by `elevation_mm` when both sides state one, else by level.
 - **Not built:** live refresh of a running MynaOps when MynaCAD records (MynaOps polls the project file and the Take-off page reloads when the file changes). The stale display was checked by unit tests only, not in the running app.
+
+## Live sync
+
+The status strip shows `Synced`, `Updated by MynaCAD at hh:mm`, `Take-off out of date`, `Locked`, `Project file was replaced` or `Project file unreadable` for the open `.osp`. It only reads the file; the Take-off page reloads when it is open. Code and what was run by hand: `docs/bridge/LIVE-SYNC.md`.
