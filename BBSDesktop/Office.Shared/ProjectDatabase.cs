@@ -195,12 +195,17 @@ public static class ProjectDatabase
 
     /// <summary>
     /// Who else has <paramref name="path"/> open. MynaCAD's live-sync marker (<see cref="ActiveProject"/>, <c>active-project.json</c>) names the
-    /// project file it has open; it counts while MynaCAD runs. Any other program is seen by its open handle on the file.
+    /// project file it has open; it counts while MynaCAD runs (kept until the pointer is removed, stage E). Any other program is seen by its open handle on the file.
     /// <paramref name="marker"/> and <paramref name="mynaCadRunning"/> replace the real marker and process check (tests).
     /// </summary>
-    public static OpenElsewhereResult OpenElsewhere(string path, ActiveProjectInfo? marker = null, bool? mynaCadRunning = null, bool useMarker = true)
+    public static OpenElsewhereResult OpenElsewhere(string path, ActiveProjectInfo? marker = null, bool? mynaCadRunning = null, bool useMarker = true, bool? cadLeaseHeld = null)
     {
         path = System.IO.Path.GetFullPath(path);
+        // The lease (docs/ops-first-workflow.md 2.3) is the first and the exact test: MynaCAD holds <hash>.cad.lock while it has the project open.
+        if (cadLeaseHeld ?? ProjectLease.IsHeld(path, ProjectLease.AppCad))
+            return new OpenElsewhereResult(true, "MynaCAD");
+        if (ProjectLease.IsHeldByOther(path, ProjectLease.AppOps))
+            return new OpenElsewhereResult(true, "another MynaOps");
         if (useMarker)
         {
             marker ??= ActiveProject.Read();
