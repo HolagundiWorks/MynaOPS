@@ -63,6 +63,11 @@
                  AutomationProperties.Name="Menu bar">
             <!-- Company first · work · Exit (same File shape as MynaHub). -->
             <MenuBarItem Title="File" AccessKey="F">
+                <MenuFlyoutItem Text="New project…" Click="NewProject_Click" AccessKey="N">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE710;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
                 <MenuFlyoutItem Text="Open project…" Click="OpenProject_Click" AccessKey="O">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE8E5;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
@@ -75,6 +80,11 @@
                     </MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Open MynaCAD" Click="OpenCad_Click" AccessKey="C">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE8A7;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
                 <MenuFlyoutItem Text="Take-off (MynaCAD)…" Click="NavMenu_Click" Tag="takeoff">
                     <MenuFlyoutItem.Icon>
                         <FontIcon Glyph="&#xE9F9;" FontFamily="{ThemeResource SymbolThemeFontFamily}"/>
@@ -176,7 +186,7 @@
 
                 <!-- Page line: the page, and whose letterhead the project is set up for -->
                 <StackPanel x:Name="PageLine" Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="24,12,24,4">
-                    <TextBlock x:Name="RibbonPageLabel" Text="Dashboard" AutomationProperties.HeadingLevel="Level1" FontSize="{StaticResource SuiteFontSection}" FontWeight="SemiBold"
+                    <TextBlock x:Name="RibbonPageLabel" Text="Home" AutomationProperties.HeadingLevel="Level1" FontSize="{StaticResource SuiteFontSection}" FontWeight="SemiBold"
                                FontFamily="{StaticResource HcwFontFamily}" Foreground="{ThemeResource HcwInkBrush}"
                                VerticalAlignment="Center"/>
                     <TextBlock x:Name="PersonaPageSep" Text="·" Foreground="{ThemeResource HcwMutedBrush}" VerticalAlignment="Center"/>
