@@ -185,6 +185,13 @@ public sealed partial class MainWindow
                 var proposal = await Task.Run(() => ProjectAdoption.Propose(path));
                 var adopt = new AdoptWindow(path, proposal);
                 await adopt.ShowModalAsync(this);
+                while (adopt.ReadFromCad)
+                {
+                    // MynaCAD described the drawing (D8): show the window again with its proposal.
+                    proposal = await Task.Run(() => ProjectAdoption.Propose(path));
+                    adopt = new AdoptWindow(path, proposal);
+                    await adopt.ShowModalAsync(this);
+                }
                 if (!adopt.Adopted) { if (created) session.Dispose(); return; }
             }
 

@@ -25,6 +25,9 @@ internal sealed class AdoptWindow : OpsWindow
     /// <summary>True once the project was adopted (the file now has its configuration).</summary>
     public bool Adopted { get; private set; }
 
+    /// <summary>True when the window was closed because MynaCAD has now written its proposal: the caller shows the window again with it (D8).</summary>
+    public bool ReadFromCad { get; private set; }
+
     public AdoptWindow(string path, AdoptionProposal proposal) : base("Adopt project settings", 720, 640)
     {
         _path = path;
@@ -72,8 +75,37 @@ internal sealed class AdoptWindow : OpsWindow
 
         var cancel = OpsUi.Button("Cancel", false, "Adopt.Cancel", Close);
         var adopt = OpsUi.Button("Adopt", true, "Adopt.Adopt", () => AdoptNow());
+        if (!proposal.FromCad)
+        {
+            // 4.5 step 2: only MynaCAD can read the drawing; this starts it for that, and shows the window again with what it wrote (D8).
+            Footer.Children.Add(OpsUi.Button("Read the drawing in MynaCAD", false, "Adopt.ReadCad", () => _ = ReadFromCadAsync()));
+        }
         Footer.Children.Add(cancel);
         Footer.Children.Add(adopt);
+    }
+
+    async Task ReadFromCadAsync()
+    {
+        _result.Text = "MynaCAD is reading the drawing...";
+        try
+        {
+            var started = await Services.OpsProject.Launcher.OpenAsync(_path);
+            if (started.Outcome is CadLaunch.NotInstalled or CadLaunch.Failed) { _result.Text = started.Message; return; }
+            if (!await ProjectAdoption.WaitForCadProposalAsync(_path, TimeSpan.FromSeconds(60)))
+            {
+                _result.Text = "MynaCAD did not describe the drawing in time. Close MynaCAD if it is open, or adopt with what the file holds.";
+                return;
+            }
+            await Services.OpsProject.Launcher.RequestCloseAsync(_path, "discard");
+            var gone = DateTime.UtcNow + TimeSpan.FromSeconds(30);
+            while (ProjectLease.IsHeld(_path, ProjectLease.AppCad) && DateTime.UtcNow < gone) await Task.Delay(200);
+            ReadFromCad = true;
+            Close();
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException)
+        {
+            _result.Text = "MynaCAD could not be asked: " + ex.Message;
+        }
     }
 
     void AdoptNow()

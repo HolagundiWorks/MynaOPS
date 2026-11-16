@@ -4,7 +4,7 @@
 namespace Office.Shared;
 
 /// <summary>A storey as MynaOps' Levels page holds it (the plinth, <c>Lvl0</c>, is AQC's own and is left out by the caller).</summary>
-public sealed record StoreLevel(string Name, double HeightMm, double SlabMm, double BeamMm);
+public sealed record StoreLevel(string Name, double HeightMm, double SlabMm, double BeamMm, uint? Cid = null);
 
 /// <summary>The project details MynaOps' Settings page holds.</summary>
 public sealed record StoreDetails(string Name, string Client, string Location, string Address, string Summary, string Persona);
@@ -31,17 +31,26 @@ public static class ConfigPublisher
         var cur = current.Levels ?? new ConfigLevels();
         var byName = new Dictionary<string, ConfigLevelItem>();
         foreach (var i in cur.Items) byName.TryAdd(i.Name.Trim().ToLowerInvariant(), i);
+        var byCid = new Dictionary<uint, ConfigLevelItem>();
+        foreach (var i in cur.Items) byCid.TryAdd(i.Cid, i);
         var storeNames = new HashSet<string>(levels.Select(l => l.Name.Trim().ToLowerInvariant()));
+        var storeCids = new HashSet<uint>(levels.Where(l => l.Cid is { } c && byCid.ContainsKey(c)).Select(l => l.Cid!.Value));
 
-        var result = cur.Items.Where(i => i.ElevationMm < 0 && !storeNames.Contains(i.Name.Trim().ToLowerInvariant())).OrderBy(i => i.ElevationMm).ToList();
+        var result = cur.Items.Where(i => i.ElevationMm < 0 && !storeNames.Contains(i.Name.Trim().ToLowerInvariant()) && !storeCids.Contains(i.Cid)).OrderBy(i => i.ElevationMm).ToList();
+        var used = new HashSet<uint>();
         var next = cur.NextCid;
         double shift = 0;
         double? top = null;
         foreach (var s in levels)
         {
             ConfigLevelItem item;
-            if (byName.TryGetValue(s.Name.Trim().ToLowerInvariant(), out var m))
+            // A level keeps its cid through a rename: the cid the page remembers first, then the name (a document saved before cids were remembered).
+            ConfigLevelItem? m = null;
+            if (s.Cid is { } known && byCid.TryGetValue(known, out var byId) && !used.Contains(byId.Cid)) m = byId;
+            else if (byName.TryGetValue(s.Name.Trim().ToLowerInvariant(), out var named) && !used.Contains(named.Cid) && (s.Cid is null || !byCid.ContainsKey(s.Cid.Value))) m = named;
+            if (m is not null)
             {
+                used.Add(m.Cid);
                 item = m with { Name = s.Name.Trim(), HeightMm = s.HeightMm, SlabMm = s.SlabMm, BeamMm = s.BeamMm, ElevationMm = m.ElevationMm + shift };
                 shift += s.HeightMm - m.HeightMm;          // a taller (shorter) level pushes the ones above it up (down)
             }

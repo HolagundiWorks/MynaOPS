@@ -171,6 +171,22 @@ public static class ProjectAdoption
     }
 
     /// <summary>
+    /// Waits until MynaCAD's <c>config.proposal</c> is in the file (MynaCAD writes it when it opens an unadopted project, 4.5 step 2). True when it is
+    /// there, false after <paramref name="timeout"/> or when cancelled. A file that is briefly busy counts as "not yet".
+    /// </summary>
+    public static async Task<bool> WaitForCadProposalAsync(string path, TimeSpan timeout, CancellationToken ct = default)
+    {
+        var until = DateTime.UtcNow + timeout;
+        while (true)
+        {
+            try { if (Propose(path).FromCad) return true; }
+            catch (Exception ex) when (ex is IOException or Microsoft.Data.Sqlite.SqliteException or ConfigException or InvalidOperationException) { }
+            if (ct.IsCancellationRequested || DateTime.UtcNow >= until) return false;
+            await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
     /// Adopt: a <c>manual</c> backup of the file, then the configuration in one revision. Throws (and writes nothing) when the file is held by MynaCAD:
     /// adoption is done from MynaOps with the file closed in MynaCAD, so no drawing is saved under it. Returns what was written and the backup's path.
     /// </summary>
