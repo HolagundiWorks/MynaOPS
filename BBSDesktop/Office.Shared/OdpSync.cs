@@ -8,7 +8,7 @@ using Microsoft.Data.Sqlite;
 namespace Office.Shared;
 
 /// <summary>What the user is told about the shared project file (MynaCAD <c>docs/live-sync.md</c>; the same words in both programs).</summary>
-public enum SyncState { None, Synced, Updated, OutOfDate, Locked, Replaced, Unreadable, Missing }
+public enum SyncState { None, Synced, Updated, OutOfDate, Locked, Replaced, Unreadable, Missing, Paused }
 
 /// <summary>The take-off stamp MynaCAD writes at every record (<c>meta.sync.takeoff.&lt;slot&gt;</c>).</summary>
 public sealed record SyncTakeoffStamp(uint Slot, long Revision, string Recorded, IReadOnlyList<(string LevelId, long Revision)> Levels);
@@ -173,6 +173,7 @@ public static class OdpSync
         SyncState.Replaced => "Project file was replaced",
         SyncState.Unreadable => "Project file unreadable",
         SyncState.Missing => "Project file missing",
+        SyncState.Paused => "Sync off",
         _ => "",
     };
 

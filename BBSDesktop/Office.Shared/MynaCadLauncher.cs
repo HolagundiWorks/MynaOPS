@@ -27,6 +27,24 @@ public static class CadRequest
     }
 }
 
+/// <summary>MynaCAD's realtime sync state as its <c>status</c>, <c>sync.set</c> and <c>sync.now</c> replies report it (<c>sync: {on, waiting, text}</c>).</summary>
+public sealed record CadSyncState(bool On, long Waiting, string Text)
+{
+    /// <summary>The <c>sync</c> object of a reply line; null when the line has none or is not JSON.</summary>
+    public static CadSyncState? Parse(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        try
+        {
+            if (JsonNode.Parse(raw) is not JsonObject o || o["sync"] is not JsonObject s) return null;
+            var on = s["on"] is JsonValue v && v.TryGetValue<bool>(out var b) ? b : true;
+            var waiting = s["waiting"] is JsonValue w && w.TryGetValue<long>(out var n) ? Math.Max(0, n) : 0;
+            return new CadSyncState(on, waiting, s["text"] is JsonValue t && t.TryGetValue<string>(out var text) ? text : "");
+        }
+        catch (Exception ex) when (ex is System.Text.Json.JsonException or InvalidOperationException or FormatException) { return null; }
+    }
+}
+
 /// <summary>Sends one request to a MynaCAD instance (the real pipe, or a fake in tests).</summary>
 public interface ICadPipe
 {
@@ -209,6 +227,33 @@ public sealed class MynaCadLauncher
         {
             return new CadLaunchResult(CadLaunch.Failed, "MynaCAD could not be started: " + ex.Message);
         }
+    }
+
+    /// <summary>MynaCAD's realtime sync state, over the pipe (<c>status</c>); null when no MynaCAD holds the project or nothing answers.</summary>
+    public async Task<CadSyncState?> SyncStatusAsync(string project, CancellationToken ct = default)
+    {
+        project = Path.GetFullPath(project);
+        if (!IsRunningFor(project)) return null;
+        var reply = await _pipe.SendAsync(project, CadRequest.Status(), TimeSpan.FromSeconds(2), ct).ConfigureAwait(false);
+        return reply is { Ok: true } ? CadSyncState.Parse(reply.Raw) : null;
+    }
+
+    /// <summary>Switch MynaCAD's realtime sync (<c>sync.set</c>); returns its new state, or null when it cannot be reached.</summary>
+    public async Task<CadSyncState?> SetSyncAsync(string project, bool on, CancellationToken ct = default)
+    {
+        project = Path.GetFullPath(project);
+        if (!IsRunningFor(project)) return null;
+        var reply = await _pipe.SendAsync(project, CadRequest.SyncSet(on), TimeSpan.FromSeconds(2), ct).ConfigureAwait(false);
+        return reply is { Ok: true } ? CadSyncState.Parse(reply.Raw) : null;
+    }
+
+    /// <summary>MynaCAD's Sync now (<c>sync.now</c>): it saves unsaved work first, so the reply can take a while (60 s at most). Null when it cannot be reached or refused.</summary>
+    public async Task<CadSyncState?> SyncNowAsync(string project, CancellationToken ct = default)
+    {
+        project = Path.GetFullPath(project);
+        if (!IsRunningFor(project)) return null;
+        var reply = await _pipe.SendAsync(project, CadRequest.SyncNow(), TimeSpan.FromSeconds(60), ct).ConfigureAwait(false);
+        return reply is { Ok: true } ? CadSyncState.Parse(reply.Raw) : null;
     }
 
     /// <summary>Ask a running MynaCAD to close (it asks the user about unsaved work when <paramref name="save"/> is <c>ask</c>). False when nothing answers.</summary>

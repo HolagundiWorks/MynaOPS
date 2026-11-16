@@ -26,7 +26,10 @@ public sealed class ProjectHomePage : Page
         _aiState = OpsUi.Text(""), _aiDetail = OpsUi.Text("", "CaptionSecondaryStyle"), _syncState = OpsUi.Text(""), _busy = OpsUi.Text("", "CaptionSecondaryStyle");
     readonly StackPanel _facts = new();
     readonly StackPanel _config = new();
-    Button? _openCad, _dbToggle, _aiToggle, _cancelWait;
+    Button? _openCad, _dbToggle, _aiToggle, _cancelWait, _syncToggle, _syncNow, _cadSyncToggle, _cadSyncNow;
+    TextBlock _cadSyncState = OpsUi.Text("", "CaptionSecondaryStyle");
+    StackPanel _cadSyncRow = new() { Orientation = Orientation.Horizontal, Spacing = 8, Visibility = Visibility.Collapsed };
+    bool _cadSyncOn = true;
     CancellationTokenSource? _wait;
     bool _building, _refreshing;
     string? _shownPath;
@@ -39,6 +42,7 @@ public sealed class ProjectHomePage : Page
         {
             OpsProject.Changed += OnChanged;
             SyncStatusService.Changed += OnSync;
+            SyncStatusService.RealtimeChanged += OnRealtime;
             _timer.Tick += async (_, _) => await RefreshAsync();
             _timer.Start();
             Build();
@@ -49,6 +53,7 @@ public sealed class ProjectHomePage : Page
             _timer.Stop();
             OpsProject.Changed -= OnChanged;
             SyncStatusService.Changed -= OnSync;
+            SyncStatusService.RealtimeChanged -= OnRealtime;
             _wait?.Cancel();
         };
     }
@@ -56,6 +61,62 @@ public sealed class ProjectHomePage : Page
     void OnChanged() => DispatcherQueue.TryEnqueue(() => { if (_shownPath != OpsProject.Path) Build(); _ = RefreshAsync(); });
 
     void OnSync(SyncStatus s) => DispatcherQueue.TryEnqueue(() => _syncState.Text = s.Text.Length > 0 ? s.Text : "Synced");
+
+    void OnRealtime(bool on) => DispatcherQueue.TryEnqueue(ShowSyncControls);
+
+    void ShowSyncControls()
+    {
+        if (_syncToggle is not null)
+        {
+            _syncToggle.Content = SyncStatusService.RealtimeOn ? "Realtime sync: on" : "Realtime sync: off";
+            AutomationProperties.SetName(_syncToggle, (string)_syncToggle.Content);
+        }
+        if (_cadSyncToggle is not null)
+        {
+            _cadSyncToggle.Content = _cadSyncOn ? "MynaCAD sync: on" : "MynaCAD sync: off";
+            AutomationProperties.SetName(_cadSyncToggle, (string)_cadSyncToggle.Content);
+        }
+    }
+
+    async Task ToggleSyncAsync()
+    {
+        if (App.MainWindow is { } w) await w.SetRealtimeSyncAsync(!SyncStatusService.RealtimeOn);
+    }
+
+    async Task SyncNowAsync()
+    {
+        if (App.MainWindow is { } w) await w.SyncNowAsync();
+    }
+
+    /// <summary>MynaCAD's own sync state over the pipe (shown only while MynaCAD holds the project): one round trip, no file read.</summary>
+    async Task RefreshCadSyncAsync(string path, bool cadHeld)
+    {
+        _cadSyncRow.Visibility = cadHeld ? Visibility.Visible : Visibility.Collapsed;
+        if (!cadHeld) { _cadSyncState.Text = ""; return; }
+        var st = await OpsProject.Launcher.SyncStatusAsync(path);
+        ApplyCadSync(st);
+    }
+
+    void ApplyCadSync(CadSyncState? st)
+    {
+        if (st is null) { _cadSyncState.Text = "MynaCAD did not answer."; return; }
+        _cadSyncOn = st.On;
+        _cadSyncState.Text = st.On ? "MynaCAD: realtime sync on" : "MynaCAD: " + (st.Text.Length > 0 ? st.Text : "Sync off");
+        ShowSyncControls();
+    }
+
+    async Task ToggleCadSyncAsync()
+    {
+        if (OpsProject.Session is not { } s) return;
+        ApplyCadSync(await OpsProject.Launcher.SetSyncAsync(s.Path, !_cadSyncOn));
+    }
+
+    async Task CadSyncNowAsync()
+    {
+        if (OpsProject.Session is not { } s) return;
+        _cadSyncState.Text = "MynaCAD: syncing...";
+        ApplyCadSync(await OpsProject.Launcher.SyncNowAsync(s.Path));
+    }
 
     // ---- layout
 
@@ -113,9 +174,28 @@ public sealed class ProjectHomePage : Page
             _page.Children.Add(OpsUi.Card("AI agent", ai, "Home.AiCard"));
 
             // Sync
+            var sync = new StackPanel { Spacing = 8 };
             AutomationProperties.SetAutomationId(_syncState, "Home.SyncState");
             _syncState.Text = SyncStatusService.Current.Text.Length > 0 ? SyncStatusService.Current.Text : "Synced";
-            _page.Children.Add(OpsUi.Card("Sync with MynaCAD", _syncState, "Home.SyncCard"));
+            sync.Children.Add(_syncState);
+            var syncRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            _syncToggle = OpsUi.Button("Realtime sync: on", false, "Home.SyncToggle", () => _ = ToggleSyncAsync());
+            _syncNow = OpsUi.Button("Sync now", false, "Home.SyncNow", () => _ = SyncNowAsync());
+            syncRow.Children.Add(_syncToggle);
+            syncRow.Children.Add(_syncNow);
+            sync.Children.Add(syncRow);
+            // MynaCAD's own switch (independent of this one), shown while MynaCAD holds the project.
+            _cadSyncState = OpsUi.Text("", "CaptionSecondaryStyle");
+            _cadSyncRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Visibility = Visibility.Collapsed };
+            AutomationProperties.SetAutomationId(_cadSyncState, "Home.CadSyncState");
+            _cadSyncToggle = OpsUi.Button("MynaCAD sync: on", false, "Home.CadSyncToggle", () => _ = ToggleCadSyncAsync());
+            _cadSyncNow = OpsUi.Button("Sync MynaCAD now", false, "Home.CadSyncNow", () => _ = CadSyncNowAsync());
+            _cadSyncRow.Children.Add(_cadSyncToggle);
+            _cadSyncRow.Children.Add(_cadSyncNow);
+            sync.Children.Add(_cadSyncState);
+            sync.Children.Add(_cadSyncRow);
+            ShowSyncControls();
+            _page.Children.Add(OpsUi.Card("Sync with MynaCAD", sync, "Home.SyncCard"));
         }
         finally { _building = false; }
     }
@@ -234,6 +314,7 @@ public sealed class ProjectHomePage : Page
                 _aiToggle.Content = running ? "Stop" : "Start";
                 AutomationProperties.SetName(_aiToggle, running ? "Stop the AI agent" : "Start the AI agent");
             }
+            await RefreshCadSyncAsync(path, cadHeld);
             if (_syncState.Text.Length == 0) _syncState.Text = SyncStatusService.Current.Text.Length > 0 ? SyncStatusService.Current.Text : "Synced";
         }
         catch (Exception ex)

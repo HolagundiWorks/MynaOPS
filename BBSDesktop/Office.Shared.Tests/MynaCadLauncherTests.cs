@@ -169,4 +169,17 @@ public sealed class MynaCadLauncherTests : OpsFirstTestBase
         var p = @"C:\Work\House.osp";
         Assert.Equal("MynaCAD." + ProjectLease.PathHash(p), NamedCadPipe.PipeName(p));
     }
+
+    [Fact]
+    public void Sync_replies_are_read_from_the_sync_object()
+    {
+        var s = CadSyncState.Parse("{\"ok\":true,\"sync\":{\"on\":false,\"waiting\":3,\"text\":\"Sync off - 3 changes waiting\"}}");
+        Assert.Equal(new CadSyncState(false, 3, "Sync off - 3 changes waiting"), s);
+        Assert.Equal(new CadSyncState(true, 0, ""), CadSyncState.Parse("{\"ok\":true,\"sync\":{\"on\":true}}"));
+        Assert.Null(CadSyncState.Parse("{\"ok\":true}"));
+        Assert.Null(CadSyncState.Parse("not json"));
+        Assert.Null(CadSyncState.Parse(""));
+        Assert.Equal(0, CadSyncState.Parse("{\"sync\":{\"waiting\":-5}}")!.Waiting);
+    }
+
 }
