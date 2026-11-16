@@ -60,7 +60,10 @@ public sealed class ProjectSession : IDisposable
         try
         {
             var holder = ReadHolder(path);
-            if (!takeOver && holder is not null && holder.IsLiveElsewhere(now()))
+            // A holder on this PC cannot be live: this process just took the project's lease, which only one MynaOps per PC can hold, so that record
+            // is left by a MynaOps that crashed or was killed (ops-first-workflow.md section 15, L3). Only another machine's fresh beat warns.
+            var onThisPc = holder is not null && string.Equals(holder.Machine, Environment.MachineName, StringComparison.OrdinalIgnoreCase);
+            if (!takeOver && holder is not null && !onThisPc && holder.IsLiveElsewhere(now()))
             {
                 lease.Dispose();
                 return new SessionOpen(null, SessionRefusal.LiveElsewhere, null, holder);

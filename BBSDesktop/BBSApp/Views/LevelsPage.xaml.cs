@@ -19,6 +19,7 @@ public sealed partial class LevelsPage : Page
     {
         InitializeComponent();
         ProjectStore.Current.EnsureDefaultLevels();
+        OpsProject.ReadLevelsBack(ProjectStore.Current, ProjectStore.Current.FilePath);
         StoryList.ItemsSource = _rows;
         ReloadRows();
     }

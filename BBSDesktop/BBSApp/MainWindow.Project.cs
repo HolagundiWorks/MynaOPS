@@ -263,6 +263,7 @@ public sealed partial class MainWindow
                 ProjectStore.Current.Info.OspPath = path;
                 ProjectStore.Current.IsDirty = true;
             }
+            if (hadDoc) OpsProject.ReadLevelsBack(ProjectStore.Current, path);           // a configuration written elsewhere since the quantities side was saved
             if (!string.IsNullOrWhiteSpace(launcherDisplayName) && (string.IsNullOrWhiteSpace(ProjectStore.Current.Info.Name) || ProjectStore.Current.Name == "Untitled Project"))
                 ProjectStore.Current.Name = launcherDisplayName.Trim();
         }
