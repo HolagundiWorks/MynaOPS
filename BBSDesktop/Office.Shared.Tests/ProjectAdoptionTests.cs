@@ -85,6 +85,19 @@ public sealed class ProjectAdoptionTests : OpsFirstTestBase
     }
 
     [Fact]
+    public async Task Waiting_for_the_cad_proposal_ends_when_MynaCAD_has_written_it_and_not_before()
+    {
+        var path = Legacy(withProposal: false, withDoc: false, withHeader: false);
+        Assert.False(ProjectAdoption.Propose(path).FromCad);
+        Assert.False(await ProjectAdoption.WaitForCadProposalAsync(path, TimeSpan.FromMilliseconds(700)));
+        var wait = ProjectAdoption.WaitForCadProposalAsync(path, TimeSpan.FromSeconds(10));
+        await Task.Delay(600);
+        RawMeta(path, "config.proposal", Proposal);                                  // MynaCAD writes its proposal (a local key)
+        Assert.True(await wait);
+        Assert.True(ProjectAdoption.Propose(path).FromCad);
+    }
+
+    [Fact]
     public void The_proposal_merges_cad_header_and_project_levels_by_name_and_keeps_the_cad_ids()
     {
         var p = Legacy();
