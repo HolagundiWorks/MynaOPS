@@ -12,3 +12,5 @@ Read **[docs/AADT.md](docs/AADT.md)** before touching imports, levels, take-off 
 - Do not guess AADT's commands, files or export code; nothing here has been checked against it. Do not copy code between AQC (AGPL) and AADT or hcwCAD-KIT; share only the file contract (`docs/bridge/` is the authority). Do not edit the AADT or hcwCAD-KIT repos from here.
 - Say only what you have run. No "works" or "tested" without the check and the commit.
 - The owner decides file formats, names, defaults and scope.
+- **Document first, then implement.** Write or update the design or contract in the docs before the code (what, why, areas touched, acceptance, out of scope), implement to it, then update the docs with what was built and what was run. A change without its documentation is not finished.
+- **Clean up after testing.** When testing is complete, delete the temp files and temp builds you made (your own `CARGO_TARGET_DIR` and output folders, scratch files, logs, junctions, test projects); never another session's cache or the user's data, never a sweep of `%TEMP%` (`MSBuildTemp` must exist). Say what was removed.
