@@ -194,11 +194,11 @@ public static class ProjectDatabase
     }
 
     /// <summary>
-    /// Who else has <paramref name="path"/> open. MynaCAD's live-sync marker (<see cref="ActiveProject"/>, <c>active-project.json</c>) names the
-    /// project file it has open; it counts while MynaCAD runs (kept until the pointer is removed, stage E). Any other program is seen by its open handle on the file.
-    /// <paramref name="marker"/> and <paramref name="mynaCadRunning"/> replace the real marker and process check (tests).
+    /// Who else has <paramref name="path"/> open: MynaCAD (its lease), another MynaOps (its lease), or any other program (its open handle on the file,
+    /// which also sees a MynaCAD of an earlier version that holds no lease). The active-project pointer is gone (docs/ops-first-workflow.md 16.6).
+    /// <paramref name="cadLeaseHeld"/> replaces the real lease test (tests).
     /// </summary>
-    public static OpenElsewhereResult OpenElsewhere(string path, ActiveProjectInfo? marker = null, bool? mynaCadRunning = null, bool useMarker = true, bool? cadLeaseHeld = null)
+    public static OpenElsewhereResult OpenElsewhere(string path, bool? cadLeaseHeld = null)
     {
         path = System.IO.Path.GetFullPath(path);
         // The lease (docs/ops-first-workflow.md 2.3) is the first and the exact test: MynaCAD holds <hash>.cad.lock while it has the project open.
@@ -206,19 +206,15 @@ public static class ProjectDatabase
             return new OpenElsewhereResult(true, "MynaCAD");
         if (ProjectLease.IsHeldByOther(path, ProjectLease.AppOps))
             return new OpenElsewhereResult(true, "another MynaOps");
-        if (useMarker)
-        {
-            marker ??= ActiveProject.Read();
-            if (marker is not null && ActiveProject.SamePath(marker.Project, path) && (mynaCadRunning ?? MynaCadRunning()))
-            {
-                var drawing = string.IsNullOrWhiteSpace(marker.Drawing) ? "" : $" ({System.IO.Path.GetFileName(marker.Drawing)})";
-                return new OpenElsewhereResult(true, "MynaCAD" + drawing);
-            }
-        }
         if (HeldByAnyProcess(path))
             return new OpenElsewhereResult(true, "another program");
         return OpenElsewhereResult.No;
     }
+
+    /// <summary>Whether two paths name the same file (full paths, ignoring case).</summary>
+    public static bool SamePath(string? a, string? b) =>
+        !string.IsNullOrEmpty(a) && !string.IsNullOrEmpty(b)
+        && string.Equals(System.IO.Path.GetFullPath(a), System.IO.Path.GetFullPath(b), StringComparison.OrdinalIgnoreCase);
 
     static void RefuseWhileOpen(string path, string action, Func<string, OpenElsewhereResult>? openCheck)
     {

@@ -23,6 +23,11 @@ public static class Program
         if (Office.Ai.HeadlessAiHost.IsHostArgument(args))
             return Office.Ai.HeadlessAiHost.Run();
 
+        // A project file or a drawing given to a second MynaOps goes to the one that already runs (docs/ops-first-workflow.md 16.4): no second window.
+        var request = Office.Shared.StartupRequest.Parse(args);
+        if (request.Kind != Office.Shared.StartupKind.None && Office.Shared.OpsInstance.TryForward(request, TimeSpan.FromMilliseconds(1500)))
+            return 0;
+
         ComWrappersSupport.InitializeComWrappers();
         Application.Start(p =>
         {

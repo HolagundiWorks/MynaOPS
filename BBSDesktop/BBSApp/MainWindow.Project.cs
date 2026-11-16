@@ -94,13 +94,68 @@ public sealed partial class MainWindow
     }
 
     /// <summary>File &gt; New project: the create-project wizard, then the new project is the open one.</summary>
-    internal async Task NewProjectAsync()
+    internal async Task NewProjectAsync(string? suggestedName = null, string? importDrawing = null)
     {
         if (!await LeaveCurrentProjectAsync()) return;
-        var wizard = new NewProjectWindow(OpsProject.Path is { } p ? Path.GetDirectoryName(p) : null);
+        var wizard = new NewProjectWindow(OpsProject.Path is { } p ? Path.GetDirectoryName(p) : null, suggestedName);
         await wizard.ShowModalAsync(this);
         if (wizard.CreatedPath is not { } path) return;
         await OpenCreatedAsync(path);
+        // New project from a drawing: MynaCAD opens the new project and imports the drawing into it (never beside the source)
+        if (importDrawing is not null && OpsProject.Session is { } s && string.Equals(s.Path, path, StringComparison.OrdinalIgnoreCase))
+            await OpenCadWithImportAsync(s, importDrawing);
+    }
+
+    /// <summary>
+    /// A drawing handed over by MynaCAD (<c>--import-pick</c>, docs/ops-first-workflow.md 16.5): import it into the open project, make a new project
+    /// from it, or cancel. MynaOps never reads the drawing; MynaCAD converts it inside the project file.
+    /// </summary>
+    internal async Task ImportPickAsync(string drawing)
+    {
+        var canImport = OpsProject.Session is { Online: true };
+        var dlg = new ContentDialog
+        {
+            Title = $"Import {Path.GetFileName(drawing)}",
+            Content = new TextBlock
+            {
+                Text = canImport
+                    ? $"Import the drawing into {ProjectStore.Current.Name}, or make a new project from it. The drawing is stored inside the project file; nothing is written beside {Path.GetFileName(drawing)}."
+                    : "Make a new project from this drawing. It is stored inside the project file; nothing is written beside the drawing.",
+                TextWrapping = TextWrapping.Wrap, MaxWidth = 440,
+            },
+            PrimaryButtonText = canImport ? "Import into project" : "",
+            SecondaryButtonText = "New project",
+            CloseButtonText = "Cancel",
+            DefaultButton = canImport ? ContentDialogButton.Primary : ContentDialogButton.Secondary,
+            XamlRoot = Content.XamlRoot,
+        };
+        ContentDialogResult r;
+        try { r = await dlg.ShowAsync(); } catch (Exception ex) when (ex is InvalidOperationException or COMException) { return; }
+        if (r == ContentDialogResult.Primary && OpsProject.Session is { } s)
+        {
+            if (!await SaveProjectAsync(quiet: true)) return;
+            await OpenCadWithImportAsync(s, drawing);
+        }
+        else if (r == ContentDialogResult.Secondary)
+            await NewProjectAsync(Path.GetFileNameWithoutExtension(drawing), drawing);
+    }
+
+    async Task OpenCadWithImportAsync(ProjectSession s, string drawing)
+    {
+        if (!s.Online) { AppNotify.Warning("MynaCAD", "The project database is offline. Take it online on the Home page first."); return; }
+        var r = await OpsProject.Launcher.OpenAsync(s.Path, drawing);
+        if (r.Outcome is CadLaunch.Started or CadLaunch.Activated) AppNotify.Success("MynaCAD", r.Message);
+        else AppNotify.Error("MynaCAD", r.Message);
+    }
+
+    /// <summary>A request from the command line or from a second MynaOps start (<see cref="OpsInstance"/>).</summary>
+    internal void HandleStartupRequest(StartupRequest request)
+    {
+        switch (request.Kind)
+        {
+            case StartupKind.OpenProject: OpenProjectFile(request.Path); break;
+            case StartupKind.ImportPick: _ = ImportPickAsync(request.Path); break;
+        }
     }
 
     /// <summary>The project the wizard just made: take its lease, fill the quantities side from its configuration, save the project document, show Home.</summary>

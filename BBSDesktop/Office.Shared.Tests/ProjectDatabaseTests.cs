@@ -101,26 +101,25 @@ public sealed class ProjectDatabaseTests : IDisposable
     public void An_open_connection_in_another_handle_is_seen()
     {
         var path = Project();
-        Assert.False(ProjectDatabase.OpenElsewhere(path, useMarker: false).IsOpen);
+        Assert.False(ProjectDatabase.OpenElsewhere(path).IsOpen);
         using var held = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = path, Pooling = false }.ToString());
         held.Open();
         using (var cmd = held.CreateCommand()) { cmd.CommandText = "SELECT COUNT(*) FROM meta"; cmd.ExecuteScalar(); }
-        var seen = ProjectDatabase.OpenElsewhere(path, useMarker: false);
+        var seen = ProjectDatabase.OpenElsewhere(path);
         Assert.True(seen.IsOpen);
         Assert.Equal("another program", seen.Who);
     }
 
     [Fact]
-    public void MynaCADs_live_sync_marker_counts_only_while_MynaCAD_runs()
+    public void The_pointer_file_is_no_longer_read_a_stale_one_names_nobody()
     {
         var path = Project();
-        var marker = new ActiveProjectInfo("O-Draft", Path.Combine(_dir, "House.osp"), path, DateTime.UtcNow);
-        var open = ProjectDatabase.OpenElsewhere(path, marker, mynaCadRunning: true);
-        Assert.True(open.IsOpen);
-        Assert.StartsWith("MynaCAD", open.Who);
-        Assert.False(ProjectDatabase.OpenElsewhere(path, marker, mynaCadRunning: false).IsOpen);
-        var other = new ActiveProjectInfo("O-Draft", "", Path.Combine(_dir, "Other.osp"), DateTime.UtcNow);
-        Assert.False(ProjectDatabase.OpenElsewhere(path, other, mynaCadRunning: true).IsOpen);
+        var pointer = Path.Combine(_dir, "active-project.json");
+        File.WriteAllText(pointer, "{\"format\":\"studio-active-project\",\"version\":1,\"project\":\"" + path.Replace("\\", "\\\\") + "\"}");
+        Assert.False(ProjectDatabase.OpenElsewhere(path).IsOpen);
+        Assert.True(ProjectDatabase.SamePath(path, path.ToUpperInvariant()));
+        Assert.False(ProjectDatabase.SamePath(path, Path.Combine(_dir, "Other.osp")));
+        Assert.False(ProjectDatabase.SamePath(null, path));
     }
 
     [Fact]

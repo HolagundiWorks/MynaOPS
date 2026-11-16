@@ -192,13 +192,13 @@ public sealed class MaintenanceGateTests : OpsFirstTestBase
         var p = Project();
         var backup = ProjectDatabase.Backup(p, "manual");
         var cad = FakeCad(p);
-        var open = ProjectDatabase.OpenElsewhere(p, useMarker: false);
+        var open = ProjectDatabase.OpenElsewhere(p);
         Assert.True(open.IsOpen);
         Assert.Equal("MynaCAD", open.Who);
         Assert.Throws<InvalidOperationException>(() => ProjectDatabase.Compact(p));
         Assert.Throws<InvalidOperationException>(() => ProjectDatabase.Restore(p, backup));
         cad.Dispose();
-        Assert.False(ProjectDatabase.OpenElsewhere(p, useMarker: false).IsOpen);
+        Assert.False(ProjectDatabase.OpenElsewhere(p).IsOpen);
         ProjectDatabase.Compact(p);
         Assert.NotNull(ProjectDatabase.Restore(p, backup));
     }
@@ -221,7 +221,7 @@ public sealed class MaintenanceGateTests : OpsFirstTestBase
         var p = Project();
         Directory.CreateDirectory(ProjectLease.Directory);
         using var other = new FileStream(ProjectLease.LockPath(Path.GetFullPath(p), ProjectLease.AppOps), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None, 4096, FileOptions.DeleteOnClose);
-        Assert.Equal("another MynaOps", ProjectDatabase.OpenElsewhere(p, useMarker: false).Who);
+        Assert.Equal("another MynaOps", ProjectDatabase.OpenElsewhere(p).Who);
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public sealed class MaintenanceGateTests : OpsFirstTestBase
     {
         var p = Project();
         using var s = ProjectSession.Open(p, heartbeat: false).Session!;
-        Assert.False(ProjectDatabase.OpenElsewhere(p, useMarker: false).IsOpen);
+        Assert.False(ProjectDatabase.OpenElsewhere(p).IsOpen);
         ProjectDatabase.Compact(p);
     }
 }

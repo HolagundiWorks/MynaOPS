@@ -307,7 +307,7 @@ public sealed class ProjectDatabasePage : Page
         }
         var reopenCad = _path is not null && ProjectLease.IsHeld(_path, ProjectLease.AppCad);
         if (!await CloseCadFirstAsync("Restore")) return;
-        bool ours = ActiveProject.SamePath(ProjectStore.Current.FilePath, _path);
+        bool ours = ProjectDatabase.SamePath(ProjectStore.Current.FilePath, _path);
         var lose = ours && ProjectStore.Current.IsDirty ? " Unsaved changes in MynaOps are discarded." : "";
         if (!await Confirm("Restore this backup?",
                 $"The project file is replaced by {Path.GetFileName(backup)}. The file as it is now is kept first as a before-restore backup.{lose}",
