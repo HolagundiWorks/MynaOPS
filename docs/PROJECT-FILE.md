@@ -11,8 +11,8 @@ A MynaOps project is a **project file, `.osp`**: one SQLite file that holds the 
 | Company file (suite-linked) | On save or calculate, mirrors **`aqc.project`** summaries (estimate + RA bills) into the company file so **MynaHub** project dashboards and fee proposals can read them; full JSON remains in the `.osp` |
 | Take-off page | Reads headers, rows and annotated PDFs from the `.osp` (`OdpTakeoffAdapter` feeds the same importer as before) |
 | Live | Every 2 s `ServedProject.PollAsync` reads `meta.revision`; a revision this app did not write raises "MynaCAD updated the take-off". Own saves are ignored (`NoteOwnRevision`) |
-| Opening MynaCAD's project | The active-project pointer `%LOCALAPPDATA%\O-Studio\active-project.json` names the `.osp` MynaCAD has open |
-| Double-click | The installer registers `.osp` with "Open in MynaOps" in the right-click menu |
+| Opening MynaCAD's project | MynaOps starts MynaCAD with `--managed --project`; the active-project pointer was removed in package E (a stale `active-project.json` is deleted at MynaOps start) |
+| Double-click | The installer registers `.osp` with the default verb **Open** = MynaOps (package E; an upgrade replaces the old MynaCAD default and removes the `ocoreop` verb) |
 
 Code: `Office.Shared/OdpFile.cs` (the format), `BBSApp/Services/ProjectFiles.cs`, `Services/Odp/{ServedProject,OdpTakeoffAdapter}.cs`, `Views/TakeoffPage.cs`.
 
@@ -28,7 +28,7 @@ Code: `Office.Shared/OdpFile.cs` (the format), `BBSApp/Services/ProjectFiles.cs`
 | Back up now | `VACUUM INTO` a temporary name in `<name>.backups\`, renamed to `<name> <UTC yyyyMMddTHHmmssZ> manual.osp`: the folder and names MynaCAD's engine uses (MynaCAD `docs/AUTOSAVE-BACKUP.md`). Safe while MynaCAD has the file open. Nothing is pruned here; MynaCAD prunes to its `BACKUPCOUNT` on its next save, counting these too |
 | Backups | The backups of the file, newest first; other files in the folder are ignored |
 | Restore selected | Only a listed backup; keeps the file as it is as a `before-restore` backup first, copies the backup to a temporary file, checkpoints, renames it over the file, removes `-wal`/`-shm`; MynaOps then reopens the project. Refused while the file is open elsewhere |
-| Open elsewhere | MynaCAD has it open when it holds `<hash>.cad.lock` (the lease, below); another MynaOps when it holds `<hash>.ops.lock`; the older marker (the active-project pointer and a running `ODraft.WinUi`) still counts until package E removes it; any other program is seen by its handle on the file (an exclusive open fails). With MynaCAD holding the project, the page asks it to close first (**Close MynaCAD**) before Compact or Restore, and refuses when it stays open |
+| Open elsewhere | MynaCAD has it open when it holds `<hash>.cad.lock` (the lease, below); another MynaOps when it holds `<hash>.ops.lock`; an older MynaCAD that holds no lease is still seen by its open handle on the file (the pointer marker was removed in package E); any other program is seen by its handle on the file (an exclusive open fails). With MynaCAD holding the project, the page asks it to close first (**Close MynaCAD**) before Compact or Restore, and refuses when it stays open |
 
 Nothing on the page changes the format: no table or column is added or altered and the revision does not move (a restore brings back the backup's own revision).
 

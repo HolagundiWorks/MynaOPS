@@ -52,7 +52,7 @@ internal sealed class NewProjectWindow : OpsWindow
     /// <summary>The path of the created project file, or null when the wizard was cancelled.</summary>
     public string? CreatedPath { get; private set; }
 
-    public NewProjectWindow(string? suggestedFolder = null) : base("New project", 760, 680)
+    public NewProjectWindow(string? suggestedFolder = null, string? suggestedName = null) : base("New project", 760, 680)
     {
         _folder.Text = suggestedFolder ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         AutomationProperties.SetAutomationId(Root, "NewProjectWizard");
@@ -83,6 +83,8 @@ internal sealed class NewProjectWindow : OpsWindow
         _next = OpsUi.Button("Next", true, "NewProject.Next", () => Go(_page + 1));
         _create = OpsUi.Button("Create project", true, "NewProject.Create", CreateNow);
         foreach (var b in new[] { _cancel, _back, _next, _create }) Footer.Children.Add(b);
+        // a drawing handed over by MynaCAD: the project is named after it (the file name follows the name)
+        if (!string.IsNullOrWhiteSpace(suggestedName)) { _name.Text = suggestedName.Trim(); _file.Text = SafeFile(_name.Text); }
         Go(0);
     }
 

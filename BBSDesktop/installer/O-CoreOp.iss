@@ -74,16 +74,15 @@ Source: "{#CadStage}\app\*"; DestDir: "{localappdata}\Programs\O-Draft"; Flags: 
 #endif
 
 [Registry]
-; The Myna Suite project file (.osp): a right-click "Open in MynaOps". Whichever app registered first stays the default (MynaCAD, when installed with the suite).
-Root: HKCU; Subkey: "Software\Classes\.osp"; ValueType: string; ValueName: ""; ValueData: "OSAS.Project"; Flags: createvalueifdoesntexist
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project"; ValueType: string; ValueName: ""; ValueData: "Myna Suite project"; Flags: createvalueifdoesntexist
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop"; ValueType: string; ValueName: ""; ValueData: "Open in MynaOps"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-CoreOp\{#MyAppExeName}"" ""%1"""
-#ifdef WithCad
-; Double-click opens the project in MynaCAD; MynaOps keeps the right-click verb. Neither starts the other app.
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open"; ValueType: string; ValueName: ""; ValueData: "Open in MynaCAD"; Flags: uninsdeletekey
-Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-Draft\ODraft.WinUi.exe"" ""%1"""
-#endif
+; The Myna Suite project file (.osp) opens in MynaOps only (docs/ops-first-workflow.md 16.2): MynaOps is the front door, MynaCAD is started from it.
+; Written without createvalueifdoesntexist so an upgrade replaces what an earlier install left (the default verb used to be "Open in MynaCAD").
+Root: HKCU; Subkey: "Software\Classes\.osp"; ValueType: string; ValueName: ""; ValueData: "OSAS.Project"
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project"; ValueType: string; ValueName: ""; ValueData: "Myna Suite project"
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell"; ValueType: string; ValueName: ""; ValueData: "open"
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open"; ValueType: string; ValueName: ""; ValueData: "Open"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{localappdata}\Programs\O-CoreOp\{#MyAppExeName}"" ""%1"""
+; The verb of earlier installs ("Open in MynaOps") is now the default verb above; remove the duplicate.
+Root: HKCU; Subkey: "Software\Classes\OSAS.Project\shell\ocoreop"; Flags: deletekey dontcreatekey
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"

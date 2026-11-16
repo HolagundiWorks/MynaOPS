@@ -53,6 +53,7 @@ The suite ships two installers, built by MynaHub's `installer/suite/build-all.ps
 launcher that hosted it was removed on 2026-11-11). Setup and the uninstaller stop a MynaOps that runs without a window as the
 AI host (`O-CoreOp.exe --ai-host`, matched by its command line) before they replace or remove files; a MynaOps window is left
 to Setup's usual close-applications step.
+The `.osp` association belongs to MynaOps only (`O-CoreOp.iss`, [ops-first-workflow.md](ops-first-workflow.md) 16.2): the default verb **Open** runs `O-CoreOp.exe "%1"`, written on every install so an upgrade replaces the old MynaCAD default, and the earlier `ocoreop` verb is deleted. MynaCAD registers nothing; its Start-menu and desktop shortcuts pass no argument (launch screen).
 
 ## Update channel (check-only)
 
