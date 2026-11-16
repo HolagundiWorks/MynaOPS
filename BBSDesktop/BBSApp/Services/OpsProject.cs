@@ -94,6 +94,44 @@ public static class OpsProject
     public static IReadOnlyList<StoreLevel> StoreLevels(ProjectStore store) =>
         store.Levels.Where(l => l.Id != "Lvl0").Select(l => new StoreLevel(l.Name, l.HeightMm, l.SlabThicknessMm, l.BeamDepthMm, l.ConfigCid)).ToList();
 
+    /// <summary>
+    /// Read <c>config.levels</c> back into the page's storeys (docs/ops-first-workflow.md section 15, L4): at open and when the Levels page is shown.
+    /// Does nothing while the page has unsaved edits, for a file without configuration, or when nothing differs. True when the storeys changed.
+    /// </summary>
+    public static bool ReadLevelsBack(ProjectStore store, string? path)
+    {
+        if (store.IsDirty || string.IsNullOrEmpty(path) || !ProjectFiles.IsOdp(path) || !File.Exists(path)) return false;
+        ProjectConfig cfg;
+        try
+        {
+            var loaded = ProjectConfig.Probe(path);
+            if (!loaded.Configured) return false;
+            cfg = loaded.Read.Config;
+        }
+        catch (Exception ex) when (ex is ConfigException or IOException or UnauthorizedAccessException or Microsoft.Data.Sqlite.SqliteException) { return false; }
+        var current = StoreLevels(store);
+        var merged = LevelReadback.Merge(current, cfg);
+        if (LevelReadback.Same(current, merged)) return false;
+        var plinth = store.Levels.FirstOrDefault(l => l.Id == "Lvl0");
+        var pool = store.Levels.Where(l => l.Id != "Lvl0").ToList();
+        var next = new List<LevelDef>();
+        foreach (var m in merged)
+        {
+            var def = pool.FirstOrDefault(l => m.Cid is { } c && l.ConfigCid == c) ?? pool.FirstOrDefault(l => l.ConfigCid is null && m.Cid is null && l.Name == m.Name) ?? pool.FirstOrDefault(l => l.ConfigCid is null && l.Name.Trim().Equals(m.Name.Trim(), StringComparison.OrdinalIgnoreCase));
+            if (def is null) def = new LevelDef { ShowMarker = true };
+            else pool.Remove(def);
+            def.Name = m.Name; def.HeightMm = m.HeightMm; def.SlabThicknessMm = m.SlabMm; def.BeamDepthMm = m.BeamMm; def.ConfigCid = m.Cid;
+            next.Add(def);
+        }
+        store.Levels.Clear();
+        if (plinth is not null) store.Levels.Add(plinth);
+        foreach (var d in next) store.Levels.Add(d);
+        store.EnsureDefaultLevels();
+        store.RenumberLevels();
+        store.Notify();
+        return true;
+    }
+
     /// <summary>After a publish: the page's storeys learn the <c>cid</c> the configuration gave them (a new storey gets one on its first publish).</summary>
     private static void RememberCids(ProjectStore store, OdpFile odp)
     {

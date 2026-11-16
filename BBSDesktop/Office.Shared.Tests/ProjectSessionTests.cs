@@ -70,6 +70,18 @@ public sealed class ProjectSessionTests : OpsFirstTestBase
     }
 
     [Fact]
+    public void A_fresh_holder_record_of_a_dead_MynaOps_on_this_pc_does_not_warn()
+    {
+        // MynaOps was killed a few seconds ago: its record is fresh, but the lease is free, so nothing on this PC holds the project.
+        var p = Project();
+        var dead = new SessionHolder(Environment.MachineName, "me", 4242, T0.AddMinutes(-5), T0.AddSeconds(-5));
+        using (var odp = OdpFile.Open(p)) odp.PutLocalMeta(SessionHolder.Key, dead.ToJson());
+        var opened = ProjectSession.Open(p, now: () => T0, heartbeat: false);
+        Assert.Equal(SessionRefusal.None, opened.Refusal);
+        opened.Session?.Dispose();
+    }
+
+    [Fact]
     public void A_stale_or_damaged_holder_does_not_block()
     {
         var p = Project();
