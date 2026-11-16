@@ -266,7 +266,7 @@ public sealed class ProjectStore
         var levels = new JsonArray();
         foreach (var l in Levels)
         {
-            levels.Add(new JsonObject
+            var levelJson = new JsonObject
             {
                 ["id"] = l.Id,
                 ["name"] = l.Name,
@@ -274,7 +274,9 @@ public sealed class ProjectStore
                 ["slab_thickness_mm"] = l.SlabThicknessMm,
                 ["beam_depth_mm"] = l.BeamDepthMm,
                 ["show_marker"] = l.ShowMarker ? 1 : 0
-            });
+            };
+            if (l.ConfigCid is { } cid) levelJson["config_cid"] = (long)cid;
+            levels.Add(levelJson);
         }
         var root = new JsonObject
         {
@@ -419,7 +421,8 @@ public sealed class ProjectStore
                     HeightMm = Num(o, "height_mm", 3000),
                     SlabThicknessMm = Num(o, "slab_thickness_mm", 150),
                     BeamDepthMm = Num(o, "beam_depth_mm", 450),
-                    ShowMarker = Num(o, "show_marker", 1) != 0
+                    ShowMarker = Num(o, "show_marker", 1) != 0,
+                    ConfigCid = o["config_cid"] is { } cc && Num(o, "config_cid", -1) is var cv && cv >= 0 ? (uint)cv : null
                 });
             }
         }

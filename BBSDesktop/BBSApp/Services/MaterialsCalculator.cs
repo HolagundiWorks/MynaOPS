@@ -18,6 +18,9 @@ public sealed class LevelDef : INotifyPropertyChanged
     private double _beamDepthMm = 450;
     private bool _showMarker = true;
 
+    /// <summary>The <c>cid</c> of this storey in <c>config.levels</c> (null until the project configuration names one); lets a rename keep its identity.</summary>
+    public uint? ConfigCid { get; set; }
+
     public string Id { get => _id; set { if (_id == value) return; _id = value; OnPropertyChanged(); } }
     public string Name { get => _name; set { if (_name == value) return; _name = value; OnPropertyChanged(); } }
     public double HeightMm

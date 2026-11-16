@@ -48,6 +48,27 @@ public sealed class ConfigPublishTests : OpsFirstTestBase
     }
 
     [Fact]
+    public void A_renamed_level_keeps_its_cid_and_a_new_level_gets_the_next()
+    {
+        var made = NewProjectBuilder.Create(Req());       // Basement 1 (cid 1), Ground (2), First (3), Second (4)
+        using var odp = OdpFile.Open(made.Path);
+        var cur = ProjectConfig.Read(odp).Read.Config.Levels!.Items.Where(i => i.ElevationMm >= 0).ToList();
+        var levels = new List<StoreLevel>();
+        foreach (var i in cur)
+            levels.Add(new StoreLevel(i.Name == "First Floor" ? "Level 1" : i.Name, i.HeightMm, i.SlabMm ?? 150, i.BeamMm ?? 450, i.Cid));
+        levels.Insert(1, new StoreLevel("Mezzanine", 2500, 150, 450));        // inserted above Ground: no cid yet
+        ConfigPublisher.Publish(odp, Details("P"), levels);
+        var items = ProjectConfig.Read(odp).Read.Config.Levels!.Items;
+        Assert.Equal(cur.Single(i => i.Name == "First Floor").Cid, items.Single(i => i.Name == "Level 1").Cid);
+        Assert.DoesNotContain(items, i => i.Name == "First Floor");
+        Assert.Equal(cur.Count + 1 + 1, items.Count);                                        // + the basement the page does not model
+        Assert.True(items.Single(i => i.Name == "Mezzanine").Cid > cur.Max(i => i.Cid));
+        // a document saved before cids were remembered still matches by name
+        var byName = items.Where(i => i.ElevationMm >= 0).Select(i => new StoreLevel(i.Name, i.HeightMm, i.SlabMm ?? 150, i.BeamMm ?? 450)).ToList();
+        Assert.Empty(ConfigPublisher.Publish(odp, Details("P"), byName)!.Changed);
+    }
+
+    [Fact]
     public void Publishing_what_is_there_changes_nothing()
     {
         var made = NewProjectBuilder.Create(Req());

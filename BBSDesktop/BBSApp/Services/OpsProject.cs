@@ -92,7 +92,16 @@ public static class OpsProject
 
     /// <summary>The storeys the Levels page holds, without the plinth (<c>Lvl0</c> is AQC's own and is not configuration).</summary>
     public static IReadOnlyList<StoreLevel> StoreLevels(ProjectStore store) =>
-        store.Levels.Where(l => l.Id != "Lvl0").Select(l => new StoreLevel(l.Name, l.HeightMm, l.SlabThicknessMm, l.BeamDepthMm)).ToList();
+        store.Levels.Where(l => l.Id != "Lvl0").Select(l => new StoreLevel(l.Name, l.HeightMm, l.SlabThicknessMm, l.BeamDepthMm, l.ConfigCid)).ToList();
+
+    /// <summary>After a publish: the page's storeys learn the <c>cid</c> the configuration gave them (a new storey gets one on its first publish).</summary>
+    private static void RememberCids(ProjectStore store, OdpFile odp)
+    {
+        var items = ProjectConfig.Read(odp).Read.Config.Levels?.Items;
+        if (items is null) return;
+        foreach (var l in store.Levels.Where(l => l.Id != "Lvl0" && l.ConfigCid is null))
+            if (items.FirstOrDefault(i => string.Equals(i.Name, l.Name.Trim(), StringComparison.OrdinalIgnoreCase)) is { } item) l.ConfigCid = item.Cid;
+    }
 
     public static StoreDetails StoreDetailsOf(ProjectStore store) =>
         new(store.Name, store.Info.ClientName, store.Info.Location, store.Info.Address, store.Info.Summary,
@@ -107,6 +116,7 @@ public static class OpsProject
         if (!ProjectFiles.IsOdp(path)) return null;
         using var odp = OdpFile.Open(path);
         var written = ConfigPublisher.Publish(odp, StoreDetailsOf(store), StoreLevels(store));
+        if (written is not null) RememberCids(store, odp);
         if (written is { Changed.Count: > 0 }) Services.Odp.ServedProject.NoteOwnRevision(path, written.Revision);
         return written;
     }
@@ -134,7 +144,7 @@ public static class OpsProject
         store.Levels.Add(new LevelDef { Id = "Lvl0", Name = "Plinth", HeightMm = 3200, SlabThicknessMm = d?.SlabMm ?? 150, BeamDepthMm = d?.BeamMm ?? 450 });
         var n = 1;
         foreach (var l in (cfg.Levels?.Items ?? Array.Empty<ConfigLevelItem>()).Where(i => i.ElevationMm >= 0).OrderBy(i => i.ElevationMm))
-            store.Levels.Add(new LevelDef { Id = "Lvl" + n++, Name = l.Name, HeightMm = l.HeightMm, SlabThicknessMm = l.SlabMm ?? d?.SlabMm ?? 150, BeamDepthMm = l.BeamMm ?? d?.BeamMm ?? 450 });
+            store.Levels.Add(new LevelDef { Id = "Lvl" + n++, Name = l.Name, HeightMm = l.HeightMm, SlabThicknessMm = l.SlabMm ?? d?.SlabMm ?? 150, BeamDepthMm = l.BeamMm ?? d?.BeamMm ?? 450, ConfigCid = l.Cid });
         store.EnsureDefaultLevels();
     }
 }
