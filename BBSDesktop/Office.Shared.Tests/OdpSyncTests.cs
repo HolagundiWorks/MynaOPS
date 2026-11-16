@@ -226,4 +226,58 @@ public class OdpSyncTests : IDisposable
         await Task.Delay(ProjectFileWatcher.DebounceMs * 3);
         Assert.Equal(after, Volatile.Read(ref polls));
     }
+
+    [Fact]
+    public async Task Realtime_off_pauses_the_detector_counts_waiting_with_one_probe_and_sync_now_reads_once()
+    {
+        var path = NewFile("rt.osp");
+        await SyncStatusService.SetRealtimeAsync(path, true);
+        try
+        {
+            await SyncStatusService.RefreshAsync(path);   // the baseline
+            Assert.Equal(SyncState.Synced, SyncStatusService.Current.State);
+            var reads = SyncStatusService.DetectorReads;
+
+            await SyncStatusService.SetRealtimeAsync(path, false);
+            Assert.Equal(reads + 1, SyncStatusService.DetectorReads);        // switching off: the one probe that counts what waits
+            Assert.Equal((SyncState.Paused, "Sync off"), (SyncStatusService.Current.State, SyncStatusService.Current.Text));
+            Assert.False(SyncStatusService.AllowDetect());
+
+            // The other program writes twice. With sync off the detector reads nothing and says nothing new.
+            using (var odp = OdpFile.Open(path)) { odp.SetProjectDoc("{\"a\":1}"); odp.SetProjectDoc("{\"a\":2}"); }
+            reads = SyncStatusService.DetectorReads;
+            for (var i = 0; i < 3; i++) await SyncStatusService.RefreshAsync(path);
+            Assert.Equal(reads, SyncStatusService.DetectorReads);
+            Assert.Equal("Sync off", SyncStatusService.Current.Text);
+
+            // The user looks: one probe, and the text says how many changes wait.
+            await SyncStatusService.ShowOffAsync(path);
+            Assert.Equal(reads + 1, SyncStatusService.DetectorReads);
+            Assert.Equal("Sync off - 2 changes waiting", SyncStatusService.Current.Text);
+            Assert.Equal(2, SyncStatusService.Waiting);
+
+            // Sync now: a forced look, then what is in the file is taken; nothing waits any more, and the switch stays off.
+            await SyncStatusService.RefreshAsync(path, force: true);
+            await SyncStatusService.AcceptAsync(path);
+            Assert.Equal("Sync off", SyncStatusService.Current.Text);
+            Assert.False(SyncStatusService.RealtimeOn);
+
+            // On again: the normal status returns and the detector reads.
+            await SyncStatusService.SetRealtimeAsync(path, true);
+            Assert.Equal(SyncState.Synced, SyncStatusService.Current.State);
+            reads = SyncStatusService.DetectorReads;
+            await SyncStatusService.RefreshAsync(path);
+            Assert.True(SyncStatusService.DetectorReads > reads);
+        }
+        finally { await SyncStatusService.SetRealtimeAsync(path, true); }
+    }
+
+    [Fact]
+    public void The_off_text_uses_the_words_of_both_apps()
+    {
+        Assert.Equal("Sync off", SyncStatusService.OffText(0));
+        Assert.Equal("Sync off - 1 change waiting", SyncStatusService.OffText(1));
+        Assert.Equal("Sync off - 7 changes waiting", SyncStatusService.OffText(7));
+        Assert.Equal("Sync off", OdpSync.Describe(SyncState.Paused, null));
+    }
 }

@@ -424,6 +424,19 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             };
             SubRibbonTabs.Children.Add(button);
         }
+        // Project group: realtime sync switch and Sync now (actions, not pages).
+        if (section?.Id == "project")
+        {
+            var on = SyncStatusService.RealtimeOn;
+            var toggle = RibbonTabButton(on ? "Realtime sync: on" : "Realtime sync: off", false, joinsBrush: BrushRes("HcwFogBrush", Color.FromArgb(255, 0xF4, 0xF5, 0xF7)));
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(toggle, "Ribbon.SyncToggle");
+            toggle.Click += async (_, _) => await SetRealtimeSyncAsync(!SyncStatusService.RealtimeOn);
+            SubRibbonTabs.Children.Add(toggle);
+            var now = RibbonTabButton("Sync now", false, joinsBrush: BrushRes("HcwFogBrush", Color.FromArgb(255, 0xF4, 0xF5, 0xF7)));
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetAutomationId(now, "Ribbon.SyncNow");
+            now.Click += async (_, _) => await SyncNowAsync();
+            SubRibbonTabs.Children.Add(now);
+        }
     }
 
     /// <summary>One text tab. Open: the colour of what is below it, edges on three sides, taller by the ribbon line.</summary>
@@ -1206,6 +1219,7 @@ public sealed partial class MainWindow : Window, IAppCommandBus, IAssistantConfi
             sync.Visibility = s.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
             ToolTipService.SetToolTip(sync, s.State switch
             {
+                SyncState.Paused => "Realtime sync is off. Changes made in MynaCAD wait until you press Sync now or switch sync on. Saving is not paused.",
                 SyncState.Updated => "The project file was changed by another program. Open the Take-off page to read it.",
                 SyncState.OutOfDate => "The drawing was saved after this take-off was recorded. Record it again in MynaCAD.",
                 SyncState.Locked => "Another program holds the project file right now. It is checked again every two seconds.",

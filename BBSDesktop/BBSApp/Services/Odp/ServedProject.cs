@@ -25,11 +25,14 @@ public static class ServedProject
     }
 
     /// <summary>Look at the project file once (the main window calls this every two seconds); a revision nobody here wrote raises <see cref="Changed"/>.</summary>
-    public static async Task PollAsync(string? projectPath)
+    public static async Task PollAsync(string? projectPath, bool force = false)
     {
+        // Realtime sync off (docs/ops-first-workflow.md section 15): neither the 2 s timer nor the watcher reads the file; Sync now forces one look.
+        if (!SyncStatusService.AllowDetect(force)) return;
         long n = -1;
         if (ProjectFiles.IsOdp(projectPath))
         {
+            SyncStatusService.NoteDetectorRead();
             try { n = await Task.Run(() => { using var odp = OdpFile.Open(projectPath!); return odp.Revision(); }).ConfigureAwait(true); }
             catch (Exception ex) when (ex is IOException or InvalidDataException or Microsoft.Data.Sqlite.SqliteException) { n = -1; }
         }
@@ -37,6 +40,6 @@ public static class ServedProject
         bool outside = n >= 0 && _count >= 0 && n != _count && n != own;
         _count = n;
         if (outside) Changed?.Invoke();
-        await SyncStatusService.RefreshAsync(projectPath).ConfigureAwait(true);   // read only; the same poll, no second timer
+        await SyncStatusService.RefreshAsync(projectPath, force).ConfigureAwait(true);   // read only; the same poll, no second timer
     }
 }
